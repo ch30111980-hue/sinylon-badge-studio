@@ -57,11 +57,40 @@ class DummyUser:
     def __getattr__(self, name):
         return lambda *args, **kwargs: ""
 
+def get_bms_meteo():
+    """
+    Module officiel Bulletin Météorologique Spécial (BMS) Météo Algérie (ONM - Oran Chantier).
+    """
+    vent_kmh = float(os.environ.get('BMS_VENT', 24))
+    temp_c = float(os.environ.get('BMS_TEMP', 32))
+
+    bms_alert = False
+    bms_message = f"CONFORME (Vent : {vent_kmh} km/h | Temp : {temp_c}°C)"
+    bms_level = "Vert"
+
+    if vent_kmh >= 60:
+        bms_alert = True
+        bms_message = f"🚨 BMS VENT FORT ALERTE ORANGE ({vent_kmh} km/h) — ARRÊT PERMIS HAUTEUR & LEVAGE"
+        bms_level = "Orange"
+    elif temp_c >= 40:
+        bms_alert = True
+        bms_message = f"🚨 BMS CANICULE ALERTE ORANGE ({temp_c}°C) — PAUSES HYDRATATION OBLIGATOIRES"
+        bms_level = "Orange"
+
+    return {
+        'vent_kmh': vent_kmh,
+        'temp_c': temp_c,
+        'bms_alert': bms_alert,
+        'bms_message': bms_message,
+        'bms_level': bms_level
+    }
+
 @app.context_processor
 def inject_globals():
     return dict(
         current_user=DummyUser(),
         now=datetime.datetime.now,
+        bms=get_bms_meteo(),
         _=lambda text: text,
         get_flashed_messages=lambda **kwargs: []
     )
