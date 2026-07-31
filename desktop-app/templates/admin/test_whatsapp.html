@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Testeur WhatsApp — SINYLON FIAT{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1"><i class="fab fa-whatsapp text-success me-2"></i>Testeur de Notifications WhatsApp</h2>
+            <p class="text-muted small mb-0">Testez l'envoi direct wa.me et l'API automatique en temps réel.</p>
+        </div>
+        <div>
+            <a href="{{ url_for('main.config_whatsapp') }}" class="btn btn-success btn-sm fw-bold me-2"><i class="fas fa-cog me-1"></i> Configurer API Meta</a>
+            <a href="{{ url_for('main.SINYLON FIAT_dashboard') }}" class="btn btn-outline-secondary btn-sm fw-bold">← Retour Dashboard</a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Formulaire de Test -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0" style="border-radius:14px;">
+                <div class="card-header bg-dark text-white fw-bold py-3" style="border-radius:14px 14px 0 0;">
+                    <i class="fas fa-paper-plane me-2 text-warning"></i> Formulaire de Test WhatsApp
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('main.test_whatsapp') }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Numéro de Téléphone *</label>
+                            <input type="text" name="phone" class="form-control font-monospace" placeholder="ex: 0550112233 ou 213550112233" value="{{ test_phone or '' }}" required>
+                            <div class="form-text small">Accepte les formats 05..., 06..., 07... ou 213...</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Clé API CallMeBot (Optionnel)</label>
+                            <input type="text" name="apikey" class="form-control font-monospace" placeholder="ex: 849204 (Laissez vide pour lien 1-Click)" value="{{ test_apikey or '' }}">
+                            <div class="form-text small">
+                                💡 Pour obtenir votre API Key gratuite : Envoyez <code>I allow callmebot to send me messages</code> au <strong>+34 644 71 90 61</strong> sur WhatsApp.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Message de Test</label>
+                            <textarea name="message" class="form-control" rows="3">{{ test_message or "🔔 SINYLON FIAT — Test de notification WhatsApp réussi sur le chantier FIAT Tafraoui !" }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 fw-bold py-2 shadow-sm">
+                            <i class="fab fa-whatsapp me-2"></i> Lancer le Test WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Résultats du Test -->
+        <div class="col-md-6">
+            {% if test_run %}
+            <div class="card shadow-sm border-0 mb-4" style="border-radius:14px; background:#f8fafc;">
+                <div class="card-header bg-success text-white fw-bold py-3" style="border-radius:14px 14px 0 0;">
+                    <i class="fas fa-check-circle me-2"></i> Résultats du Diagnostic
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <span class="text-muted small d-block">Numéro Formaté (International) :</span>
+                        <strong class="font-monospace fs-5 text-primary">{{ clean_phone }}</strong>
+                    </div>
+
+                    <!-- 1-Click WhatsApp Direct -->
+                    <div class="p-3 mb-3 border rounded-3 bg-white">
+                        <h6 class="fw-bold text-success mb-2"><i class="fab fa-whatsapp me-1"></i> Option 1 : Lien Direct 1-Click (100% Gratuit)</h6>
+                        <p class="small text-muted mb-2">Fonctionne immédiatement sans aucune clé API ni inscription.</p>
+                        <a href="{{ wa_link }}" target="_blank" class="btn btn-success fw-bold w-100 py-2">
+                            <i class="fab fa-whatsapp me-2"></i> Ouvrir WhatsApp Direct (1-Click)
+                        </a>
+                    </div>
+
+                    <!-- API Automatique Background -->
+                    <div class="p-3 border rounded-3 bg-white">
+                        <h6 class="fw-bold mb-2">
+                            {% if api_success %}
+                            <span class="text-success"><i class="fas fa-check-circle me-1"></i> Option 2 : API Arrière-Plan réussie !</span>
+                            {% else %}
+                            <span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Option 2 : Échec API Arrière-Plan (HTTP {{ status_code }})</span>
+                            {% endif %}
+                        </h6>
+                        <p class="small text-muted mb-2">Réponse exacte reçue de la passerelle :</p>
+                        <pre class="p-2 bg-dark text-light rounded small font-monospace mb-0" style="max-height: 120px; overflow-y: auto;">{{ api_response }}</pre>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card shadow-sm border-0 p-4 text-center text-muted" style="border-radius:14px; background:#f8fafc;">
+                <i class="fab fa-whatsapp fa-4x text-success mb-3 opacity-50"></i>
+                <h5 class="fw-bold text-dark">Prêt pour le Test</h5>
+                <p class="small mb-0">Renseignez votre numéro de téléphone à gauche et cliquez sur "Lancer le Test WhatsApp".</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

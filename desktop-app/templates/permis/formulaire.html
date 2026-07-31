@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Nouveau Permis{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Tableau de Bord
+        </a>
+        <div class="dropdown">
+            <button class="btn btn-outline-success shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-plus-circle me-2"></i> Nouvelle Demande de Permis
+            </button>
+            <ul class="dropdown-menu shadow border-0">
+                <li><a class="dropdown-item" href="{{ url_for('permis.nouveau') }}">
+                    <i class="fas fa-file-signature me-2 text-primary"></i> <strong>DEMANDE DE PERMIS (SINYLON FIAT)</strong> — En ligne
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header small text-uppercase fw-bold">Permis Papier SINYLON FIAT</h6></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='securite_generale') }}">
+                    <i class="fas fa-file-contract me-2 text-dark"></i> <strong>RECTO (P1)</strong> — Sécurité Générale
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='revalidation') }}">
+                    <i class="fas fa-sync me-2 text-secondary"></i> <strong>VERSO (P2)</strong> — Revalidation
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='hauteur') }}">
+                    <i class="fas fa-hard-hat me-2 text-primary"></i> <strong>BLEUE (A)</strong> — Travail en Hauteur
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='chaud') }}">
+                    <i class="fas fa-fire me-2 text-danger"></i> <strong>ROUGE (B)</strong> — Travail à Chaud
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='levage') }}">
+                    <i class="fas fa-dolly me-2 text-warning"></i> <strong>JAUNE (C)</strong> — Permis de Levage
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='espace_confine') }}">
+                    <i class="fas fa-door-closed me-2 text-success"></i> <strong>CYAN (E)</strong> — Espace Confiné
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='fouille') }}">
+                    <i class="fas fa-shovel me-2" style="color: #2e7d32;"></i> <strong>PERMIS D'EXCAVATION (F)</strong>
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='electrique') }}">
+                    <i class="fas fa-bolt me-2" style="color: #ff9500;"></i> <strong>ORANGE (G)</strong> — Consignation Électrique
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='vehicule') }}">
+                    <i class="fas fa-car me-2 text-info"></i> <strong>VIOLETTE (D)</strong> — Permis d'Entrée Véhicule
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='materiel') }}">
+                    <i class="fas fa-toolbox me-2 text-secondary"></i> <strong>MATÉRIELS</strong> — Autorisation d'utilisation
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">Nouvelle Demande de Permis SINYLON FIAT</div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Entreprise Intervenante</label>
+                        <input type="text" name="entreprise_intervenante" class="form-control" value="{{ request.args.get('entreprise_intervenante') or (prefill_permis.entreprise_intervenante if prefill_permis else '') or current_user.entreprise }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type de Permis</label>
+                        <select name="type_permis" class="form-select" required>
+                            <option value="SINYLON FIAT">SINYLON FIAT (Général)</option>
+                            <option value="Hauteur">Travail en Hauteur (Bleue / A)</option>
+                            <option value="Chaud">Travail à Chaud (Rouge / B)</option>
+                            <option value="Levage">Permis de Levage (Jaune / C)</option>
+                            <option value="Confiné">Espace Confiné (Cyan / E)</option>
+                            <option value="Excavation">Permis d'Excavation (F)</option>
+                            <option value="Électrique">Consignation Électrique (Orange / G)</option>
+                            <option value="Véhicule">Permis d'Entrée Véhicule (Violette / D)</option>
+                            <option value="Matériel">Autorisation d'utilisation de matériels</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Zone de Travail</label>
+                        <input type="text" name="zone_travail" class="form-control" value="{{ request.args.get('zone_travail') or (prefill_permis.zone_travail if prefill_permis else '') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Équipement</label>
+                        <input type="text" name="equipement" class="form-control" value="{{ request.args.get('equipement') or (prefill_permis.equipement if prefill_permis else '') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description_activite" class="form-control" rows="3">{{ request.args.get('description_activite') or (prefill_permis.description_activite if prefill_permis else '') }}</textarea>
+                    </div>
+
+                    <!-- Workers checklist -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold"><i class="fas fa-users text-success me-2"></i> Travailleurs affectés au permis</label>
+                        <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto; background: #fafafa;">
+                            {% if active_badges %}
+                                <div class="row g-2">
+                                {% for b in active_badges %}
+                                    <div class="col-md-6">
+                                        <div class="card p-2 h-100 {% if b.is_blocked %}border-danger bg-light{% endif %}" style="border: 1px solid #ddd; border-radius:6px;">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="form-check m-0">
+                                                    <input class="form-check-input" type="checkbox" name="travailleurs" value="{{ b.id }}" id="worker_{{ b.id }}" {% if b.is_blocked %}disabled{% endif %}>
+                                                </div>
+                                                {% if b.photo_filename %}
+                                                    <img src="{{ b.get_photo_url() }}" style="width:35px; height:35px; border-radius:50%; object-fit:cover; border:1px solid #ccc;">
+                                                {% else %}
+                                                    <div style="width:35px; height:35px; border-radius:50%; background:#e0e0e0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; color:#777;">{{ b.prenom[0] }}{{ b.nom[0] }}</div>
+                                                {% endif %}
+                                                <div style="flex:1; min-width:0;">
+                                                    <label for="worker_{{ b.id }}" class="m-0 fw-bold d-block text-truncate" style="font-size:13px; cursor:{% if b.is_blocked %}not-allowed{% else %}pointer{% endif %}; {% if b.is_blocked %}color:#999; text-decoration:line-through;{% endif %}">
+                                                        {{ b.prenom }} {{ b.nom }}
+                                                    </label>
+                                                    <small class="text-muted d-block" style="font-size:11px;">N.{{ b.numero_badge }} | {{ b.fonction }}</small>
+                                                    {% if b.is_blocked %}
+                                                        <span class="badge bg-danger text-white" style="font-size:9px; padding:2px 5px; border-radius:3px;">🚫 BLOQUÉ : {{ b.motif_blocage or 'Sécurité' }}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center text-muted small py-3">Aucun travailleur actif trouvé. Veuillez d'abord créer des badges.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Dual Drag and Drop Zones -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="form-label fw-bold"><i class="fas fa-file-upload text-success me-1"></i> Plan de Travail (Obligatoire / Recommandé)</label>
+                            <div class="drag-drop-zone border-2 border-dashed rounded p-3 text-center cursor-pointer position-relative" style="border: 2px dashed #ccc; background:#fafafa; border-radius:8px; transition:all 0.3s;" id="drop-zone-plan">
+                                <i class="fas fa-map-marked-alt text-success fa-2x mb-2"></i>
+                                <p class="mb-1 small fw-bold">Glissez-déposez le plan de travail ici</p>
+                                <span class="text-muted small d-block mb-2" style="font-size:10px;">ou cliquez pour parcourir</span>
+                                <input type="file" name="plan_joint" id="plan_joint" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept=".pdf,.png,.jpg,.jpeg" style="cursor:pointer;">
+                                <div class="file-name-display text-success small fw-bold mt-2" id="plan-file-name" style="font-size:11px;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold"><i class="fas fa-paperclip text-success me-1"></i> Pièces Jointes / Photo / Équipement</label>
+                            <div class="drag-drop-zone border-2 border-dashed rounded p-3 text-center cursor-pointer position-relative" style="border: 2px dashed #ccc; background:#fafafa; border-radius:8px; transition:all 0.3s;" id="drop-zone-fichier">
+                                <i class="fas fa-file-invoice text-success fa-2x mb-2"></i>
+                                <p class="mb-1 small fw-bold">Glissez-déposez vos fichiers ici</p>
+                                <span class="text-muted small d-block mb-2" style="font-size:10px;">ou cliquez pour parcourir</span>
+                                <input type="file" name="fichier_joint" id="fichier_joint" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" style="cursor:pointer;">
+                                <div class="file-name-display text-success small fw-bold mt-2" id="fichier-file-name" style="font-size:11px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Date Début</label>
+                            <input type="date" name="date_debut" class="form-control" required>
+                            <input type="time" name="heure_debut" class="form-control mt-2">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date Fin</label>
+                            <input type="date" name="date_fin" class="form-control" required>
+                            <input type="time" name="heure_fin" class="form-control mt-2">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100 shadow-sm"><i class="fas fa-check me-2"></i> Soumettre la Demande</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const planInput = document.getElementById('plan_joint');
+    const planName = document.getElementById('plan-file-name');
+    const planZone = document.getElementById('drop-zone-plan');
+    
+    planInput.addEventListener('change', (e) => {
+        if (planInput.files.length > 0) {
+            planName.textContent = "🗺️ Plan sélectionné : " + planInput.files[0].name;
+            planZone.style.borderColor = '#198754';
+            planZone.style.background = '#eefdf4';
+        }
+    });
+
+    const fileInput = document.getElementById('fichier_joint');
+    const fileName = document.getElementById('fichier-file-name');
+    const fileZone = document.getElementById('drop-zone-fichier');
+    
+    fileInput.addEventListener('change', (e) => {
+        if (fileInput.files.length > 0) {
+            fileName.textContent = "📄 Document sélectionné : " + fileInput.files[0].name;
+            fileZone.style.borderColor = '#198754';
+            fileZone.style.background = '#eefdf4';
+        }
+    });
+</script>
+{% endblock %}

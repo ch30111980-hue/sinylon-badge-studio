@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SINYLON Badge Studio Pro</title>
+  <!-- Sinylon Ultra-Fast Dark Glass Design System -->
+  <link rel="stylesheet" href="/static/css/sinylon.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .worker-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary-cyan);
+      background: #1e293b;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: var(--primary-cyan);
+      font-size: 15px;
+      box-shadow: 0 0 10px rgba(14, 165, 233, 0.2);
+    }
+    .btn-action-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .role-badge {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .tab-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-glass);
+      padding-bottom: 12px;
+    }
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--border-glass);
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .status-blocked {
+      background: rgba(220, 38, 38, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .form-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 24px;
+    }
+    .permit-paper-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .permit-paper-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+    .permit-paper-card:hover {
+      border-color: var(--primary-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(14, 165, 233, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="brand">
+      <div class="brand-logo-badge">SINYLON</div>
+      <div>
+        <div class="brand-title">Badge Studio Pro & HSE</div>
+        <div class="brand-subtitle">
+          <span style="display: inline-flex; align-items: center; gap: 6px; color: #34d399; font-weight: 700; font-size: 11px; background: rgba(52, 211, 153, 0.12); padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(52, 211, 153, 0.3); margin-right: 8px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399;"></span> SERVEUR ACTIF 0.0.0.0:5050
+          </span>
+          Badges Certifiés, Permis HSE & Caisse NFC
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <a href="/badge/caisse" target="_blank" class="btn-secondary" style="background: rgba(14, 165, 233, 0.15); border-color: rgba(14, 165, 233, 0.4); color: #38bdf8; font-weight: 700;">
+        <i data-lucide="shield-check"></i> 💳 Caisse & Contrôle d'Accès NFC
+      </a>
+      <button class="btn-primary" onclick="openAddModal()">
+        <i data-lucide="user-plus"></i> Nouveau Travailleur
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container">
+
+    <!-- NAVIGATION TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('tab-workers', this)">
+        <i data-lucide="users"></i> 1. Personnel & Badges Officiels
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-qrcodes', this)">
+        <i data-lucide="qr-code"></i> 2. 📱 Galerie QR Codes Terrain
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-permits', this)">
+        <i data-lucide="file-check"></i> 3. Permis de Travail HSE (Noro-Unified)
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-forms', this)">
+        <i data-lucide="clipboard-list"></i> 4. Fiches Remplissables du Bureau
+      </button>
+    </div>
+
+    <!-- TAB 1 : PERSONNEL & BADGES -->
+    <div id="tab-workers" class="tab-content active">
+
+      <!-- URGENCE HSE BANNER -->
+      <div style="background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.4); border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px; color: #ef4444; font-weight: 700; font-size: 0.95rem;">
+          <i data-lucide="phone-call"></i>
+          <span>🚨 CONTACT URGENCE HSE CHANTIER :</span>
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 800; color: #ffffff;">
+          Nouri : <a href="tel:0563765157" style="color: #f87171; text-decoration: none;">0563765157</a>
+        </div>
+      </div>
+
+      <!-- METRICS DASHBOARD -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon">
+            <i data-lucide="users"></i>
+          </div>
+          <div class="metric-data">
+            <div class="value">{{ workers|length }}</div>
+            <div class="label">Travailleurs Enregistrés</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">
+            <i data-lucide="badge-check"></i>
+          </div>
+          <div class="metric-data">
+            <div class="value">{{ workers|length }}</div>
+            <div class="label">Badges Accrédités</div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">
+            <i data-lucide="printer"></i>
+          </div>
+          <div class="metric-data">
+            <div class="value">{{ print_count }}</div>
+            <div class="label">Impressions Effectuées</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLEAU WORKERS AVEC CASE À COCHER & MULTI-IMPRESSION -->
+      <div class="card-section">
+        <form id="batchSelectForm" action="/api/print/selected" method="POST" target="_blank">
+          <div class="section-header">
+            <h2 class="section-title">👥 Flotte des Travailleurs Sinylon ({{ workers|length }})</h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <input type="text" id="searchInput" class="search-input" placeholder="⚡ Recherche nom, matricule, grade..." onkeyup="filterTable()">
+              <button type="button" id="selectAllBtn" class="btn-secondary" onclick="toggleSelectAllBtn()">
+                <i data-lucide="check-square"></i> Tout Cocher
+              </button>
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <i data-lucide="printer"></i> Imprimer les Coché(e)s
+              </button>
+              <a href="/api/print/batch" target="_blank" class="btn-secondary">
+                <i data-lucide="printer"></i> Tout Imprimer (A4)
+              </a>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="table-custom" id="workersTable">
+              <thead>
+                <tr>
+                  <th style="width: 30px;"><input type="checkbox" id="masterCheckbox" onchange="toggleSelectAll(this)"></th>
+                  <th style="width: 50px;">N°</th>
+                  <th style="width: 50px;">Photo</th>
+                  <th>Matricule</th>
+                  <th>Nom & Prénom</th>
+                  <th>Fonction / Grade</th>
+                  <th>Entreprise</th>
+                  <th>Statut</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for w in workers %}
+                <tr>
+                  <td><input type="checkbox" name="worker_ids" value="{{ w.id }}" class="worker-checkbox"></td>
+                  <td><span style="background: rgba(14, 165, 233, 0.15); color: var(--primary-cyan); font-weight: 800; padding: 3px 8px; border-radius: 6px; font-size: 13px;">N° {{ w.seq_id }}</span></td>
+                  <td>
+                    {% if w.photo_path %}
+                      <img src="{{ w.photo_path }}" class="worker-avatar" alt="Photo {{ w.nom }}">
+                    {% else %}
+                      <div class="worker-avatar">{{ w.prenom[0] if w.prenom else '' }}{{ w.nom[0] if w.nom else 'S' }}</div>
+                    {% endif %}
+                  </td>
+                  <td><strong style="color: var(--primary-cyan);">{{ w.matricule }}</strong></td>
+                  <td><strong style="color: #ffffff;">{{ w.prenom }} {{ w.nom|upper }}</strong></td>
+                  <td><span class="role-badge">{{ w.fonction }}</span></td>
+                  <td><strong style="color: #38bdf8;">Sinylon</strong></td>
+                  <td>
+                    <div class="toggle-switch-wrapper" onclick="toggleBlock({{ w.id }})" title="Cliquer pour basculer le statut Actif / Inactif">
+                      <input type="checkbox" {{ 'checked' if w.status == 'Actif' else '' }} class="toggle-switch-input" readonly>
+                      <div class="toggle-switch-slider">
+                        <div class="toggle-switch-knob"></div>
+                      </div>
+                      <span class="toggle-switch-label {{ 'text-success' if w.status == 'Actif' else 'text-danger' }}">
+                        {{ 'Actif' if w.status == 'Actif' else 'Inactif' }}
+                      </span>
+                    </div>
+                  </td>
+                  <td style="text-align: right;">
+                    <div class="btn-action-group">
+                      <a href="/api/print/single/{{ w.id }}" target="_blank" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Imprimer
+                      </a>
+                      <button type="button" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('{{ w.matricule }}', '{{ w.prenom }} {{ w.nom|upper }}')">
+                        <i data-lucide="qr-code" style="width: 14px; height: 14px;"></i> QR Code
+                      </button>
+                      <button type="button" class="btn-secondary btn-sm" onclick="previewBadge({{ w.id }}, '{{ w.prenom }} {{ w.nom }}')">
+                        <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Aperçu
+                      </button>
+                      <button type="button" class="btn-secondary btn-sm" onclick="openEditModal({{ w.id }}, '{{ w.nom }}', '{{ w.prenom }}', '{{ w.matricule }}', '{{ w.fonction }}', '{{ w.status }}')">
+                        <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+                      </button>
+                      <button type="button" class="btn-secondary btn-sm" style="color: #ef4444;" onclick="deleteWorker({{ w.id }}, '{{ w.prenom }} {{ w.nom }}')">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- TAB 2 : GALERIE QR CODES TERRAIN -->
+    <div id="tab-qrcodes" class="tab-content">
+      <div class="card-section">
+        <div class="section-header">
+          <h2 class="section-title">📱 Galerie des QR Codes Terrain ({{ workers|length }})</h2>
+          <span style="font-size: 13px; color: var(--text-muted);">QR Codes fixes scannables par appareil photo iPhone / Android</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+          {% for w in workers %}
+          <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass-strong); border-radius: 18px; padding: 20px; text-align: center; position: relative; box-shadow: var(--shadow-card);">
+            <!-- PHOTO DU TRAVAILLEUR -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 14px; background: rgba(30, 41, 59, 0.6); padding: 10px; border-radius: 12px;">
+              {% if w.photo_path %}
+                <img src="{{ w.photo_path }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-cyan);" alt="Photo {{ w.nom }}">
+              {% else %}
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; border: 2px solid var(--primary-cyan);">
+                  {{ w.prenom[0] if w.prenom else '' }}{{ w.nom[0] if w.nom else 'S' }}
+                </div>
+              {% endif %}
+              <div style="text-align: left;">
+                <div style="font-weight: 800; font-size: 14px; color: #ffffff;">{{ w.prenom }} {{ w.nom|upper }}</div>
+                <div style="font-size: 12px; color: var(--primary-cyan); font-weight: 700;">{{ w.matricule }}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">{{ w.fonction }}</div>
+              </div>
+            </div>
+
+            <!-- QR CODE HD -->
+            <img src="/api/qr/png/{{ w.matricule }}" style="width: 170px; height: 170px; border-radius: 12px; background: white; padding: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); margin-bottom: 14px;">
+
+            <div style="display: flex; gap: 8px; justify-content: center;">
+              <button type="button" class="btn-primary btn-sm" onclick="openQrModal('{{ w.matricule }}', '{{ w.prenom }} {{ w.nom|upper }}')">
+                <i data-lucide="maximize-2"></i> Voir HD
+              </button>
+              <a href="/api/qr/png/{{ w.matricule }}" download="QR_{{ w.matricule }}.png" target="_blank" class="btn-secondary btn-sm">
+                <i data-lucide="download"></i> PNG
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3 : PERMIS DE TRAVAIL HSE (MODÈLES PAPIER NORO-UNIFIED) -->
+    <div id="tab-permits" class="tab-content">
+      
+      <div class="card-section mb-4">
+        <div class="section-header">
+          <h2 class="section-title">📄 Modèles Permis Papier Officiels (Noro-Unified) à Remplir / Imprimer</h2>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">Cliquez sur n'importe quel permis ci-dessous pour ouvrir directement le formulaire papier officiel issu de Noro-Unified prêt à remplir et imprimer :</p>
+        
+        <div class="permit-paper-grid">
+          <div class="permit-paper-card">
+            <div>
+              <h3 style="color: #f59e0b; margin-bottom: 6px;">🔥 Permis Travaux à Chaud (Feu)</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Formulaire officiel pour meulage, découpe, soudure.</p>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <a href="/permis/papier/chaud" target="_blank" class="btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                <i data-lucide="external-link"></i> Remplir
+              </a>
+              <button type="button" class="btn-primary btn-sm" style="flex: 1; background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('PERM-FEU-01', 'Permis Feu (Travaux à Chaud)')">
+                <i data-lucide="qr-code"></i> QR Code
+              </button>
+            </div>
+          </div>
+
+          <div class="permit-paper-card">
+            <div>
+              <h3 style="color: #10b981; margin-bottom: 6px;">🚜 Permis Fouille & Excavation</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Formulaire officiel pour terrassement et tranchées > 1.3m.</p>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <a href="/permis/papier/fouille" target="_blank" class="btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                <i data-lucide="external-link"></i> Remplir
+              </a>
+              <button type="button" class="btn-primary btn-sm" style="flex: 1; background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('PERM-FOUILLE-01', 'Permis Fouille & Excavation')">
+                <i data-lucide="qr-code"></i> QR Code
+              </button>
+            </div>
+          </div>
+
+          <div class="permit-paper-card">
+            <div>
+              <h3 style="color: #ef4444; margin-bottom: 6px;">☣️ Permis Espace Confiné</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Formulaire officiel pour travaux en cuve, réservoir, silo.</p>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <a href="/permis/papier/espace_confine" target="_blank" class="btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                <i data-lucide="external-link"></i> Remplir
+              </a>
+              <button type="button" class="btn-primary btn-sm" style="flex: 1; background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('PERM-CONFINE-01', 'Permis Espace Confiné')">
+                <i data-lucide="qr-code"></i> QR Code
+              </button>
+            </div>
+          </div>
+
+          <div class="permit-paper-card">
+            <div>
+              <h3 style="color: #3b82f6; margin-bottom: 6px;">⚡ Permis Habilitation Électrique</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Formulaire officiel pour consignation et travaux sous tension.</p>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <a href="/permis/papier/electrique" target="_blank" class="btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                <i data-lucide="external-link"></i> Remplir
+              </a>
+              <button type="button" class="btn-primary btn-sm" style="flex: 1; background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('PERM-ELEC-01', 'Permis Électrique')">
+                <i data-lucide="qr-code"></i> QR Code
+              </button>
+            </div>
+          </div>
+
+          <div class="permit-paper-card">
+            <div>
+              <h3 style="color: #8b5cf6; margin-bottom: 6px;">🧗 Permis Travail en Hauteur</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Formulaire officiel pour travaux > 2m avec harnais.</p>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <a href="/permis/papier/hauteur" target="_blank" class="btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                <i data-lucide="external-link"></i> Remplir
+              </a>
+              <button type="button" class="btn-primary btn-sm" style="flex: 1; background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('PERM-HAUTEUR-01', 'Permis Travail en Hauteur')">
+                <i data-lucide="qr-code"></i> QR Code
+              </button>
+            </div>
+          </div>
+
+          <div class="permit-paper-card">
+            <div>
+              <h3 style="color: #ec4899; margin-bottom: 6px;">🏗️ Permis Levage & Manutention</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Formulaire officiel pour levages critiques par grue.</p>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <a href="/permis/papier/levage" target="_blank" class="btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                <i data-lucide="external-link"></i> Remplir
+              </a>
+              <button type="button" class="btn-primary btn-sm" style="flex: 1; background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('PERM-LEVAGE-01', 'Permis Levage & Grue')">
+                <i data-lucide="qr-code"></i> QR Code
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-section mb-4">
+        <div class="section-header">
+          <h2 class="section-title">📜 Permis de Travail Enregistrés dans le Système</h2>
+          <button class="btn-primary" onclick="openPermitModal()">
+            <i data-lucide="plus-circle"></i> Créer un Permis de Travail
+          </button>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Réf. Permis</th>
+                <th>Type Permis</th>
+                <th>Demandeur / Responsable</th>
+                <th>Zone Chantier</th>
+                <th>Météo (Vent/Temp)</th>
+                <th>Statut HSE</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in permits %}
+              <tr>
+                <td><strong style="color: var(--primary-cyan);">{{ p.ref_num }}</strong></td>
+                <td><span class="role-badge">{{ p.type_permis }}</span></td>
+                <td><strong>{{ p.demandeur }}</strong></td>
+                <td>{{ p.zone }}</td>
+                <td>💨 {{ p.vent_kmh }} km/h | 🌡️ {{ p.temp_celsius }}°C</td>
+                <td>
+                  {% if p.status == 'VALIDE' %}
+                    <span class="status-badge-active">✓ VALIDE</span>
+                  {% else %}
+                    <span class="status-blocked">⚠️ {{ p.status }}</span>
+                  {% endif %}
+                </td>
+                <td style="text-align: right;">
+                  <div style="display: inline-flex; gap: 6px;">
+                    <a href="/api/permis/pdf/{{ p.id }}" target="_blank" class="btn-primary btn-sm">
+                      <i data-lucide="file-text"></i> PDF
+                    </a>
+                    <button type="button" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('{{ p.ref_num }}', '{{ p.type_permis }} - {{ p.zone }}')">
+                      <i data-lucide="qr-code"></i> QR Code Permis
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">Aucun permis créé pour le moment. Cliquez sur "Créer un Permis de Travail".</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3 : FICHES & FORMULAIRES REMPLISSABLES (BUREAU) -->
+    <div id="tab-forms" class="tab-content">
+      
+      <div class="card-section mb-4">
+        <div class="section-header">
+          <h2 class="section-title">📂 Accès Direct aux Fiches du Bureau à Remplir</h2>
+        </div>
+        <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+          <a href="/fiches/sortie_materiel" target="_blank" class="btn-primary" style="flex: 1; text-align: center;">
+            <i data-lucide="file-code"></i> Ouvrir Fiche Autorisation Sortie Matériel (HTML Bureau)
+          </a>
+          <a href="/fiches/inspection_pemp" target="_blank" class="btn-primary" style="flex: 1; text-align: center; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
+            <i data-lucide="file-text"></i> Ouvrir Fiche Inspection Mensuelle PEMP (PDF Bureau)
+          </a>
+        </div>
+      </div>
+
+      <div class="form-card-grid">
+
+        <!-- FICHE 1 : SORTIE DE MATÉRIEL SINYLON -->
+        <div class="card-section">
+          <div class="section-header">
+            <h2 class="section-title">📄 1. Autorisation de Sortie de Matériel Sinylon</h2>
+          </div>
+          <form action="/api/fiches/sortie_materiel" method="POST" target="_blank">
+            <div class="form-group">
+              <label class="form-label">Demandeur / Transporteur</label>
+              <input type="text" name="demandeur" class="form-control" placeholder="ex: Zhang Wei / Transporteur Sinylon" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Destination / Destinataire</label>
+              <input type="text" name="destination" class="form-control" placeholder="ex: Site Fiat Oran / Ateliers Sinylon" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Véhicule / Immatriculation</label>
+              <input type="text" name="vehicule" class="form-control" placeholder="ex: Camion Sinylon - 00123-116-31" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Désignation & Liste des Matériels</label>
+              <textarea name="materiels" class="form-control" rows="4" placeholder="ex: 1x Groupe Électrogène 50kVA&#10;2x Postes à souder Inverter&#10;5x Échafaudages roulants" required></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+              <button type="submit" class="btn-primary" style="flex: 1;">
+                <i data-lucide="printer"></i> Générer Fiche PDF
+              </button>
+              <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); flex: 1;" onclick="let dest = document.querySelector('input[name=destination]').value || 'ATELIERS-SINYLON'; openQrModal('SORTIE-MATERIEL-01', 'Autorisation Sortie Matériel (' + dest + ')');">
+                <i data-lucide="qr-code"></i> QR Code Sortie
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- FICHE 2 : INSPECTION MENSUELLE PEMP -->
+        <div class="card-section">
+          <div class="section-header">
+            <h2 class="section-title">🚜 2. Fiche d'Inspection Mensuelle PEMP / Nacelles</h2>
+          </div>
+          <form action="/api/fiches/inspection_pemp" method="POST" target="_blank">
+            <div class="form-group">
+              <label class="form-label">Inspecteur HSE</label>
+              <input type="text" name="inspecteur" class="form-control" placeholder="ex: Brahimi Karim" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nacelle N° / Identifiant</label>
+              <input type="text" name="nacelle_num" class="form-control" placeholder="ex: NAC-SIN-04" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Marque / Modèle Nacelle</label>
+              <input type="text" name="modele" class="form-control" placeholder="ex: Genie Z-45/25" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Résultat de l'Inspection</label>
+              <select name="resultat" class="form-control">
+                <option value="CONFORME">✓ CONFORME (Accrédité)</option>
+                <option value="NON CONFORME">⚠️ NON CONFORME (Immobilisé)</option>
+              </select>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+              <button type="submit" class="btn-primary" style="flex: 1;">
+                <i data-lucide="printer"></i> Générer Rapport PDF
+              </button>
+              <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); flex: 1;" onclick="let nac = document.querySelector('input[name=nacelle_num]').value || 'NAC-SIN-01'; openQrModal('INSP-' + nac, 'Inspection Nacelle ' + nac);">
+                <i data-lucide="qr-code"></i> QR Code Fixe Nacelle
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL : NOUVEAU PERMIS DE TRAVAIL -->
+  <div class="modal-overlay" id="permitModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">📜 Nouveau Permis de Travail HSE</h3>
+        <button class="close-btn" onclick="closePermitModal()">&times;</button>
+      </div>
+      <form action="/api/permis/nouveau" method="POST">
+        <div class="form-group">
+          <label class="form-label">Type de Permis</label>
+          <select name="type_permis" class="form-control">
+            <option value="Travaux à Chaud (Feu)">🔥 Travaux à Chaud (Feu / Soudure)</option>
+            <option value="Espace Confiné">☣️ Espace Confiné (Cuve / Silo)</option>
+            <option value="Fouille & Excavation">🚜 Fouille & Excavation (> 1.3m)</option>
+            <option value="Habilitation Électrique">⚡ Habilitation Électrique</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Responsable / Demandeur</label>
+          <input type="text" name="demandeur" class="form-control" placeholder="ex: Shi Junming" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Zone de Chantier</label>
+          <input type="text" name="zone" class="form-control" placeholder="ex: Batiment A - Zone Électricité" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mesures Météo (Vent / Température)</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <input type="number" name="vent_kmh" class="form-control" placeholder="Vent (km/h)">
+            <input type="number" name="temp_celsius" class="form-control" placeholder="Temp (°C)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description des Travaux</label>
+          <textarea name="description" class="form-control" rows="3" placeholder="Description courte des travaux..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closePermitModal()">Annuler</button>
+          <button type="submit" class="btn-primary">Valider & Créer le Permis</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL : AJOUT TRAVAILLEUR SINYLON -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ Nouveau Travailleur Sinylon</h3>
+        <button class="close-btn" onclick="closeAddModal()">&times;</button>
+      </div>
+      <form action="/api/workers" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-label">Nom</label>
+          <input type="text" name="nom" class="form-control" placeholder="ex: Zhang" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prénom</label>
+          <input type="text" name="prenom" class="form-control" placeholder="ex: Wei" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Matricule Sinylon</label>
+          <input type="text" name="matricule" class="form-control" placeholder="ex: SIN-0080" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fonction / Poste Officiel</label>
+          <input type="text" name="fonction" class="form-control" placeholder="ex: Directeur projet, Electrical engineer, Soudeur..." required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Photo d'Identité (Optionnel)</label>
+          <input type="file" name="photo" class="form-control" accept="image/*">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeAddModal()">Annuler</button>
+          <button type="submit" class="btn-primary">Enregistrer le Travailleur</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL : MODIFIER TRAVAILLEUR SINYLON -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Modifier le Travailleur Sinylon</h3>
+        <button class="close-btn" onclick="closeEditModal()">&times;</button>
+      </div>
+      <form id="editForm" action="" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-label">Nom</label>
+          <input type="text" id="edit_nom" name="nom" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prénom</label>
+          <input type="text" id="edit_prenom" name="prenom" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Matricule Sinylon</label>
+          <input type="text" id="edit_matricule" name="matricule" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fonction / Poste Officiel</label>
+          <input type="text" id="edit_fonction" name="fonction" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Statut Accréditation</label>
+          <select id="edit_status" name="status" class="form-control">
+            <option value="Actif">Actif</option>
+            <option value="Inactif">Inactif</option>
+            <option value="Bloqué">Bloqué</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nouvelle Photo (Optionnel)</label>
+          <input type="file" name="photo" class="form-control" accept="image/*">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeEditModal()">Annuler</button>
+          <button type="submit" class="btn-primary">Enregistrer les Modifications</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL : APERÇU BADGE & IMPRESSION -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="previewWorkerName">Aperçu du Badge Sinylon</h3>
+        <button class="close-btn" onclick="closePreviewModal()">&times;</button>
+      </div>
+      <div style="background: rgba(220, 38, 38, 0.1); border-left: 4px solid #ef4444; padding: 10px 16px; margin: 10px 20px 0; border-radius: 6px; font-size: 13px; color: #ef4444; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+        <span>🚨 Contact Urgence HSE Chantier :</span>
+        <strong style="color: #ffffff; font-size: 14px;">Nouri : 0563765157</strong>
+      </div>
+      <div class="badge-preview-container">
+        <iframe id="badgeIframe" src="about:blank"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closePreviewModal()">Fermer</button>
+        <a id="printDirectLink" href="#" target="_blank" class="btn-primary">
+          <i data-lucide="printer"></i> Imprimer Badge Officiel
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL : VISUALISATEUR QR CODE DYNAMIQUE -->
+  <div class="modal-overlay" id="qrDisplayModal">
+    <div class="modal-card" style="text-align: center; max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="qrTitle">📱 QR Code Dynamique</h3>
+        <button class="close-btn" onclick="closeQrModal()">&times;</button>
+      </div>
+      <div style="background: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 12px; padding: 20px; margin: 15px 0;">
+        <img id="qrImageElement" src="" alt="QR Code HD" style="width: 220px; height: 220px; border-radius: 12px; background: white; padding: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <div id="qrSubText" style="margin-top: 14px; font-weight: 700; color: #38bdf8; font-size: 14px;">SIN-0000</div>
+        <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Scannable directement par l'appareil photo iPhone / Android</div>
+      </div>
+      <div class="modal-footer" style="justify-content: center; gap: 10px;">
+        <button class="btn-secondary" onclick="closeQrModal()">Fermer</button>
+        <a id="downloadQrBtn" href="#" download="QRCode_Sinylon.png" target="_blank" class="btn-primary">
+          <i data-lucide="download"></i> Télécharger PNG
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openQrModal(key, name) {
+      document.getElementById('qrTitle').innerText = '📱 QR Code : ' + name;
+      document.getElementById('qrSubText').innerText = 'Matricule / Réf : ' + key;
+      document.getElementById('qrImageElement').src = '/api/qr/png/' + encodeURIComponent(key) + '?t=' + new Date().getTime();
+      document.getElementById('downloadQrBtn').href = '/api/qr/png/' + encodeURIComponent(key);
+      document.getElementById('qrDisplayModal').classList.add('active');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeQrModal() {
+      document.getElementById('qrDisplayModal').classList.remove('active');
+    }
+    lucide.createIcons();
+
+    // Onglets Navigation
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // Tout Cocher / Décocher
+    function toggleSelectAll(masterSource) {
+      let master = masterSource || document.getElementById('masterCheckbox');
+      let checkboxes = document.querySelectorAll('.worker-checkbox');
+      let targetState = master.checked;
+      checkboxes.forEach(cb => cb.checked = targetState);
+
+      let btn = document.getElementById('selectAllBtn');
+      if (btn) {
+        btn.innerHTML = targetState ? '<i data-lucide="square"></i> Tout Décocher' : '<i data-lucide="check-square"></i> Tout Cocher';
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    function toggleSelectAllBtn() {
+      let master = document.getElementById('masterCheckbox');
+      master.checked = !master.checked;
+      toggleSelectAll(master);
+    }
+
+    // Actions Worker
+    function toggleBlock(workerId) {
+      let form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/api/workers/toggle_block/' + workerId;
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    function deleteWorker(workerId, name) {
+      if (confirm("Êtes-vous sûr de vouloir supprimer définitivement " + name + " ?")) {
+        let form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/api/workers/delete/' + workerId;
+        document.body.appendChild(form);
+        form.submit();
+      }
+    }
+
+    // Modales Permis / Travailleurs
+    function openPermitModal() { document.getElementById('permitModal').classList.add('active'); }
+    function closePermitModal() { document.getElementById('permitModal').classList.remove('active'); }
+
+    function openAddModal() { document.getElementById('addModal').classList.add('active'); }
+    function closeAddModal() { document.getElementById('addModal').classList.remove('active'); }
+
+    function openEditModal(id, nom, prenom, matricule, fonction, status) {
+      document.getElementById('editForm').action = "/api/workers/edit/" + id;
+      document.getElementById('edit_nom').value = nom;
+      document.getElementById('edit_prenom').value = prenom;
+      document.getElementById('edit_matricule').value = matricule;
+      document.getElementById('edit_fonction').value = fonction;
+      document.getElementById('edit_status').value = status;
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+
+    function previewBadge(workerId, workerName) {
+      document.getElementById('previewWorkerName').innerText = "Badge Officiel Sinylon — " + workerName;
+      var iframe = document.getElementById('badgeIframe');
+      iframe.src = "about:blank";
+      setTimeout(function() {
+        iframe.src = "/api/print/single/" + workerId + "?t=" + new Date().getTime();
+        document.getElementById('printDirectLink').href = "/api/print/single/" + workerId;
+        document.getElementById('previewModal').classList.add('active');
+      }, 100);
+    }
+
+    function closePreviewModal() {
+      document.getElementById('previewModal').classList.remove('active');
+      document.getElementById('badgeIframe').src = "about:blank";
+    }
+
+    function filterTable() {
+      let input = document.getElementById("searchInput").value.toLowerCase();
+      let table = document.getElementById("workersTable");
+      let trs = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < trs.length; i++) {
+        let tdSeq = trs[i].getElementsByTagName("td")[1];
+        let tdMat = trs[i].getElementsByTagName("td")[3];
+        let tdName = trs[i].getElementsByTagName("td")[4];
+        let tdRole = trs[i].getElementsByTagName("td")[5];
+        
+        if (tdMat || tdName || tdRole) {
+          let text = ((tdSeq ? tdSeq.textContent : "") + " " + tdMat.textContent + " " + tdName.textContent + " " + tdRole.textContent).toLowerCase();
+          trs[i].style.display = text.includes(input) ? "" : "none";
+        }
+      }
+    }
+  </script>
+</body>
+</html>

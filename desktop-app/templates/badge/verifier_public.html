@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification Badge — NORO Security</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.95);
+            --card-border: rgba(55, 65, 81, 0.4);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+            --accent-blue: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .verify-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Top Header Brand */
+        .brand-header {
+            background: #030712;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .brand-logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-logo span {
+            color: var(--accent-green);
+        }
+
+        .verified-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* Status Indicator Banner */
+        .status-banner {
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-banner.valid {
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .status-banner.blocked, .status-banner.expired, .status-banner.blacklist {
+            background: linear-gradient(180deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .status-banner.provisional {
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.1) 0%, transparent 100%);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+        }
+
+        .status-icon-wrapper {
+            width: 72px;
+            height: 72px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .status-banner.valid .status-icon-wrapper {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border: 2px solid var(--accent-green);
+            animation: pulse-green 2s infinite;
+        }
+
+        .status-banner.blocked .status-icon-wrapper,
+        .status-banner.expired .status-icon-wrapper,
+        .status-banner.blacklist .status-icon-wrapper {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            border: 2px solid var(--accent-red);
+            animation: pulse-red 2s infinite;
+        }
+
+        .status-banner.provisional .status-icon-wrapper {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-orange);
+            border: 2px solid var(--accent-orange);
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .status-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .status-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 80%;
+        }
+
+        /* Profile Block */
+        .profile-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .profile-photo {
+            width: 90px;
+            height: 90px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 2px solid var(--card-border);
+            background: #1f2937;
+        }
+
+        .profile-photo-placeholder {
+            width: 90px;
+            height: 90px;
+            border-radius: 16px;
+            background: #1f2937;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--text-muted);
+            border: 2px solid var(--card-border);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .profile-role {
+            font-size: 14px;
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .company-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+        }
+
+        /* Compliance Checklist */
+        .checklist-section {
+            padding: 24px;
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compliance-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .compliance-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .item-label-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-icon {
+            font-size: 16px;
+            color: var(--text-muted);
+            width: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .item-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .item-sublabel {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .item-status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .item-status-pill.success {
+            color: var(--accent-green);
+        }
+
+        .item-status-pill.danger {
+            color: var(--accent-red);
+        }
+
+        .item-status-pill.warning {
+            color: var(--accent-orange);
+        }
+
+        /* Step Checklist Bar */
+        .steps-bar-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .step-pill {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid var(--card-border);
+        }
+
+        .step-pill.valid {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .step-pill.invalid {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        /* Warnings box */
+        .warning-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .warning-banner i {
+            color: var(--accent-orange);
+            font-size: 18px;
+        }
+
+        .warning-banner-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        /* Footer Info */
+        .verify-footer {
+            background: #030712;
+            padding: 16px;
+            text-align: center;
+            border-top: 1px solid var(--card-border);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="verify-container">
+        
+        <!-- Header -->
+        <div class="brand-header">
+            <div class="brand-logo">
+                <i class="fa-solid fa-shield-halved"></i> NORO<span>UNIFIED</span>
+            </div>
+            <div class="verified-badge">
+                <i class="fa-solid fa-square-check me-1"></i> Certifié
+            </div>
+        </div>
+
+        <!-- Banner Statut -->
+        {% if badge.blacklist %}
+            <div class="status-banner blacklist">
+                <div class="status-icon-wrapper">
+                    <i class="fa-solid fa-skull-crossbones"></i>
+                </div>
+                <div class="status-title" style="color: var(--accent-red);">Individu Blacklisté</div>
+                <div class="status-subtitle">Entrée interdite. Alerter immédiatement le PC Sécurité.</div>
+            </div>
+        {% elif badge.is_blocked %}
+            <div class="status-banner blocked">
+                <div class="status-icon-wrapper">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+                <div class="status-title" style="color: var(--accent-red);">Badge Bloqué</div>
+                <div class="status-subtitle">{{ badge.motif_blocage or "Blocage administratif ou infraction sécurité" }}</div>
+            </div>
+        {% elif badge_expire %}
+            <div class="status-banner expired">
+                <div class="status-icon-wrapper">
+                    <i class="fa-solid fa-hourglass-end"></i>
+                </div>
+                <div class="status-title" style="color: var(--accent-red);">Badge Expiré</div>
+                <div class="status-subtitle">Date d'expiration dépassée le {{ badge.date_expiration.strftime('%d/%m/%Y') if badge.date_expiration }}</div>
+            </div>
+        {% elif badge.statut == 'provisoire' %}
+            <div class="status-banner provisional">
+                <div class="status-icon-wrapper">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div class="status-title" style="color: var(--accent-orange);">Badge Provisoire</div>
+                <div class="status-subtitle">Valide temporairement pour 10 jours maximum</div>
+            </div>
+        {% else %}
+            <div class="status-banner valid">
+                <div class="status-icon-wrapper">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="status-title" style="color: var(--accent-green);">Badge Actif</div>
+                <div class="status-subtitle">Accès autorisé. Tous les contrôles de conformité sont conformes.</div>
+            </div>
+        {% endif %}
+
+        <!-- Profil -->
+        <div class="profile-block">
+            {% if badge.photo_filename %}
+                <img src="{{ badge.get_photo_url() }}" class="profile-photo" alt="Photo">
+            {% else %}
+                <div class="profile-photo-placeholder">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            {% endif %}
+            <div class="profile-info">
+                <div class="profile-name">{{ badge.prenom }} {{ badge.nom }}</div>
+                <div class="profile-role">{{ badge.fonction }}</div>
+                <div class="company-pill">
+                    <i class="fa-solid fa-building"></i>
+                    {% if badge.entreprise_rel %}
+                        {{ badge.entreprise_rel.nom.upper() }}
+                    {% else %}
+                        {{ badge.societe_affichee or 'Sinylon' }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Panneau Contrôle HSE Terrain Express (Smartphone 1-Tap) -->
+        {% if current_user.is_authenticated and (current_user.role in ['SINYLON FIAT', 'admin', 'agent', 'gardien', 'securite', 'FIAT'] or current_user.is_admin) %}
+        <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 18px; padding: 18px; margin: 16px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+            <div style="font-size: 13px; font-weight: 800; color: #10b981; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                <span><i class="fa-solid fa-shield-halved me-1"></i> Contrôle HSE Terrain Instantané</span>
+                <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 2px 8px; border-radius: 10px;">SINYLON FIAT / Sécurité</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                <form method="POST" action="{{ url_for('badge.inspection_express', id=badge.id) }}">
+                    <input type="hidden" name="type_inspection" value="conforme">
+                    <button type="submit" style="width: 100%; background: #10b981; color: #fff; border: none; padding: 12px 6px; border-radius: 12px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                        <i class="fa-solid fa-circle-check" style="font-size: 18px;"></i>
+                        <span>Conforme</span>
+                    </button>
+                </form>
+
+                <button type="button" onclick="document.getElementById('modalAvertissement').style.display='flex'" style="width: 100%; background: #f59e0b; color: #fff; border: none; padding: 12px 6px; border-radius: 12px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 18px;"></i>
+                    <span>Avertir</span>
+                </button>
+
+                <button type="button" onclick="document.getElementById('modalInfractionGrave').style.display='flex'" style="width: 100%; background: #ef4444; color: #fff; border: none; padding: 12px 6px; border-radius: 12px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                    <i class="fa-solid fa-ban" style="font-size: 18px;"></i>
+                    <span>Infraction</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Avertissement -->
+        <div id="modalAvertissement" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: #1e293b; border: 1px solid #f59e0b; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; color: #fff;">
+                <h4 style="color: #f59e0b; font-weight: 800; margin-bottom: 10px;"><i class="fa-solid fa-triangle-exclamation me-1"></i> Avertissement HSE</h4>
+                <form method="POST" action="{{ url_for('badge.inspection_express', id=badge.id) }}">
+                    <input type="hidden" name="type_inspection" value="avertissement">
+                    <label style="font-size: 12px; font-weight: 600; color: #cbd5e1; display: block; margin-bottom: 6px;">Sélectionner le motif :</label>
+                    <select name="motif" style="width: 100%; padding: 10px; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 10px; margin-bottom: 12px;">
+                        <option value="EPI non portés / partiels (Casque, Gilet, Chaussures)">EPI non portés / partiels (Casque, Gilet...)</option>
+                        <option value="Badge non porté de manière visible">Badge non porté de manière visible</option>
+                        <option value="Habilitation / Document à renouveler sous 48h">Document à renouveler sous 48h</option>
+                        <option value="Non-respect consignes de balisage zone">Non-respect balisage zone</option>
+                    </select>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button type="button" onclick="document.getElementById('modalAvertissement').style.display='none'" style="background: #475569; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600;">Annuler</button>
+                        <button type="submit" style="background: #f59e0b; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700;">Avertir + WhatsApp</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Infraction Grave -->
+        <div id="modalInfractionGrave" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: #1e293b; border: 1px solid #ef4444; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; color: #fff;">
+                <h4 style="color: #ef4444; font-weight: 800; margin-bottom: 10px;"><i class="fa-solid fa-ban me-1"></i> Infraction Grave HSE</h4>
+                <form method="POST" action="{{ url_for('badge.inspection_express', id=badge.id) }}">
+                    <input type="hidden" name="type_inspection" value="infraction_grave">
+                    <label style="font-size: 12px; font-weight: 600; color: #cbd5e1; display: block; margin-bottom: 6px;">Motif de l'infraction :</label>
+                    <select name="motif" style="width: 100%; padding: 10px; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 10px; margin-bottom: 12px;">
+                        <option value="Travail en hauteur sans harnais attaché">Travail en hauteur sans harnais attaché</option>
+                        <option value="Permis de travail non délivré / non signé">Permis de travail non délivré / non signé</option>
+                        <option value="Non-respect consignes de consignation électrique">Non-respect consignation électrique</option>
+                        <option value="Comportement dangereux / Mise en danger d'autrui">Comportement dangereux</option>
+                    </select>
+
+                    <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 10px; margin-bottom: 14px;">
+                        <label style="font-size: 12px; font-weight: 700; color: #fca5a5; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" name="bloquer_badge" value="true" checked style="width: 18px; height: 18px; accent-color: #ef4444;">
+                            <span>BLOQUER LE BADGE (Tourniquets refusés)</span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button type="button" onclick="document.getElementById('modalInfractionGrave').style.display='none'" style="background: #475569; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600;">Annuler</button>
+                        <button type="submit" style="background: #ef4444; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700;">Sanctionner + Alerte WhatsApp</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Compliance & Security Check -->
+        <div class="checklist-section">
+            <div class="section-title">
+                <i class="fa-solid fa-list-check"></i> Audit Sécurité & Conformité
+            </div>
+
+            <div class="compliance-grid">
+                
+                <!-- CNAS / Sécurité Sociale -->
+                <div class="compliance-item">
+                    <div class="item-label-group">
+                        <div class="item-icon"><i class="fa-solid fa-briefcase-medical"></i></div>
+                        <div>
+                            <div class="item-label">Sécurité Sociale (CNAS)</div>
+                            <div class="item-sublabel">N° : {{ badge.cnas or 'Absent' }}</div>
+                        </div>
+                    </div>
+                    <div>
+                        {% if badge.cnas %}
+                            <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Présente</span>
+                        {% else %}
+                            <span class="item-status-pill danger"><i class="fa-solid fa-triangle-exclamation"></i> Absente</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Visite Médicale -->
+                <div class="compliance-item">
+                    <div class="item-label-group">
+                        <div class="item-icon"><i class="fa-solid fa-stethoscope"></i></div>
+                        <div>
+                            <div class="item-label">Visite Médicale</div>
+                            <div class="item-sublabel">Exp : {{ badge.visite_medicale_expiration.strftime('%d/%m/%Y') if badge.visite_medicale_expiration else 'Non définie' }}</div>
+                        </div>
+                    </div>
+                    <div>
+                        {% if badge.visite_medicale_expiration %}
+                            {% if vm_expire %}
+                                <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée</span>
+                            {% else %}
+                                <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> En cours</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="item-status-pill warning"><i class="fa-solid fa-circle-question"></i> Non renseignée</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Habilitations Spéciales Section -->
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px;">
+                    <div style="font-family: 'Oswald', sans-serif; font-size: 13px; color: var(--accent-blue); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-bolt"></i> HABILITATIONS & FORMATIONS HSE
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        
+                        <!-- 1. Hauteur -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div>
+                                <span style="font-weight: 600; color: #fff;">🪜 Travail en Hauteur</span>
+                                <div style="font-size: 11px; color: var(--text-muted);">Échafaudages, harnais, nacelles</div>
+                            </div>
+                            <div>
+                                {% if badge.habilitation_hauteur %}
+                                    {% if hab_hauteur_expire %}
+                                        <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée ({{ badge.habilitation_hauteur_expiration.strftime('%d/%m/%Y') }})</span>
+                                    {% else %}
+                                        <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide{% if badge.habilitation_hauteur_expiration %} ({{ badge.habilitation_hauteur_expiration.strftime('%d/%m/%Y') }}){% endif %}</span>
+                                    {%     endif %}
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Non requis</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 2. Soudure / Permis Feu -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div>
+                                <span style="font-weight: 600; color: #fff;">🔥 Permis Feu / Soudure</span>
+                                <div style="font-size: 11px; color: var(--text-muted);">Travaux par point chaud / étincelles</div>
+                            </div>
+                            <div>
+                                {% if badge.habilitation_soudure %}
+                                    {% if hab_soudure_expire %}
+                                        <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée ({{ badge.habilitation_soudure_expiration.strftime('%d/%m/%Y') }})</span>
+                                    {% else %}
+                                        <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide{% if badge.habilitation_soudure_expiration %} ({{ badge.habilitation_soudure_expiration.strftime('%d/%m/%Y') }}){% endif %}</span>
+                                    {%     endif %}
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Non requis</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 3. Électrique -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div>
+                                <span style="font-weight: 600; color: #fff;">⚡ Habilitation Électrique (BT / HT)</span>
+                                <div style="font-size: 11px; color: var(--text-muted);">Interventions sur réseaux électriques</div>
+                            </div>
+                            <div>
+                                {% if badge.habilitation_electricite %}
+                                    {% if hab_electricite_expire %}
+                                        <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée ({{ badge.habilitation_electricite_expiration.strftime('%d/%m/%Y') }})</span>
+                                    {% else %}
+                                        <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide{% if badge.habilitation_electricite_expiration %} ({{ badge.habilitation_electricite_expiration.strftime('%d/%m/%Y') }}){% endif %}</span>
+                                    {%     endif %}
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Non requis</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 4. Confines -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div>
+                                <span style="font-weight: 600; color: #fff;">🕳️ Espaces Confinés</span>
+                                <div style="font-size: 11px; color: var(--text-muted);">Cuves, tunnels, réservoirs</div>
+                            </div>
+                            <div>
+                                {% if badge.habilitation_confine %}
+                                    {% if hab_confine_expire %}
+                                        <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée ({{ badge.habilitation_confine_expiration.strftime('%d/%m/%Y') }})</span>
+                                    {% else %}
+                                        <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide{% if badge.habilitation_confine_expiration %} ({{ badge.habilitation_confine_expiration.strftime('%d/%m/%Y') }}){% endif %}</span>
+                                    {%     endif %}
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Non requis</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 5. Engins -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div>
+                                <span style="font-weight: 600; color: #fff;">🚜 Conduite d'Engins</span>
+                                <div style="font-size: 11px; color: var(--text-muted);">Chariots élévateurs, grues, nacelles</div>
+                            </div>
+                            <div>
+                                {% if badge.habilitation_engins %}
+                                    {% if hab_engins_expire %}
+                                        <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée ({{ badge.habilitation_engins_expiration.strftime('%d/%m/%Y') }})</span>
+                                    {% else %}
+                                        <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide{% if badge.habilitation_engins_expiration %} ({{ badge.habilitation_engins_expiration.strftime('%d/%m/%Y') }}){% endif %}</span>
+                                    {%     endif %}
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Non requis</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 6. Chimique -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div>
+                                <span style="font-weight: 600; color: #fff;">🧪 Produits Dangereux</span>
+                                <div style="font-size: 11px; color: var(--text-muted);">Produits chimiques, gaz, inflammables</div>
+                            </div>
+                            <div>
+                                {% if badge.habilitation_chimique %}
+                                    {% if hab_chimique_expire %}
+                                        <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée ({{ badge.habilitation_chimique_expiration.strftime('%d/%m/%Y') }})</span>
+                                    {% else %}
+                                        <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide{% if badge.habilitation_chimique_expiration %} ({{ badge.habilitation_chimique_expiration.strftime('%d/%m/%Y') }}){% endif %}</span>
+                                    {%     endif %}
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Non requis</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 7. SST -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <div>
+                                <span style="font-weight: 600; color: #fff;">⛑️ Secourisme / SST</span>
+                                <div style="font-size: 11px; color: var(--text-muted);">Sauveteur Secouriste du Travail</div>
+                            </div>
+                            <div>
+                                {% if badge.habilitation_sst %}
+                                    {% if hab_sst_expire %}
+                                        <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée ({{ badge.habilitation_sst_expiration.strftime('%d/%m/%Y') }})</span>
+                                    {% else %}
+                                        <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide{% if badge.habilitation_sst_expiration %} ({{ badge.habilitation_sst_expiration.strftime('%d/%m/%Y') }}){% endif %}</span>
+                                    {%     endif %}
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Non requis</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 8. Safety Indication -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px;">
+                            <div>
+                                <span style="font-weight: 600; color: #fff;">🛡️ Safety Indication / Induction</span>
+                                <div style="font-size: 11px; color: var(--text-muted);">Indication de sécurité générale</div>
+                            </div>
+                            <div>
+                                {% if badge.habilitation_safety %}
+                                    {% if hab_safety_expire %}
+                                        <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expirée ({{ badge.habilitation_safety_expiration.strftime('%d/%m/%Y') }})</span>
+                                    {% else %}
+                                        <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide{% if badge.habilitation_safety_expiration %} ({{ badge.habilitation_safety_expiration.strftime('%d/%m/%Y') }}){% endif %}</span>
+                                    {%     endif %}
+                                {% else %}
+                                    <span style="color: rgba(255,255,255,0.25); font-size: 11px;">Non faite</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Steps Validations -->
+                <div class="compliance-item">
+                    <div class="item-label-group">
+                        <div class="item-icon"><i class="fa-solid fa-network-wired"></i></div>
+                        <div>
+                            <div class="item-label">Validation Steps (SINYLON FIAT)</div>
+                            <div class="item-sublabel">Accès zones STEP 1, 2, 3</div>
+                        </div>
+                    </div>
+                    <div class="steps-bar-wrapper">
+                        <span class="step-pill {% if badge.step_1_valide or 'STEP 1' in (badge.zones_acces or '') %}valid{% else %}invalid{% endif %}">S1</span>
+                        <span class="step-pill {% if badge.step_2_valide or 'STEP 2' in (badge.zones_acces or '') %}valid{% else %}invalid{% endif %}">S2</span>
+                        <span class="step-pill {% if badge.step_3_valide or 'STEP 3' in (badge.zones_acces or '') %}valid{% else %}invalid{% endif %}">S3</span>
+                    </div>
+                </div>
+
+                <!-- Date Expiration Badge -->
+                <div class="compliance-item">
+                    <div class="item-label-group">
+                        <div class="item-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                        <div>
+                            <div class="item-label">Expiration Badge</div>
+                            <div class="item-sublabel">Valide jusqu'au {{ badge.date_expiration.strftime('%d/%m/%Y') if badge.date_expiration else 'N/A' }}</div>
+                        </div>
+                    </div>
+                    <div>
+                        {% if badge_expire %}
+                            <span class="item-status-pill danger"><i class="fa-solid fa-circle-xmark"></i> Expiré</span>
+                        {% else %}
+                            <span class="item-status-pill success"><i class="fa-solid fa-circle-check"></i> Valide</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Warnings / Avertissements Banner -->
+            {% if badge.avertissements and badge.avertissements > 0 %}
+                <div class="warning-banner">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div class="warning-banner-text">
+                        <strong>{{ badge.avertissements }} Avertissement(s)</strong> enregistré(s) pour cet employé concernant les règles HSE.
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+
+        {% if current_user and current_user.is_authenticated and current_user.is_admin %}
+        <div class="checklist-section" style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--card-border); padding: 24px;">
+            <div class="section-title" style="color: var(--accent-orange); margin-bottom: 16px;">
+                <i class="fa-solid fa-user-shield"></i> Actions de Supervision
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Validation Actions -->
+                {% if (badge.statut == 'attente_provisoire' and current_user.role == 'admin') or (badge.statut == 'en_attente' and (current_user.role == 'admin' or current_user.role == 'SINYLON FIAT')) %}
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="{{ url_for('badge.valider_SINYLON FIAT', id=badge.id) }}" style="display: block; width: 100%; padding: 12px; background: var(--accent-green); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);">
+                        <i class="fa-solid fa-circle-check me-1"></i> Valider / Activer le Badge
+                    </a>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{{ url_for('badge.refaire_SINYLON FIAT', id=badge.id) }}" style="flex: 1; padding: 10px; background: var(--accent-orange); color: #0b0f19; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                            <i class="fa-solid fa-rotate me-1"></i> À Refaire
+                        </a>
+                        <a href="{{ url_for('badge.refuser_SINYLON FIAT', id=badge.id) }}" style="flex: 1; padding: 10px; background: var(--accent-red); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                            <i class="fa-solid fa-circle-xmark"></i> Refuser
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Block / Unblock Action -->
+                <div>
+                    <div style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 8px;">
+                        <i class="fa-solid fa-lock me-1"></i> Contrôle du Blocage (HSE)
+                    </div>
+                    <form action="{{ url_for('badge.bloquer', id=badge.id) }}" method="POST" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 14px;">
+                        <div style="display: flex; gap: 16px; margin-bottom: 10px;">
+                            <label style="color: var(--accent-green); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="statut_blocage" value="actif" {% if not badge.is_blocked %}checked{% endif %} style="accent-color: var(--accent-green);" onchange="document.getElementById('b_v_motif_field').style.display='none';"> 
+                                ACTIF
+                            </label>
+                            <label style="color: var(--accent-red); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                <input type="radio" name="statut_blocage" value="bloque" {% if badge.is_blocked %}checked{% endif %} style="accent-color: var(--accent-red);" onchange="document.getElementById('b_v_motif_field').style.display='block';"> 
+                                BLOQUÉ
+                            </label>
+                        </div>
+                        <div id="b_v_motif_field" style="{% if not badge.is_blocked %}display:none;{% endif %} margin-bottom: 10px;">
+                            <label style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Motif de blocage :</label>
+                            <textarea name="motif_blocage" rows="2" style="width: 100%; background: #111827; border: 1px solid var(--card-border); color: #fff; border-radius: 8px; padding: 6px 10px; font-family: inherit; font-size: 12px;" placeholder="ex: Infraction sécurité ou document manquant...">{{ badge.motif_blocage or '' }}</textarea>
+                        </div>
+                        <button type="submit" style="width: 100%; padding: 8px 12px; background: #fff; color: #0b0f19; border: none; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer;">
+                            <i class="fa-solid fa-save me-1"></i> Enregistrer le statut de blocage
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="verify-footer">
+            SINYLON FIAT Management System • Réf: {{ badge.numero_badge or 'N/A' }}
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation des sons
+            const soundSuccess = new Audio('/static/sounds/success.mp3');
+            const soundAlert = new Audio('/static/sounds/alert.mp3');
+
+            // Déterminer le statut de blocage
+            const isBlocked = {% if badge.is_blocked or badge.blacklist or badge_expire %}true{% else %}false{% endif %};
+
+            let played = false;
+
+            function playFeedback() {
+                if (played) return;
+                played = true;
+                if (isBlocked) {
+                    soundAlert.play().catch(e => console.log("L'audio n'a pas pu se lancer :", e));
+                } else {
+                    soundSuccess.play().catch(e => console.log("L'audio n'a pas pu se lancer :", e));
+                }
+            }
+
+            // Tenter de jouer immédiatement
+            playFeedback();
+
+            // Fallback d'activation au premier clic/toucher (règle autoplay des navigateurs)
+            const unlockAndPlay = function() {
+                playFeedback();
+                document.removeEventListener('click', unlockAndPlay);
+                document.removeEventListener('touchstart', unlockAndPlay);
+            };
+            document.addEventListener('click', unlockAndPlay);
+            document.addEventListener('touchstart', unlockAndPlay);
+        });
+    </script>
+</body>
+</html>

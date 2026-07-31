@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+{% block title %}Nouveau Badge Provisoire — SINYLON FIAT{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
+
+    .nb5-wrapper {
+        background: #0f1117;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #2c3048;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        color: #fff !important;
+    }
+
+    .nb5-header {
+        background: #0a0c11;
+        border-bottom: 2px solid #dc2626;
+        padding: 14px 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .nb5-header .logo {
+        font-family: 'Oswald', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 4px;
+        border: 2px solid #fff;
+        padding: 3px 12px;
+        border-radius: 4px;
+    }
+    .nb5-header .title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 16px;
+        color: #fff;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nb5-body {
+        display: flex;
+        flex-direction: row;
+        gap: 0;
+        min-height: 70vh;
+    }
+
+    .nb5-panel {
+        background: #181b24;
+        border-right: 1px solid #2c3048;
+        padding: 0;
+        width: 460px;
+        flex-shrink: 0;
+    }
+    .nb5-panel-header {
+        background: #0a0c11;
+        padding: 12px 20px;
+        border-bottom: 1px solid #2c3048;
+    }
+    .nb5-panel-header .sec-title {
+        color: #ef4444;
+        font-family: 'Oswald', sans-serif;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+    .nb5-panel-header .sub {
+        font-size: 11px;
+        color: #5a6080;
+        margin-top: 2px;
+    }
+    .nb5-form-body {
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .nb5-sec {
+        margin-bottom: 20px;
+    }
+    .nb5-sec-title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 11px;
+        letter-spacing: 3px;
+        color: #ef4444;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #2c3048;
+    }
+
+    .nb5-field {
+        margin-bottom: 12px;
+    }
+    .nb5-field label {
+        display: block;
+        font-size: 10px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: #5a6080;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+    .nb5-field input,
+    .nb5-field select {
+        width: 100%;
+        background: #1e2130;
+        border: 1px solid #2c3048;
+        border-radius: 6px;
+        color: #e6e8f2;
+        font-size: 13px;
+        padding: 8px 10px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color .2s;
+    }
+    .nb5-field input:focus,
+    .nb5-field select:focus {
+        border-color: #ef4444;
+    }
+    .nb5-r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .nb5-submit {
+        display: block;
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: #fff;
+        font-family: 'Oswald', sans-serif;
+        font-size: 14px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-weight: 700;
+        transition: all 0.25s ease;
+        margin-top: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    }
+    .nb5-submit:hover {
+        background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    }
+
+    .nb5-back-btn {
+        background: #1e2130;
+        border: 1px solid #2c3048;
+        color: #e6e8f2;
+        font-family: 'Oswald', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        text-decoration: none;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .nb5-back-btn:hover {
+        background: #2c3048;
+        color: #fff;
+    }
+
+    .nb5-content {
+        flex: 1;
+        padding: 25px;
+        background: #0f1117;
+    }
+
+    .nb5-info-card {
+        background: #1a1d29;
+        border: 1px solid #dc2626;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .nb5-info-card h5 {
+        font-family: 'Oswald', sans-serif;
+        color: #ef4444;
+        font-size: 16px;
+        margin: 0 0 14px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .nb5-access-list {
+        background: #0a0c11;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .nb5-access-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .nb5-preview {
+        background: #181b24;
+        border: 1px solid #2c3048;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+    }
+    .nb5-preview-title {
+        font-family: 'Oswald', sans-serif;
+        color: #5a6080;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #2c3048;
+        padding-bottom: 10px;
+    }
+
+    /* Badge Preview Mockup */
+    .badge-card { width:60mm; height:86mm; background:#fff; border:1px solid #ccc; position:relative; overflow:hidden; display:inline-block; text-align:left; font-family:'Oswald', sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,0.3); transform: scale(1.1); transform-origin: top center; margin-bottom: 20px; border: 2px solid #dc2626 !important; }
+    .b-header { height:15mm; display:flex; align-items:center; padding:0 4mm; justify-content:space-between; color:#fff; background-color:#991b1b; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 56' fill='none' preserveAspectRatio='none'><path d='M0 0 H200 V40 C140 30, 70 56, 0 42 Z' fill='%23991b1b'/><path d='M0 42 C70 56, 140 30, 200 40' stroke='%23fca5a5' stroke-width='1.5' fill='none'/><path d='M0 43.5 C70 57.5, 140 31.5, 200 41.5' stroke='%23f87171' stroke-width='1' fill='none'/></svg>"); background-size: 100% 100%; background-position: center; position: relative; overflow: hidden; }
+    .b-header img { height: 10mm; z-index: 2; object-fit: contain; }
+    .b-alert { background:#fef2f2; height:5mm; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #fca5a5; margin:0;}
+    .b-alert-text { color:#dc2626; font-size:7px; font-weight:bold; letter-spacing:1px; }
+    .b-middle { display:flex; padding:3mm; gap:3mm; }
+    .b-photo { width:20mm; height:24mm; background:#eee; border:1.5px solid #dc2626; border-radius:1mm; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+    .b-photo img { width:100%; height:100%; object-fit:cover; }
+    .b-photo span { font-size:8px; color:#999; }
+    .b-qr { width:20mm; height:20mm; background:#fff; border:1px solid #dc2626; padding:1mm; display:flex; align-items:center; justify-content:center; }
+    .b-qr img { width:100%; height:100%; opacity: 0.3; }
+    .b-info { padding:0 3mm; line-height:1.2; margin-top:-1mm; }
+    .b-line { font-size:7px; color:#666; margin-bottom:0.5mm; }
+    .b-val { color:#000; font-weight:bold; }
+    .b-validity { position:absolute; bottom:13mm; right:3mm; background:#dc2626 !important; color:#fff; padding:1mm 2mm; border-radius:1mm; font-size:8px; font-weight:bold; }
+    .b-footer { position:absolute; bottom:0; left:0; width:100%; height:11mm; overflow:hidden; z-index:5; text-align: center; }
+    .b-footer svg { width:100%; height:100%; position:absolute; bottom:0; left:0; transition: fill 0.3s; z-index:6; }
+    .b-footer-SINYLON FIAT { position: absolute; bottom: 1.2mm; left: 50%; transform: translateX(-50%); background: #991b1b; color: #fff; font-size: 7px; padding: 0.5mm 2.5mm; border-radius: 0.5mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .b-footer-sf { position: absolute; bottom: 4.8mm; left: 50%; transform: translateX(-50%); color: #ffffff; font-size: 5.5px; font-weight: bold; z-index: 10; letter-spacing: 0.5px; }
+    .prov-tag {
+        position: absolute;
+        top: 16mm;
+        right: 2mm;
+        background: #dc2626;
+        color: #fff;
+        font-size: 5.5px;
+        font-weight: bold;
+        padding: 0.5mm 1.5mm;
+        border-radius: 0.5mm;
+        letter-spacing: 0.5px;
+        z-index: 20;
+    }
+</style>
+
+<!-- Nav -->
+<div class="d-flex align-items-center gap-2 mb-3">
+    <a href="{{ url_for('dashboard') }}" class="nb5-back-btn">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
+
+<div class="nb5-wrapper">
+    <!-- Header -->
+    <div class="nb5-header">
+        <div class="logo">FIAT</div>
+        <div class="title">
+            <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 24px;">
+            <span>NORO BADGE — DEMANDE DE BADGE PROVISOIRE</span>
+        </div>
+        <div style="font-size:11px; color:#5a6080; font-family:'Oswald',sans-serif; letter-spacing:2px;">
+            {{ current_user.full_name() }}
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="nb5-body">
+        <!-- Formulaire (Gauche) -->
+        <div class="nb5-panel">
+            <div class="nb5-panel-header">
+                <div class="sec-title">🎫 Badge Provisoire (Validité 10 Jours)</div>
+                <div class="sub">Veuillez renseigner les informations requises (*)</div>
+            </div>
+
+            <div class="nb5-form-body">
+                <form action="{{ url_for('badge.save_provisional_badge') }}" method="POST" enctype="multipart/form-data">
+                    <div class="nb5-sec">
+                        <div class="nb5-sec-title">👤 Identité & RH</div>
+                        
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>Nom *</label>
+                                <input type="text" name="nom" required placeholder="Nom du visiteur" oninput="updatePreview()">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Prénom *</label>
+                                <input type="text" name="prenom" required placeholder="Prénom" oninput="updatePreview()">
+                            </div>
+                        </div>
+
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>CNAS *</label>
+                                <input type="text" name="cnas" required placeholder="N° Sécurité Sociale">
+                            </div>
+                            <div class="nb5-field">
+                                <label>N° Carte ID / Passeport *</label>
+                                <input type="text" name="carte_id" required placeholder="N° de document" oninput="updatePreview()">
+                            </div>
+                        </div>
+
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>Poste / Fonction *</label>
+                                <input type="text" name="poste" required value="Visiteur">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Téléphone</label>
+                                <input type="text" name="telephone" placeholder="Optionnel">
+                            </div>
+                        </div>
+
+                        <div class="nb5-field">
+                            <label>Date de Naissance</label>
+                            <input type="date" name="date_naissance">
+                        </div>
+
+                        {% if current_user.is_admin %}
+                            <div class="nb5-field">
+                                <label>Entreprise / Société *</label>
+                                <select name="entreprise_id" id="entreprise_id" required onchange="updateSocieteName()">
+                                    <option value="">-- Sélectionner --</option>
+                                    {% for ent in entreprises %}
+                                        <option value="{{ ent.id }}">{{ ent.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" name="societe" id="societe_name">
+                            </div>
+                        {% else %}
+                            <div class="nb5-field">
+                                <label>Entreprise / Société</label>
+                                <input type="text" class="form-control" style="background:#2c3048; color:#cbd5e1;" readonly value="{{ current_user.entreprise }}" oninput="updatePreview()">
+                                <input type="hidden" name="societe" value="{{ current_user.entreprise }}">
+                            </div>
+                        {% endif %}
+
+                        <div class="nb5-field">
+                            <label>Photo (Recommandée)</label>
+                            <input type="file" name="photo" accept="image/*" onchange="previewPhoto(event)">
+                        </div>
+
+                        <div class="nb5-field">
+                            <label>Action après enregistrement</label>
+                            <select name="action_after">
+                                <option value="save">💾 Enregistrer seulement</option>
+                                {% if current_user.is_admin %}
+                                    <option value="print">🖨️ Enregistrer et Imprimer</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="nb5-submit">
+                        <i class="fas fa-save me-2"></i> Soumettre la Demande
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Panneau Droit (Aperçu) -->
+        <div class="nb5-content">
+            <div class="nb5-info-card">
+                <h5>🚨 Règlement Badge Provisoire</h5>
+                <div class="nb5-access-list">
+                    <div class="nb5-access-item">
+                        <span>⌛</span>
+                        <span>Validité limitée à 10 jours glissants.</span>
+                    </div>
+                    <div class="nb5-access-item">
+                        <span>🔒</span>
+                        <span>Soumis à la validation de la sécurité de l'Usine.</span>
+                    </div>
+                    <div class="nb5-access-item">
+                        <span>🖨️</span>
+                        <span>Impression disponible immédiatement après validation par le SINYLON FIAT.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nb5-preview">
+                <div class="nb5-preview-title">🪪 Aperçu du Badge Provisoire</div>
+                
+                <div class="badge-card">
+                    <div class="b-header">
+                        <img src="{{ url_for('static', filename='img/fiat_logo.png') }}" alt="FIAT">
+                        <img src="{{ url_for('static', filename='img/amce_logo.png') }}" alt="AMCE">
+                    </div>
+                    <div class="b-alert"><span class="b-alert-text">⚠️ BADGE PROVISOIRE · 10 JOURS</span></div>
+                    <div class="prov-tag">PROVISOIRE</div>
+                    
+                    <div class="b-middle">
+                        <div class="b-photo" id="avatar-container">
+                            <span>PHOTO</span>
+                        </div>
+                        <div class="b-qr">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Provisional" alt="QR">
+                        </div>
+                    </div>
+
+                    <div class="b-info">
+                        <div class="b-line">Nom : <span class="b-val" id="prev-nom">...</span></div>
+                        <div class="b-line">Prénom : <span class="b-val" id="prev-prenom">...</span></div>
+                        <div class="b-line">Société : <span class="b-val" id="prev-societe">...</span></div>
+                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;">SINYLON FIAT Projet FIAT</span></div>
+                        <div class="b-line">ID Carte : <span class="b-val" id="prev-num">...</span></div>
+                    </div>
+
+                    <div class="b-validity" id="prev-valid">10 JOURS</div>
+
+                    <div class="b-footer">
+                        <svg viewBox="0 0 200 50" preserveAspectRatio="none">
+                            <path d="M0 50 L0 20 C60 40, 140 40, 200 20 L200 50 Z" fill="#991b1b"></path>
+                        </svg>
+                        <div class="b-footer-SINYLON FIAT">SINYLON FIAT</div>
+                        <div class="b-footer-sf">SAFETY FIRST</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updatePreview() {
+        const nom = document.querySelector('input[name="nom"]').value || '...';
+        const prenom = document.querySelector('input[name="prenom"]').value || '...';
+        const id_card = document.querySelector('input[name="carte_id"]').value || '...';
+        
+        let societe = '';
+        const selectEnt = document.getElementById('entreprise_id');
+        if (selectEnt) {
+            societe = selectEnt.options[selectEnt.selectedIndex].text;
+            if (selectEnt.value === '') societe = '...';
+        } else {
+            societe = document.querySelector('input[readonly]')?.value || '...';
+        }
+
+        document.getElementById('prev-nom').innerText = nom.toUpperCase();
+        document.getElementById('prev-prenom').innerText = prenom;
+        document.getElementById('prev-societe').innerText = societe;
+        document.getElementById('prev-num').innerText = "N." + id_card;
+    }
+
+    function updateSocieteName() {
+        const selectEnt = document.getElementById('entreprise_id');
+        if (selectEnt) {
+            document.getElementById('societe_name').value = selectEnt.options[selectEnt.selectedIndex].text;
+            updatePreview();
+        }
+    }
+
+    function previewPhoto(event) {
+        const input = event.target;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatar-container').innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Set expiration text
+    const today = new Date();
+    const expDate = new Date(today);
+    expDate.setDate(today.getDate() + 10);
+    const expText = expDate.toLocaleDateString('fr-FR');
+    document.getElementById('prev-valid').innerText = expText;
+
+    updatePreview();
+</script>
+{% endblock %}

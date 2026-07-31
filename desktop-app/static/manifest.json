@@ -1,0 +1,16 @@
+{
+  "name": "NORO UNIFIED HSE Chantier FIAT",
+  "short_name": "NORO HSE",
+  "description": "Système de Gestion HSE et Contrôle d'Accès Chantier FIAT Tafraoui",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    {
+      "src": "/static/img/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

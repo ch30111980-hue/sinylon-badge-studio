@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONTRÔLE HSE - Fiche Permis</title>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --card-bg: rgba(17, 24, 39, 0.9);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --warning-glow: rgba(245, 158, 11, 0.15);
+            --danger-glow: rgba(239, 68, 68, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Ambient Glow effect at the top */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* Dynamic background glows based on status */
+        .status-valide-glow::before { background: var(--success); }
+        .status-attente_FIAT-glow::before { background: var(--warning); }
+        .status-attente_SINYLON FIAT-glow::before { background: var(--warning); }
+        .status-refuse-glow::before { background: var(--danger); }
+        .status-bloque-glow::before { background: var(--danger); }
+        .status-revoc-glow::before { background: var(--danger); }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .brand {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 99px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 12px 0 20px 0;
+        }
+
+        .status-valide {
+            background-color: var(--success-glow);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+        }
+
+        .status-attente_FIAT, .status-attente_SINYLON FIAT {
+            background-color: var(--warning-glow);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-refuse, .status-bloque, .status-revoc {
+            background-color: var(--danger-glow);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.01);
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .timeline-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .step-ok {
+            background-color: var(--success-glow);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .step-pending {
+            background-color: var(--warning-glow);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .step-err {
+            background-color: var(--danger-glow);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .step-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .epi-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .epi-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .epi-item i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .epi-item.required {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.03);
+        }
+
+        .epi-item.required i {
+            color: var(--success);
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Card with dynamic status glow -->
+        <div class="card status-{{ 'bloque' if permit.is_blocked else permit.status.value }}-glow">
+            <div class="card-content">
+                <!-- Header -->
+                <div class="header">
+                    <div class="brand">SINYLON FIAT HSE</div>
+                    <h1 class="title">Permis de Travail N° {{ permit.id }}</h1>
+                    
+                    <!-- Status Badge -->
+                    <div class="status-badge status-{{ 'bloque' if permit.is_blocked else permit.status.value }}">
+                        {% if permit.is_blocked %}
+                            <i class="fas fa-exclamation-triangle"></i> Bloqué (HSE)
+                        {% elif permit.status.value == 'valide' %}
+                            <i class="fas fa-check-circle"></i> Autorisé / Validé
+                        {% elif permit.status.value == 'attente_FIAT' %}
+                            <i class="fas fa-clock"></i> Attente FIAT
+                        {% elif permit.status.value == 'attente_SINYLON FIAT' %}
+                            <i class="fas fa-clock"></i> Attente SINYLON FIAT
+                        {% elif permit.status.value == 'refuse' %}
+                            <i class="fas fa-times-circle"></i> Refusé
+                        {% elif permit.status.value == 'revoc' %}
+                            <i class="fas fa-ban"></i> Révoqué / Annulé
+                        {% elif permit.status.value == 'bloque' %}
+                            <i class="fas fa-exclamation-triangle"></i> Bloqué
+                        {% else %}
+                            <i class="fas fa-info-circle"></i> {{ permit.status.value | upper }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if permit.is_blocked %}
+                <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 12px 16px; border-radius: 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--danger); font-size: 18px;"></i>
+                    <div style="font-size: 13px; color: var(--text-primary); text-align: left;">
+                        <strong>Raison du Blocage :</strong> {{ permit.motif_blocage or "Non spécifié" }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Info Grid -->
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Entreprise Intervenante</span>
+                        <span class="info-value">{{ permit.entreprise_rel.nom }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Zone de Chantier</span>
+                        <span class="info-value"><i class="fas fa-map-marker-alt text-primary me-2"></i>{{ permit.zone_travail }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Type de Travaux</span>
+                        <span class="info-value"><i class="fas fa-tools text-primary me-2"></i>{{ permit.type_travaux }}</span>
+                    </div>
+                    {% if permit.date_debut %}
+                    <div class="info-item">
+                        <span class="info-label">Période de Validité</span>
+                        <span class="info-value" style="font-size: 13px;">
+                            Du {{ permit.date_debut }} au {{ permit.date_fin }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Timelines for approvals -->
+                <h3 class="section-title"><i class="fas fa-shield-alt"></i> Circuit de Validation</h3>
+                <div class="timeline">
+                    <!-- Step 1: Subcontractor Demand -->
+                    <div class="timeline-step">
+                        <div class="timeline-icon step-ok"><i class="fas fa-arrow-up"></i></div>
+                        <div class="step-text">Demande enregistrée</div>
+                    </div>
+                    
+                    <!-- Step 2: FIAT Approval -->
+                    <div class="timeline-step">
+                        {% if permit.status.value in ['attente_SINYLON FIAT', 'valide'] %}
+                            <div class="timeline-icon step-ok"><i class="fas fa-check"></i></div>
+                            <div class="step-text">Validation FIAT : Conforme</div>
+                        {% elif permit.status.value == 'attente_FIAT' %}
+                            <div class="timeline-icon step-pending"><i class="fas fa-spinner fa-spin"></i></div>
+                            <div class="step-text">Validation FIAT : En attente</div>
+                        {% else %}
+                            <div class="timeline-icon step-err"><i class="fas fa-times"></i></div>
+                            <div class="step-text">Validation FIAT : Non autorisée</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Step 3: SINYLON FIAT Final Validation -->
+                    <div class="timeline-step">
+                        {% if permit.status.value == 'valide' %}
+                            <div class="timeline-icon step-ok"><i class="fas fa-check-double"></i></div>
+                            <div class="step-text">Approbation SINYLON FIAT : Validé Terrain</div>
+                        {% elif permit.status.value == 'attente_SINYLON FIAT' %}
+                            <div class="timeline-icon step-pending"><i class="fas fa-spinner fa-spin"></i></div>
+                            <div class="step-text">Approbation SINYLON FIAT : En attente</div>
+                        {% else %}
+                            <div class="timeline-icon step-err"><i class="fas fa-times"></i></div>
+                            <div class="step-text">Approbation SINYLON FIAT : Non autorisé</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Safety Gear Checklist -->
+                <h3 class="section-title"><i class="fas fa-hard-hat"></i> Équipements de Sécurité (EPI)</h3>
+                <div class="epi-container">
+                    <div class="epi-item required"><i class="fas fa-hard-hat"></i> Casque obligatoire</div>
+                    <div class="epi-item required"><i class="fas fa-boot"></i> Chaussures de séc.</div>
+                    
+                    {% if 'hauteur' in permit.type_travaux.lower() or 'hauteur' in permit.type_travaux.lower() %}
+                        <div class="epi-item required"><i class="fas fa-user-shield"></i> Harnais antichute</div>
+                    {% else %}
+                        <div class="epi-item"><i class="fas fa-user-shield"></i> Harnais (Si requis)</div>
+                    {% endif %}
+
+                    {% if 'chaud' in permit.type_travaux.lower() or 'soudure' in permit.type_travaux.lower() %}
+                        <div class="epi-item required"><i class="fas fa-fire"></i> Gants anti-chaleur</div>
+                    {% else %}
+                        <div class="epi-item"><i class="fas fa-hands-wash"></i> Gants standards</div>
+                    {% endif %}
+                </div>
+
+                <!-- Footer note -->
+                <div class="footer-note">
+                    <i class="fas fa-lock text-success"></i> Fiche sécurisée — Validée en temps réel
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation des sons
+            const soundSuccess = new Audio('/static/sounds/success.mp3');
+            const soundAlert = new Audio('/static/sounds/alert.mp3');
+
+            // Déterminer le statut de validité / blocage
+            const isBlocked = {% if permit.is_blocked or permit.status.value != 'valide' %}true{% else %}false{% endif %};
+
+            let played = false;
+
+            function playFeedback() {
+                if (played) return;
+                played = true;
+                if (isBlocked) {
+                    soundAlert.play().catch(e => console.log("L'audio n'a pas pu se lancer :", e));
+                } else {
+                    soundSuccess.play().catch(e => console.log("L'audio n'a pas pu se lancer :", e));
+                }
+            }
+
+            // Tenter de jouer immédiatement
+            playFeedback();
+
+            // Fallback d'activation au premier clic/toucher (règle autoplay des navigateurs)
+            const unlockAndPlay = function() {
+                playFeedback();
+                document.removeEventListener('click', unlockAndPlay);
+                document.removeEventListener('touchstart', unlockAndPlay);
+            };
+            document.addEventListener('click', unlockAndPlay);
+            document.addEventListener('touchstart', unlockAndPlay);
+        });
+    </script>
+</body>
+</html>

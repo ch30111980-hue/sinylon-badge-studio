@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="{{ session.get('lang', 'fr') }}" dir="{{ 'rtl' if session.get('lang') == 'ar' else 'ltr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINYLON FIAT - {% block title %}{% endblock %}</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Preload Dancing Script for signature canvas -->
+    <link rel="preload" href="{{ url_for('static', filename='fonts/dancing-script-regular.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <!-- Local Fonts (Plus Jakarta Sans & Dancing Script) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+    <style>
+        /* Wobble animation for alert bell */
+        @keyframes wobble-bell {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(15deg); }
+            30% { transform: rotate(-15deg); }
+            45% { transform: rotate(10deg); }
+            60% { transform: rotate(-10deg); }
+            75% { transform: rotate(5deg); }
+            85% { transform: rotate(-5deg); }
+            100% { transform: rotate(0); }
+        }
+        .shake-bell {
+            animation: wobble-bell 0.6s ease;
+            transform-origin: top center;
+            color: #ea580c !important; /* Visual feedback: changes color to vibrant warning orange while shaking */
+            text-shadow: 0 0 12px rgba(234, 88, 12, 0.7);
+        }
+        /* Preload helper for Dancing Script font in canvas */
+        .font-preload-helper {
+            font-family: 'Dancing Script';
+            position: absolute;
+            visibility: hidden;
+            height: 0;
+            width: 0;
+            overflow: hidden;
+        }
+        body { 
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .navbar { 
+            background-color: rgba(255, 255, 255, 0.85) !important; 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid transparent;
+            border-image: linear-gradient(to right, #ea580c, #84cc16) 1;
+            padding: 10px 0 !important;
+            position: relative !important;
+            z-index: 1000 !important;
+        }
+        .navbar-nav .nav-link {
+            background-color: transparent !important;
+            border-radius: 0;
+            margin: 0 12px;
+            padding: 6px 0 !important;
+            transition: color 0.25s ease;
+            box-shadow: none !important;
+            position: relative;
+            top: 0;
+            color: #334155 !important;
+            font-weight: 600;
+            text-transform: none;
+            font-size: 13px;
+            letter-spacing: 0.2px;
+        }
+        .navbar-nav .nav-link:active {
+            top: 0;
+            box-shadow: none;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #0ea5e9 !important;
+            background-color: transparent !important;
+            transform: none;
+        }
+        
+        /* Premium Card Light Mode */
+        .card {
+            border-radius: 20px !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #0f172a !important;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+            border-color: rgba(14, 165, 233, 0.3) !important;
+        }
+        .card-header { 
+            background: transparent;
+            border-bottom: none;
+            padding: 20px 20px 5px 20px !important;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #0f172a !important;
+        }
+        .card-body {
+            padding: 20px !important;
+            color: #334155 !important;
+        }
+
+        /* Premium Button Design System */
+        .btn {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.1px;
+            border-radius: 12px !important;
+            padding: 8px 18px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+            opacity: 0.95;
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary, .btn-blue {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+            color: #ffffff !important;
+        }
+        .btn-primary:hover, .btn-blue:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        }
+
+        .btn-success, .btn-green {
+            background: linear-gradient(135deg, #84cc16 0%, #22c55e 100%) !important;
+            color: #ffffff !important;
+        }
+        .btn-success:hover, .btn-green:hover {
+            background: linear-gradient(135deg, #65a30d 0%, #16a34a 100%) !important;
+        }
+
+        .btn-danger, .btn-red {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
+            color: #ffffff !important;
+        }
+        .btn-danger:hover, .btn-red:hover {
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+        }
+
+        .btn-warning, .btn-gold, .btn-chic-gold {
+            background: linear-gradient(135deg, #ea580c 0%, #f97316 100%) !important;
+            color: #ffffff !important;
+        }
+        .btn-warning:hover, .btn-gold:hover, .btn-chic-gold:hover {
+            background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%) !important;
+        }
+
+        .btn-secondary, .btn-gray, .btn-chic-silver {
+            background: rgba(0, 0, 0, 0.05) !important;
+            color: #475569 !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+        .btn-secondary:hover, .btn-gray:hover, .btn-chic-silver:hover {
+            background: rgba(0, 0, 0, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        /* Form Inputs Premium Light Mode */
+        .form-control, .form-select {
+            border-radius: 12px !important;
+            padding: 10px 16px;
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #0f172a;
+            transition: all 0.2s ease;
+        }
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #0ea5e9 !important;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15) !important;
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        .x-small { font-size: 0.75rem; }
+        .btn-3d {
+            border-radius: 12px !important;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .btn-3d:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== FORCER les couleurs Bootstrap sur les span.badge ===== */
+        span.badge.bg-success, .badge.bg-success { background: #84cc16 !important; color: #fff !important; }
+        span.badge.bg-danger,  .badge.bg-danger  { background: #ef4444 !important; color: #fff !important; }
+        span.badge.bg-warning, .badge.bg-warning { background: #ea580c !important; color: #fff !important; }
+        span.badge.bg-primary, .badge.bg-primary { background: #0ea5e9 !important; color: #fff !important; }
+        span.badge.bg-secondary, .badge.bg-secondary { background: #475569 !important; color: #fff !important; }
+        span.badge.bg-info, .badge.bg-info    { background: #06b6d4 !important; color: #fff !important; }
+        span.badge.bg-light, .badge.bg-light   { background: rgba(0,0,0,0.05) !important; color: #475569 !important; border: 1px solid rgba(0,0,0,0.05) !important; }
+
+        /* Dropdowns */
+        .dropdown-menu {
+            z-index: 1050 !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(0,0,0,0.08) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+            background: #ffffff !important;
+        }
+        .dropdown-item {
+            color: #334155 !important;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(0,0,0,0.03) !important;
+            color: #0f172a !important;
+        }
+        .dropdown-divider {
+            border-top: 1px solid rgba(0,0,0,0.08) !important;
+        }
+        .dropdown-header {
+            color: #64748b !important;
+        }
+        
+        /* Support pour l'affichage en iframe (Modal) */
+        body.in-iframe nav,
+        body.in-iframe header,
+        body.in-iframe footer,
+        body.in-iframe a[href*="/dashboard"],
+        body.in-iframe a[href*="dashboard"] {
+            display: none !important;
+        }
+        body.in-iframe {
+            background: #ffffff !important;
+            min-height: auto !important;
+            padding: 15px !important;
+        }
+        body.in-iframe .container {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        @media print {
+            nav, .navbar, .no-print, .btn, .alert, .modal, .modal-backdrop, .dropdown-menu {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                background-color: white !important;
+                color: black !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+        }
+    </style>
+    <script>
+        window.isPermisReadOnly = {% if permis %}true{% else %}false{% endif %};
+        // Détecter si la page est chargée dans un iframe (Modal)
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('in-iframe');
+            document.addEventListener("DOMContentLoaded", function() {
+                document.body.classList.add('in-iframe');
+            });
+        }
+    </script>
+    <!-- Début du code Firebase / Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EYV8HG2B7D"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-EYV8HG2B7D');
+    </script>
+    <!-- Fin du code Firebase / Google Analytics -->
+</head>
+<body style="padding-top: 72px;">
+    <!-- Dummy element to force browser to load Dancing Script font -->
+    <div class="font-preload-helper">Preload signature font</div>
+    <nav class="navbar navbar-expand navbar-light shadow-sm fixed-top" style="backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid rgba(226, 232, 240, 0.8); z-index: 1050; box-shadow: 0 4px 20px rgba(0,0,0,0.06); transition: all 0.3s ease;">
+
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('dashboard') }}">
+                <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 28px; width: auto; margin-right: 10px;">
+                <span style="letter-spacing: 1px; color: #0f172a;">NORO <span style="background: linear-gradient(to right, #ea580c, #84cc16); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">UNIFIED</span></span>
+                <span class="badge bg-primary ms-2 px-2 py-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">SINYLON FIAT STELLANTIS</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if current_user.is_authenticated %}
+                <ul class="navbar-nav me-auto">
+                    {% if current_user.role not in ['agent', 'gardien', 'securite'] %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">{{ _('Dashboard') }}</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-primary" href="{{ url_for('permis.assistant') }}"><i class="fas fa-robot me-1"></i> NORO</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('badge.liste') }}">{{ _('Badges') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('permis.liste') }}">{{ _('Permis') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('badge.documents') }}">📂 {{ _('Documents') }}</a></li>
+                    {% if is_desktop %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('carte_chantier') }}">🗺️ Plan Interactif</a></li>
+                    {% endif %}
+                    {% endif %}
+                    {% if current_user.role in ['SINYLON FIAT', 'admin', 'agent', 'gardien', 'securite'] %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('badge.caisse') }}">📟 {{ _('Caisse NFC') }}</a></li>
+                    {% endif %}
+                    {% if current_user.is_admin or (current_user.username and current_user.username.lower() == 'nouri') %}
+                    <li class="nav-item"><a class="nav-link fw-bold text-info" href="{{ url_for('annuaire') }}">📖 Annuaire & Urgences</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-primary" href="{{ url_for('analytics') }}">📊 Analytics</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-warning" href="{{ url_for('habilitations') }}">🏗️ Habilitations</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-danger" href="{{ url_for('incidents') }}">📸 Incidents HSE</a></li>
+                    {% endif %}
+                    {% if current_user.is_admin %}
+                    <li class="nav-item"><a class="nav-link fw-bold text-warning" href="{{ url_for('badge.admin_dashboard') }}">👑 Admin Entreprise</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" style="color: #10b981 !important;" href="{{ url_for('SINYLON FIAT_dashboard') }}">🏢 SINYLON FIAT - ENTREPRISES</a></li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav align-items-center">
+                    {% if current_user.is_admin %}
+                    <li class="nav-item dropdown me-2">
+                        <a class="nav-link position-relative px-2" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="line-height: 1; overflow: visible;">
+                            <i class="fas fa-bell text-secondary" style="font-size: 1.1rem;"></i>
+                            <span id="notif-badge" style="display:none; position:absolute; top:-2px; right:-6px; background:#dc3545; color:#fff; font-size:9px; font-weight:700; min-width:14px; height:14px; line-height:14px; text-align:center; border-radius:50%; padding:0 3px; z-index:1; pointer-events:none;">
+                                0
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notifDropdown" id="notif-list" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                            <li><h6 class="dropdown-header">Notifications en direct</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li id="no-notifs"><span class="dropdown-item text-muted small">Aucune nouvelle demande</span></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
+                             {% if current_user.get_photo_url() %}
+                             <img src="{{ current_user.get_photo_url() }}" class="rounded-circle border border-primary shadow-sm" style="width: 32px; height: 32px; object-fit: cover;" alt="Avatar">
+                             {% else %}
+                             <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                 {{ current_user.full_name()[:2].upper() }}
+                             </div>
+                             {% endif %}
+                             <span class="fw-semibold">{{ current_user.full_name() }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 16px;">
+                            <li><a class="dropdown-item fw-medium py-2" href="#" data-bs-toggle="modal" data-bs-target="#userProfileModal"><i class="fas fa-user-cog text-primary me-2"></i>Mon Profil (Photo, Téléphone, Signature)</a></li>
+                            {% if current_user.is_admin %}
+                            <li><a class="dropdown-item fw-medium py-2" href="{{ url_for('main.users_online') }}"><i class="fas fa-signal text-success me-2"></i>Comptes en Ligne (PC 💻 / Mobile 📱)</a></li>
+                            {% endif %}
+                            {% if not current_user.is_admin %}
+                            <li><a class="dropdown-item fw-medium py-2" href="#" data-bs-toggle="modal" data-bs-target="#emailNotificationsModal"><i class="fas fa-bell text-warning me-2"></i>Email Notifications</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger fw-bold py-2" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>{{ _('Déconnexion') }}</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="show"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Electron Developer Tool (Mise à jour en Production) -->
+        <div id="electron-publish-banner" class="alert alert-info d-none shadow-sm border-info mt-2 mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="fw-bold mb-1 text-info-emphasis"><i class="fas fa-terminal me-2"></i>Mode Client Mac / Windows (Développement)</h6>
+                <p class="mb-0 text-muted small" style="font-size: 0.75rem;">Vous testez vos modifications en local. Cliquez sur le bouton pour publier et déployer automatiquement en ligne sur Render.</p>
+            </div>
+            <div>
+                <button id="electron-publish-btn" class="btn btn-primary btn-sm px-4 fw-bold" onclick="publishElectronSite()">
+                    <i class="fas fa-paper-plane me-1"></i> Publier sur Render
+                </button>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Vérifier si nous tournons dans l'application Electron
+                if (window.electronAPI && window.electronAPI.isElectron) {
+                    {% if current_user.role in ['admin', 'SINYLON FIAT'] %}
+                    document.getElementById('electron-publish-banner').classList.remove('d-none');
+                    {% endif %}
+                }
+            });
+
+            function publishElectronSite() {
+                const btn = document.getElementById('electron-publish-btn');
+                
+                if (!confirm("Voulez-vous vraiment publier toutes vos modifications locales en production sur Render ?")) {
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Publication...';
+                
+                window.electronAPI.publishSite()
+                    .then(res => {
+                        if (res.success) {
+                            alert("Succès ! Vos modifications ont été envoyées à GitHub. Render va maintenant reconstruire le site en ligne (2 à 3 minutes).");
+                            location.reload();
+                        } else {
+                            alert("Erreur de publication : " + res.error);
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Publier sur Render';
+                        }
+                    })
+                    .catch(err => {
+                        alert("Erreur système : " + err);
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Publier sur Render';
+                    });
+            }
+        </script>
+
+        {% block content %}{% endblock %}
+
+        {% if permis and permis.data is defined %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // 1. Disable all inputs, selects, textareas, files, and buttons
+                const form = document.querySelector('form:not(#sig-form-admin):not(.no-print)');
+                if (form) {
+                    const elements = form.querySelectorAll('input, select, textarea, button, [type="file"]');
+                    elements.forEach(el => {
+                        if (!el.classList.contains('no-print') && el.type !== 'button') {
+                            el.disabled = true;
+                            // Style text elements nicely for printing (remove borders except bottom)
+                            if ((el.type === 'text' || el.tagName === 'TEXTAREA') && !el.classList.contains('form-control-color')) {
+                                el.style.border = 'none';
+                                el.style.borderBottom = '1px solid #000';
+                                el.style.borderRadius = '0';
+                                el.style.background = 'transparent';
+                                el.style.padding = '0';
+                            }
+                        }
+                    });
+                    // Hide save/submit buttons
+                    const submitBtns = form.querySelectorAll('button[type="submit"], button[onclick*="submitForm"]');
+                    submitBtns.forEach(btn => btn.style.display = 'none');
+                }
+
+                if (form) {
+                    // 2. Populate text values, radios, and checkboxes
+                    const permitData = {{ permis.data|tojson|safe }};
+                    for (const [key, value] of Object.entries(permitData)) {
+                        // Find element by name inside form only
+                        const inputs = form.querySelectorAll(`[name="${key}"]`);
+                        inputs.forEach(el => {
+                            if (el.type === 'radio') {
+                                if (el.value === value) {
+                                    el.checked = true;
+                                    el.setAttribute('checked', 'checked');
+                                }
+                            } else if (el.type === 'checkbox') {
+                                el.checked = (value === 'on' || value === 'Y' || value === true || el.value === value);
+                                if (el.checked) el.setAttribute('checked', 'checked');
+                            } else {
+                                el.value = value;
+                            }
+                        });
+                    }
+                }
+
+                // 3. Draw saved signatures on canvases
+                const permitSigs = {{ permis.signatures|tojson|safe }};
+                for (const [key, value] of Object.entries(permitSigs)) {
+                    if (!value) continue;
+                    
+                    // Find any canvas whose ID matches key, sig_ + key, or has key in it
+                    let canvas = document.getElementById(key);
+                    if (!canvas) {
+                        // Try different template naming variations
+                        const suffix = key.replace('sig_', '');
+                        canvas = document.getElementById('sig_hauteur_' + suffix) ||
+                                 document.getElementById('sig_chaud_' + suffix) ||
+                                 document.getElementById('sig_espace_' + suffix) ||
+                                 document.getElementById('sig_levage_' + suffix) ||
+                                 document.getElementById('sig_fouille_' + suffix) ||
+                                 document.getElementById('sig_electrique_' + suffix) ||
+                                 document.getElementById('sig_vehicule_' + suffix) ||
+                                 document.getElementById('sig_reval_' + suffix) ||
+                                 document.getElementById('sig_hb_' + suffix) ||
+                                 document.getElementById('sig_hb_hb_' + suffix) ||
+                                 document.querySelector(`canvas[id$="${suffix}"]`);
+                    }
+                    
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        const img = new Image();
+                        img.onload = function() {
+                            // Clear canvas first
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            
+                            // Save context, reset transform to draw correctly
+                            ctx.save();
+                            ctx.setTransform(1, 0, 0, 1, 0, 0);
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            ctx.restore();
+                        };
+                        img.src = value;
+                    }
+                }
+                
+                // 4. Auto-print if requested
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('print') === 'true') {
+                    setTimeout(function() {
+                        window.print();
+                    }, 800);
+                }
+            });
+        </script>
+        {% endif %}
+        <script>
+            function submitForPrint() {
+                let actionAfterInput = document.getElementById('action_after');
+                if (!actionAfterInput) {
+                    actionAfterInput = document.createElement('input');
+                    actionAfterInput.type = 'hidden';
+                    actionAfterInput.name = 'action_after';
+                    actionAfterInput.id = 'action_after';
+                    const form = document.querySelector('form');
+                    if (form) form.appendChild(actionAfterInput);
+                }
+                actionAfterInput.value = 'print';
+                
+                if (typeof submitForm === 'function') {
+                    submitForm();
+                } else if (typeof submitExcavationForm === 'function') {
+                    submitExcavationForm();
+                } else if (typeof submitVehiculeForm === 'function') {
+                    submitVehiculeForm();
+                } else {
+                    const form = document.querySelector('form');
+                    if (form) form.submit();
+                }
+            }
+        </script>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    
+    {% if current_user.is_authenticated %}
+    <script>
+        let myAudioContext = null;
+        let audioUnlocked = false;
+
+        // Initialisation des fichiers audio physiques
+        const soundSuccess = new Audio('/static/sounds/success.mp3');
+        const soundAlert = new Audio('/static/sounds/alert.mp3');
+
+        // Fonction pour déverrouiller l'AudioContext et précharger l'audio lors d'une interaction utilisateur
+        function unlockAudio() {
+            if (audioUnlocked) return;
+            try {
+                myAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (myAudioContext.state === 'suspended') {
+                    myAudioContext.resume();
+                }
+                // Joue un court son silencieux pour forcer l'autorisation du navigateur
+                const buffer = myAudioContext.createBuffer(1, 1, 22050);
+                const source = myAudioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(myAudioContext.destination);
+                source.start(0);
+                
+                // Précharger les éléments audio HTML5
+                soundSuccess.load();
+                soundAlert.load();
+                
+                audioUnlocked = true;
+                console.log("AudioContext déverrouillé et fichiers audio initialisés avec succès.");
+                
+                // Retirer les écouteurs temporaires
+                ['click', 'touchstart', 'keydown'].forEach(evt => {
+                    document.removeEventListener(evt, unlockAudio);
+                });
+            } catch(e) {
+                console.warn("Échec du déverrouillage audio:", e);
+            }
+        }
+
+        // Écouter la première interaction de l'utilisateur pour débloquer l'audio
+        ['click', 'touchstart', 'keydown'].forEach(evt => {
+            document.addEventListener(evt, unlockAudio, { once: true });
+        });
+
+        // Fonction pour jouer un son de notification (lecture des fichiers MP3)
+        function playNotificationSound(action) {
+            try {
+                if (action === 'revocation' || action === 'bloque' || action === 'error' || action === 'critical') {
+                    soundAlert.currentTime = 0;
+                    soundAlert.play().catch(e => console.log("L'audio n'a pas pu se lancer :", e));
+                } else {
+                    soundSuccess.currentTime = 0;
+                    soundSuccess.play().catch(e => console.log("L'audio n'a pas pu se lancer :", e));
+                }
+            } catch(e) {
+                console.warn("Échec de la lecture sonore :", e);
+            }
+        }
+
+        // Créer le conteneur de Toasts à la volée
+        function createToastContainer() {
+            let container = document.getElementById('security-toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'security-toast-container';
+                container.style.position = 'fixed';
+                container.style.top = '80px';
+                container.style.right = '20px';
+                container.style.zIndex = '10000';
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                container.style.gap = '12px';
+                container.style.maxWidth = '380px';
+                document.body.appendChild(container);
+            }
+            return container;
+        }
+
+        // Afficher un Toast premium avec option WhatsApp
+        function showPremiumToast(type_item, action, message, title, wa_link = null) {
+            const container = createToastContainer();
+            const toast = document.createElement('div');
+            toast.className = 'security-toast card border-0 shadow-lg';
+            
+            let borderColor = '#3b82f6'; // bleu par défaut
+            let iconClass = 'fa-bell';
+            
+            if (action === 'approbation' || action === 'debloque') {
+                borderColor = '#10b981'; // vert
+                iconClass = 'fa-check-circle';
+            } else if (action === 'creation' || action === 'refaire') {
+                borderColor = '#f59e0b'; // orange/ambre
+                iconClass = 'fa-info-circle';
+            } else if (action === 'revocation' || action === 'bloque') {
+                borderColor = '#ef4444'; // rouge
+                iconClass = 'fa-exclamation-triangle';
+            }
+            
+            let waBtn = '';
+            if (wa_link) {
+                waBtn = `<div class="mt-2"><a href="${wa_link}" target="_blank" class="btn btn-sm btn-success fw-bold py-1 px-2.5 d-inline-flex align-items-center gap-1 shadow-sm" style="font-size: 0.72rem; border-radius: 6px; background-color: #25D366; border: none; color: #fff;">
+                    <i class="fab fa-whatsapp fs-6"></i> Transmettre via WhatsApp
+                </a></div>`;
+            }
+            
+            toast.style.background = 'linear-gradient(135deg, rgba(31, 41, 55, 0.96), rgba(17, 24, 39, 0.96))';
+            toast.style.color = '#fff';
+            toast.style.borderLeft = `5px solid ${borderColor}`;
+            toast.style.borderRadius = '8px';
+            toast.style.backdropFilter = 'blur(12px)';
+            toast.style.width = '350px';
+            toast.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.3)';
+            toast.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            toast.style.transform = 'translateX(120%)';
+            toast.style.opacity = '0';
+            
+            toast.innerHTML = `
+                <div class="card-body p-3 d-flex align-items-start gap-3">
+                    <div class="fs-4 flex-shrink-0" style="color: ${borderColor};">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small text-white-50 text-uppercase" style="letter-spacing: 0.5px; font-size: 10px;">${title}</div>
+                        <div class="mt-1 small" style="line-height: 1.4; color: #f3f4f6;">${message}</div>
+                        ${waBtn}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white btn-sm flex-shrink-0" style="font-size: 0.65rem;" onclick="this.closest('.security-toast').remove()"></button>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Animation d'entrée
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+                toast.style.opacity = '1';
+            }, 50);
+            
+            // Suppression automatique après 7 secondes
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 400);
+            }, 7000);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var socket = io({ transports: ['websocket'] });
+            var liveAlertsLog = [];
+            let lastGrandTotal = null;
+
+            function updatePendingCountsDropdown(data) {
+                const totalPermis = data.total_permis || 0;
+                const totalBadges = data.total_badges || 0;
+                const grandTotal = totalPermis + totalBadges;
+
+                const badgeEl = document.getElementById('notif-badge');
+                if (badgeEl) {
+                    if (grandTotal > 0) {
+                        badgeEl.textContent = grandTotal;
+                        badgeEl.style.display = 'block';
+                    } else {
+                        badgeEl.style.display = 'none';
+                    }
+                }
+
+                const list = document.getElementById('notif-list');
+                if (!list) return;
+
+                let html = `<li><h6 class="dropdown-header text-uppercase fw-bold text-primary" style="font-size: 0.75rem; letter-spacing: 0.5px;">Demandes en attente</h6></li>`;
+
+                if (grandTotal === 0) {
+                    html += `<li><span class="dropdown-item text-muted small py-2 text-center">Aucune demande en attente</span></li>`;
+                } else {
+                    if (totalPermis > 0) {
+                        html += `<li><hr class="dropdown-divider my-1"></li>`;
+                        html += `<li><h6 class="dropdown-header fw-bold text-dark d-flex justify-content-between align-items-center" style="font-size: 0.8rem;">
+                                   <span><i class="fas fa-file-signature text-info me-2"></i>Permis en attente</span>
+                                   <span class="badge bg-info text-white rounded-pill">${totalPermis}</span>
+                                 </h6></li>`;
+                        for (const [company, count] of Object.entries(data.permis_by_company)) {
+                            html += `<li><a class="dropdown-item py-1 px-4 small d-flex justify-content-between align-items-center" href="/permis/">
+                                       <span class="text-secondary">${company}</span>
+                                       <span class="badge bg-light text-secondary border rounded-pill">${count}</span>
+                                     </a></li>`;
+                        }
+                    }
+
+                    if (totalBadges > 0) {
+                        html += `<li><hr class="dropdown-divider my-1"></li>`;
+                        html += `<li><h6 class="dropdown-header fw-bold text-dark d-flex justify-content-between align-items-center" style="font-size: 0.8rem;">
+                                   <span><i class="fas fa-id-card text-success me-2"></i>Badges en attente</span>
+                                   <span class="badge bg-success text-white rounded-pill">${totalBadges}</span>
+                                 </h6></li>`;
+                        for (const [company, count] of Object.entries(data.badges_by_company)) {
+                            html += `<li><a class="dropdown-item py-1 px-4 small d-flex justify-content-between align-items-center" href="/badge/admin">
+                                       <span class="text-secondary">${company}</span>
+                                       <span class="badge bg-light text-secondary border rounded-pill">${count}</span>
+                                     </a></li>`;
+                        }
+                    }
+                }
+
+                html += `<li><hr class="dropdown-divider my-2"></li>`;
+                html += `<li><h6 class="dropdown-header text-uppercase fw-bold text-secondary" style="font-size: 0.75rem; letter-spacing: 0.5px;">Flux des alertes direct</h6></li>`;
+                
+                if (liveAlertsLog.length === 0) {
+                    html += `<li><span class="dropdown-item text-muted small py-2 text-center" id="no-live-alerts">Aucune alerte récente</span></li>`;
+                } else {
+                    liveAlertsLog.forEach(alert => {
+                        html += `<li><a class="dropdown-item py-2 px-3 small border-bottom-0" href="${alert.url}">
+                                   <div class="fw-bold text-dark d-flex align-items-center gap-2">
+                                     <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:${alert.color}"></span>
+                                     ${alert.title}
+                                   </div>
+                                   <div class="text-muted" style="font-size: 0.75rem; white-space: normal; line-height: 1.3;">${alert.message}</div>
+                                 </a></li>`;
+                    });
+                }
+
+                list.innerHTML = html;
+            }
+
+            function fetchPendingCounts(playBeepIfIncreased) {
+                fetch('/api/v1/admin/pending_counts')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) return;
+                        const totalPermis = data.total_permis || 0;
+                        const totalBadges = data.total_badges || 0;
+                        const grandTotal = totalPermis + totalBadges;
+                        
+                        if (playBeepIfIncreased && lastGrandTotal !== null && grandTotal > lastGrandTotal) {
+                            playNotificationSound('creation');
+                        }
+                        
+                        lastGrandTotal = grandTotal;
+                        updatePendingCountsDropdown(data);
+                    })
+                    .catch(err => console.error("Error fetching pending counts:", err));
+            }
+
+            function addNotification(titre, message, url, action) {
+                let color = '#3b82f6';
+                if (action === 'approbation' || action === 'debloque') color = '#10b981';
+                else if (action === 'revocation' || action === 'bloque') color = '#dc2626';
+                else if (action === 'creation' || action === 'refaire') color = '#ea580c';
+
+                liveAlertsLog.unshift({
+                    title: titre,
+                    message: message,
+                    url: url,
+                    color: color
+                });
+
+                if (liveAlertsLog.length > 5) {
+                    liveAlertsLog.pop();
+                }
+
+                playNotificationSound(action);
+                fetchPendingCounts(false);
+            }
+
+            // Écouteur unique et universel d'alertes de sécurité
+            socket.on('security_alert', function(data) {
+                console.log("Reçu alerte de sécurité :", data);
+                
+                // Shake the alert bell icon and make it flash yellow
+                const bellIcon = document.querySelector('#notifDropdown i');
+                if (bellIcon) {
+                    bellIcon.classList.add('shake-bell');
+                    setTimeout(() => bellIcon.classList.remove('shake-bell'), 600);
+                }
+                
+                let title = "Alerte Système";
+                let url = "{{ url_for('dashboard') }}";
+                
+                if (data.type === 'permis') {
+                    url = "{{ url_for('dashboard') }}";
+                    if (data.action === 'creation') title = "Nouveau Permis Soumis";
+                    else if (data.action === 'approbation') title = "Permis Validé 🟢";
+                    else if (data.action === 'refaire') title = "Permis à Corriger 🟠";
+                    else if (data.action === 'revocation') title = "Permis Révoqué 🚨";
+                    else if (data.action === 'bloque') title = "Permis Bloqué 🚫";
+                    else if (data.action === 'debloque') title = "Permis Réactivé ✅";
+                } else if (data.type === 'badge') {
+                    url = "{{ url_for('badge.liste') }}";
+                    if (data.action === 'creation') title = "Nouveau Badge Demandé";
+                    else if (data.action === 'bloque') title = "Badge Bloqué 🚫";
+                    else if (data.action === 'debloque') title = "Badge Réactivé ✅";
+                } else if (data.type === 'entreprise') {
+                    url = "{{ url_for('dashboard') }}";
+                    if (data.action === 'bloque') title = "Entreprise Bloquée ⛔";
+                    else if (data.action === 'debloque') title = "Entreprise Débloquée ✅";
+                }
+
+                // 1. Afficher le Toast premium
+                showPremiumToast(data.type, data.action, data.message, title);
+
+                // 2. Ajouter au dropdown de notifications via addNotification
+                addNotification(title, data.message, url, data.action);
+
+                // 3. Mettre à jour dynamiquement les compteurs si présents sur la page
+                {% if current_user.is_admin %}
+                if (data.global_stats) {
+                    const elTotalP = document.getElementById('admin-total-permis');
+                    const elEnAttenteP = document.getElementById('admin-permis-en-attente');
+                    const elBlueP = document.getElementById('admin-blue-permis');
+                    const elOrangeP = document.getElementById('admin-orange-permis');
+                    const elRedP = document.getElementById('admin-red-permis');
+                    const elAlerts = document.getElementById('admin-alerts-count');
+
+                    if (elTotalP) elTotalP.textContent = data.global_stats.total_permis;
+                    if (elEnAttenteP) elEnAttenteP.textContent = data.global_stats.permis_en_attente;
+                    if (elBlueP) elBlueP.textContent = data.global_stats.blue_permis;
+                    if (elOrangeP) elOrangeP.textContent = data.global_stats.orange_permis;
+                    if (elRedP) elRedP.textContent = data.global_stats.red_permis;
+                    
+                    if (elAlerts && (data.action === 'revocation' || data.action === 'bloque')) {
+                        let curAlerts = parseInt(elAlerts.textContent) || 0;
+                        elAlerts.textContent = curAlerts + 1;
+                    }
+                }
+                {% else %}
+                if (data.company_stats && data.company_stats.entreprise === "{{ current_user.entreprise }}") {
+                    const elTotalPVal = document.getElementById('total-permis-val');
+                    const elTotalBVal = document.getElementById('total-badges-val');
+                    const elEnAttentePVal = document.getElementById('permis-en-attente-val');
+                    const elBluePVal = document.getElementById('blue-permis-val');
+                    const elOrangePVal = document.getElementById('orange-permis-val');
+                    const elRedPVal = document.getElementById('red-permis-val');
+
+                    if (elTotalPVal) elTotalPVal.textContent = data.company_stats.total_permis;
+                    if (elTotalBVal) elTotalBVal.textContent = data.company_stats.total_badges;
+                    if (elEnAttentePVal) elEnAttentePVal.textContent = data.company_stats.permis_en_attente;
+                    if (elBluePVal) elBluePVal.textContent = data.company_stats.blue_permis;
+                    if (elOrangePVal) elOrangePVal.textContent = data.company_stats.orange_permis;
+                    if (elRedPVal) elRedPVal.textContent = data.company_stats.red_permis;
+                }
+                {% endif %}
+            });
+            
+            // Remise à zéro du compteur visuel (notifCount n'est plus utilisé de la même façon mais on nettoie le badge si clic)
+            const notifDrop = document.getElementById('notifDropdown');
+            if (notifDrop) {
+                notifDrop.addEventListener('click', function() {
+                    const badge = document.getElementById('notif-badge');
+                    if (badge) badge.style.display = 'none';
+                    
+                    // Interaction utilisateur garantie : déclencher le tremblement de la cloche et le son test
+                    const icon = notifDrop.querySelector('i');
+                    if (icon) {
+                        icon.classList.add('shake-bell');
+                        setTimeout(() => icon.classList.remove('shake-bell'), 600);
+                    }
+                    playNotificationSound('info');
+                });
+            }
+
+            // Periodically poll pending counts if admin
+            {% if current_user.is_admin %}
+            fetchPendingCounts(false);
+            setInterval(function() {
+                fetchPendingCounts(true);
+            }, 10000); // poll every 10 seconds
+            {% endif %}
+        });
+    </script>
+    {% endif %}
+    
+    {% if current_user.is_authenticated and not current_user.is_admin %}
+    <!-- Modal Email Notifications -->
+    <div class="modal fade" id="emailNotificationsModal" tabindex="-1" aria-labelledby="emailNotificationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-dark" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px;">
+                <div class="modal-header border-bottom border-light">
+                    <h5 class="modal-title fw-bold" id="emailNotificationsModalLabel">
+                        <i class="fas fa-bell text-warning me-2"></i>Email dédié aux Notifications
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/entreprise/set_email_notifications" method="POST">
+                    <div class="modal-body">
+                        <p class="small text-muted">
+                            Configurez la boîte mail d'alerte de votre entreprise. Cette adresse recevra toutes les notifications (blocage de badges, validation SINYLON FIAT, etc.) indépendamment de votre email de connexion.
+                        </p>
+                        <div class="mb-3">
+                            <label for="email_notifications_input" class="form-label fw-bold text-dark">Email d'alertes / notifications</label>
+                            <input type="email" name="email_notifications" id="email_notifications_input" class="form-control bg-white border-secondary text-dark" placeholder="alertes@entreprise.com" value="{{ current_user.email_notifications or '' }}" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top border-light">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-warning btn-sm fw-bold">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Modal Gestion Complète du Profil Utilisateur -->
+    {% if current_user.is_authenticated %}
+    <div class="modal fade" id="userProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg text-dark" style="border-radius: 20px;">
+                <div class="modal-header bg-dark text-white p-4" style="border-radius: 20px 20px 0 0;">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-user-cog me-2 text-primary"></i> Mon Profil & Paramètres (Photo, Téléphone, Signature)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ url_for('auth.upload_profil_photo') }}" enctype="multipart/form-data">
+                    <div class="modal-body p-4 text-start">
+                        
+                        <!-- Header Profil Avatar -->
+                        <div class="d-flex align-items-center gap-4 mb-4 p-3 bg-light rounded-4 border">
+                            <div class="position-relative flex-shrink-0">
+                                {% if current_user.get_photo_url() %}
+                                <img src="{{ current_user.get_photo_url() }}" class="rounded-circle border border-3 border-primary shadow" style="width: 80px; height: 80px; object-fit: cover;" alt="Avatar">
+                                {% else %}
+                                <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center fw-bold shadow" style="width: 80px; height: 80px; font-size: 2rem;">
+                                    {{ current_user.full_name()[:2].upper() }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1 text-dark">{{ current_user.full_name() }}</h5>
+                                <div class="badge bg-primary px-2.5 py-1 text-uppercase me-1">{{ current_user.role.upper() }}</div>
+                                <span class="badge bg-secondary px-2.5 py-1">{{ current_user.entreprise or 'Chantier FIAT' }}</span>
+                                <p class="text-muted small mb-0 mt-1"><i class="fas fa-envelope me-1"></i> {{ current_user.email }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Informations Personnelles -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Nom *</label>
+                                <input type="text" name="nom" class="form-control fw-semibold" value="{{ current_user.nom or '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Prénom *</label>
+                                <input type="text" name="prenom" class="form-control fw-semibold" value="{{ current_user.prenom or '' }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="fab fa-whatsapp text-success me-1"></i> Numéro WhatsApp Direct Direct</label>
+                                <input type="text" name="telephone" class="form-control font-monospace" placeholder="ex: 0550 12 34 56" value="{{ current_user.telephone or '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Poste / Fonction / Rôle HSE</label>
+                                <input type="text" name="fonction" class="form-control" placeholder="ex: Responsable SINYLON FIAT / Chef de Projet" value="{{ current_user.fonction or '' }}">
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Section Photo de Profil -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold"><i class="fas fa-camera text-primary me-1"></i> Modifier la Photo de Profil / Avatar</label>
+                                <div class="input-group">
+                                    <input type="file" name="photo" class="form-control" accept="image/*">
+                                    <button type="submit" name="action" value="reset_to_badge" class="btn btn-outline-secondary btn-sm" title="Utiliser la photo du badge ou directeur">
+                                        <i class="fas fa-sync-alt me-1"></i> Auto-Détection
+                                    </button>
+                                </div>
+                                <div class="form-text small text-muted">Si aucune photo n'est choisie, le système détection automatiquement celle de votre badge.</div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Section Signature Électronique -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold d-flex align-items-center justify-content-between">
+                                    <span><i class="fas fa-signature text-warning me-1"></i> Signature Électronique Officielle (Validation Permis)</span>
+                                    {% if current_user.get_signature_url() %}
+                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i> Signature Enregistrée</span>
+                                    {% endif %}
+                                </label>
+
+                                {% if current_user.get_signature_url() %}
+                                <div class="mb-2 p-2 bg-light rounded text-center border">
+                                    <img src="{{ current_user.get_signature_url() }}" style="max-height: 70px;" alt="Signature actuelle">
+                                </div>
+                                {% endif %}
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-light rounded border h-100">
+                                            <label class="form-label fw-bold text-dark small mb-1"><i class="fas fa-camera text-primary me-1"></i> Option 1 : Importer une Photo / Image PNG ou JPG</label>
+                                            <div class="text-muted small mb-2">Prenez en photo votre vraie signature sur papier blanc et importez-la ici.</div>
+                                            <input type="file" name="signature_file" class="form-control form-control-sm" accept="image/*">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-light rounded border h-100">
+                                            <label class="form-label fw-bold text-dark small mb-1"><i class="fas fa-pen-nib text-success me-1"></i> Option 2 : Dessiner à la main / tactile sur écran</label>
+                                            <div class="border rounded bg-white p-1 text-center shadow-sm">
+                                                <canvas id="userSignatureCanvas" width="300" height="90" style="border: 1px dashed #cbd5e1; cursor: crosshair; touch-action: none; background: #fff;"></canvas>
+                                                <div class="mt-1 d-flex justify-content-end gap-1">
+                                                    <button type="button" class="btn btn-xs btn-outline-danger py-0 px-2" style="font-size: 0.7rem;" onclick="clearUserSignatureCanvas()"><i class="fas fa-eraser me-1"></i> Effacer</button>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" name="signature_data" id="userSignatureData">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light p-3" style="border-radius: 0 0 20px 20px;">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" onclick="prepareUserSignatureData()" class="btn btn-primary fw-bold px-4 shadow-sm"><i class="fas fa-save me-1"></i> Enregistrer Mon Profil</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userSigCanvas, userSigCtx, isDrawingUserSig = false;
+        document.addEventListener("DOMContentLoaded", function() {
+            userSigCanvas = document.getElementById('userSignatureCanvas');
+            if (userSigCanvas) {
+                userSigCtx = userSigCanvas.getContext('2d');
+                userSigCtx.strokeStyle = "#0f172a";
+                userSigCtx.lineWidth = 2.5;
+                userSigCtx.lineCap = "round";
+
+                function getPos(e) {
+                    const rect = userSigCanvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    return { x: clientX - rect.left, y: clientY - rect.top };
+                }
+
+                function startDraw(e) {
+                    isDrawingUserSig = true;
+                    const pos = getPos(e);
+                    userSigCtx.beginPath();
+                    userSigCtx.moveTo(pos.x, pos.y);
+                }
+
+                function draw(e) {
+                    if (!isDrawingUserSig) return;
+                    e.preventDefault();
+                    const pos = getPos(e);
+                    userSigCtx.lineTo(pos.x, pos.y);
+                    userSigCtx.stroke();
+                }
+
+                function stopDraw() { isDrawingUserSig = false; }
+
+                userSigCanvas.addEventListener('mousedown', startDraw);
+                userSigCanvas.addEventListener('mousemove', draw);
+                userSigCanvas.addEventListener('mouseup', stopDraw);
+
+                userSigCanvas.addEventListener('touchstart', startDraw);
+                userSigCanvas.addEventListener('touchmove', draw);
+                userSigCanvas.addEventListener('touchend', stopDraw);
+            }
+        });
+
+        function clearUserSignatureCanvas() {
+            if (userSigCtx && userSigCanvas) {
+                userSigCtx.clearRect(0, 0, userSigCanvas.width, userSigCanvas.height);
+                document.getElementById('userSignatureData').value = "";
+            }
+        }
+
+        function prepareUserSignatureData() {
+            if (userSigCanvas) {
+                const blank = document.createElement('canvas');
+                blank.width = userSigCanvas.width;
+                blank.height = userSigCanvas.height;
+                if (userSigCanvas.toDataURL() !== blank.toDataURL()) {
+                    document.getElementById('userSignatureData').value = userSigCanvas.toDataURL('image/png');
+                }
+            }
+        }
+    </script>
+    {% endif %}
+
+    {% block scripts %}{% endblock %}
+
+    <!-- NORO AI Autofill Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const pendingData = localStorage.getItem('noro_pending_data');
+            if (pendingData) {
+                try {
+                    const data = JSON.parse(pendingData);
+                    let filledCount = 0;
+                    
+                    // Remplit les champs qui ont un name="..." ou data-field="..."
+                    for (const [key, value] of Object.entries(data)) {
+                        if (key === 'permit_type' || key === 'ai_response') continue;
+                        
+                        // Chercher par name ou data-field
+                        let el = document.querySelector(`[name="${key}"], [data-field="${key}"]`);
+                        if (el) {
+                            if (el.tagName === 'INPUT' && (el.type === 'checkbox' || el.type === 'radio')) {
+                                // Gérer les checkbox/radio
+                                if (value === true || value === "true" || value === "oui" || value === "yes" || value === "1") {
+                                    el.checked = true;
+                                    filledCount++;
+                                }
+                            } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+                                el.value = value;
+                                filledCount++;
+                            } else {
+                                el.innerText = value;
+                                filledCount++;
+                            }
+                        }
+                    }
+                    
+                    if (filledCount > 0) {
+                        console.log(`NORO AI a pré-rempli ${filledCount} champs.`);
+                        // Optionnel: afficher un petit toast de confirmation
+                    }
+                    
+                    // Nettoyer pour ne pas re-remplir à l'infini
+                    localStorage.removeItem('noro_pending_data');
+                } catch (e) {
+                    console.error("Erreur lors de l'auto-remplissage NORO AI:", e);
+                }
+            }
+        });
+    </script>
+    <!-- Modal 1-Clic Création Combinée Entreprise + Compte Utilisateur -->
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <div class="modal fade" id="createEnterpriseUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg text-dark" style="border-radius: 20px;">
+                <div class="modal-header bg-success text-white p-4" style="border-radius: 20px 20px 0 0;">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-building-circle-check me-2"></i> Création 1-Clic Entreprise & Accès</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ url_for('main.creer_entreprise_combines') }}">
+                    <div class="modal-body p-4 text-start">
+                        <p class="text-muted small mb-3"><i class="fas fa-magic text-success me-1"></i> Crée instantanément l'Entreprise et son compte de connexion sans aucune double saisie.</p>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nom de l'Entreprise Sous-Traitante *</label>
+                            <input type="text" name="nom_entreprise" class="form-control fw-bold" placeholder="ex: COSIDER, SIMAN, FIAT" required>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold small">Nom Responsable</label>
+                                <input type="text" name="nom_responsable" class="form-control form-control-sm" placeholder="ex: Benali">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold small">Prénom Responsable</label>
+                                <input type="text" name="prenom_responsable" class="form-control form-control-sm" placeholder="ex: Ahmed">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold"><i class="fas fa-envelope text-primary me-1"></i> Email de Connexion (Identifiant) *</label>
+                            <input type="email" name="email" class="form-control" placeholder="ex: cosider@noro.dz" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold"><i class="fab fa-whatsapp text-success me-1"></i> Numéros WhatsApp Multiples (DG, Chef, HSE 1, HSE 2)</label>
+                            <input type="text" name="telephones_whatsapp" class="form-control font-monospace" placeholder="ex: 0550112233 (DG), 0770445566 (HSE 1), 0661889900 (HSE 2)">
+                            <div class="form-text text-muted small"><i class="fas fa-info-circle me-1"></i> Séparer par des virgules. Les alertes seront expédiées à tous ces numéros en parallèle.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mot de Passe d'Accès</label>
+                            <input type="text" name="password" class="form-control font-monospace" placeholder="Laisser vide pour générer auto (ex: Cosider2026!)">
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light p-3" style="border-radius: 0 0 20px 20px;">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-success fw-bold px-4 shadow-sm"><i class="fas fa-check-circle me-1"></i> Créer & Générer Accès WhatsApp</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- PWA Offline ServiceWorker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(reg => console.log('NORO PWA ServiceWorker registered:', reg.scope))
+                    .catch(err => console.log('ServiceWorker error:', err));
+            });
+        }
+    </script>
+</body>
+</html>

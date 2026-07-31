@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block title %}Classification Équipement — SINYLON FIAT{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
+
+    .nb5-wrapper {
+        background: #0f1117;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #2c3048;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        color: #fff !important;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .nb5-header {
+        background: #0a0c11;
+        border-bottom: 2px solid #10b981;
+        padding: 14px 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .nb5-header .logo {
+        font-family: 'Oswald', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 4px;
+        border: 2px solid #fff;
+        padding: 3px 12px;
+        border-radius: 4px;
+    }
+    .nb5-header .title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 16px;
+        color: #fff;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nb5-form-body {
+        padding: 25px;
+    }
+
+    .nb5-field {
+        margin-bottom: 15px;
+    }
+    .nb5-field label {
+        display: block;
+        font-size: 11px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: #8b95b3;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
+    .nb5-field input,
+    .nb5-field select {
+        width: 100%;
+        background: #1e2130;
+        border: 1px solid #2c3048;
+        border-radius: 6px;
+        color: #e6e8f2;
+        font-size: 13px;
+        padding: 10px 12px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color .2s;
+    }
+    .nb5-field input:focus,
+    .nb5-field select:focus {
+        border-color: #10b981;
+    }
+    .nb5-r2 { display: grid; grid-template-columns: 1fr 140px; gap: 10px; }
+
+    .nb5-submit {
+        display: block;
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #fff;
+        font-family: 'Oswald', sans-serif;
+        font-size: 14px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-weight: 700;
+        transition: all 0.25s ease;
+        margin-top: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    }
+    .nb5-submit:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    }
+
+    .nb5-back-btn {
+        background: #1e2130;
+        border: 1px solid #2c3048;
+        color: #e6e8f2;
+        font-family: 'Oswald', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        text-decoration: none;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .nb5-back-btn:hover {
+        background: #2c3048;
+        color: #fff;
+    }
+</style>
+
+<!-- Nav -->
+<div class="d-flex align-items-center gap-2 mb-3">
+    <a href="{{ url_for('dashboard') }}" class="nb5-back-btn">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
+
+<div class="nb5-wrapper">
+    <!-- Header -->
+    <div class="nb5-header">
+        <div class="logo">FIAT</div>
+        <div class="title">
+            <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 24px;">
+            <span>CLASSIFICATION ÉQUIPEMENTS</span>
+        </div>
+        <div style="font-size:11px; color:#5a6080; font-family:'Oswald',sans-serif; letter-spacing:2px;">
+            HSE Admin
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="nb5-form-body">
+        <form action="{{ url_for('badge.save_equipment') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="badge_id" id="badge_id_input" value="{{ badge.id if badge else '' }}">
+
+            <!-- Sélection du Badge -->
+            {% if badge %}
+                <div class="nb5-field">
+                    <label>Détenteur du Badge</label>
+                    <div style="background: #1e2130; border: 1px solid #2c3048; padding: 10px 12px; border-radius: 6px; color: #10b981; font-weight: bold;">
+                        {{ badge.numero_badge }} - {{ badge.prenom }} {{ badge.nom }} ({{ badge.societe_affichee or 'N/A' }})
+                    </div>
+                </div>
+            {% else %}
+                <div class="nb5-field">
+                    <label for="badge_select">Détenteur du Badge *</label>
+                    <select id="badge_select" required onchange="document.getElementById('badge_id_input').value = this.value;">
+                        <option value="">-- Sélectionner un Badge --</option>
+                        {% for b in tous_badges %}
+                            <option value="{{ b.id }}">{{ b.numero_badge }} - {{ b.prenom }} {{ b.nom }} ({{ b.societe_affichee or 'N/A' }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+
+            <hr style="border-top: 1px solid #2c3048; margin: 20px 0;">
+
+            <!-- Date d'entrée -->
+            <div class="nb5-field">
+                <label for="equip_date_entree">Date d'entrée de l'équipement</label>
+                <div class="nb5-r2">
+                    <input type="date" name="equip_date_entree" id="equip_date_entree" value="{{ badge.equip_date_entree or '' }}">
+                    <select name="equip_date_entree_color" id="equip_date_entree_color">
+                        <option value="vert" {% if badge and badge.equip_date_entree_color == 'vert' %}selected{% endif %}>Vert</option>
+                        <option value="rouge" {% if badge and badge.equip_date_entree_color == 'rouge' %}selected{% endif %}>Rouge</option>
+                        <option value="jaune" {% if badge and badge.equip_date_entree_color == 'jaune' %}selected{% endif %}>Jaune</option>
+                        <option value="bleu" {% if badge and badge.equip_date_entree_color == 'bleu' %}selected{% endif %}>Bleu</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Document Carte Grise -->
+            <div class="nb5-field">
+                <label for="equip_carte_grise_file">Document Carte Grise</label>
+                <input type="file" name="equip_carte_grise_file" id="equip_carte_grise_file" accept=".pdf,.jpg,.jpeg,.png">
+                {% if badge and badge.equip_carte_grise_doc %}
+                    <div style="margin-top: 5px; font-size: 11px;">
+                        <a href="{{ badge.get_equip_doc_url('equip_carte_grise_doc') }}" target="_blank" style="color: #10b981; text-decoration: none;"><i class="fas fa-file-pdf"></i> Voir Carte Grise actuelle</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Assurance -->
+            <div class="nb5-field">
+                <label for="equip_assurance">Assurance de l'équipement</label>
+                <div class="nb5-r2">
+                    <input type="text" name="equip_assurance" id="equip_assurance" placeholder="Référence d'assurance" value="{{ badge.equip_assurance or '' }}">
+                    <select name="equip_assurance_color" id="equip_assurance_color">
+                        <option value="vert" {% if badge and badge.equip_assurance_color == 'vert' %}selected{% endif %}>Vert</option>
+                        <option value="rouge" {% if badge and badge.equip_assurance_color == 'rouge' %}selected{% endif %}>Rouge</option>
+                        <option value="jaune" {% if badge and badge.equip_assurance_color == 'jaune' %}selected{% endif %}>Jaune</option>
+                        <option value="bleu" {% if badge and badge.equip_assurance_color == 'bleu' %}selected{% endif %}>Bleu</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Document Assurance -->
+            <div class="nb5-field">
+                <label for="equip_assurance_file">Document Assurance</label>
+                <input type="file" name="equip_assurance_file" id="equip_assurance_file" accept=".pdf,.jpg,.jpeg,.png">
+                {% if badge and badge.equip_assurance_doc %}
+                    <div style="margin-top: 5px; font-size: 11px;">
+                        <a href="{{ badge.get_equip_doc_url('equip_assurance_doc') }}" target="_blank" style="color: #10b981; text-decoration: none;"><i class="fas fa-file-pdf"></i> Voir Assurance actuelle</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Contrôle technique -->
+            <div class="nb5-field">
+                <label for="equip_control_technique">Date d'expiration Contrôle Technique</label>
+                <input type="date" name="equip_control_technique" id="equip_control_technique" value="{{ badge.equip_control_technique or '' }}">
+                <small style="color: #5a6080; font-size: 10px; margin-top: 4px; display: block;">Le statut de conformité couleur est recalculé automatiquement selon l'expiration.</small>
+            </div>
+            
+            <!-- Document Contrôle Technique -->
+            <div class="nb5-field">
+                <label for="equip_control_technique_file">Document Contrôle Technique</label>
+                <input type="file" name="equip_control_technique_file" id="equip_control_technique_file" accept=".pdf,.jpg,.jpeg,.png">
+                {% if badge and badge.equip_control_technique_doc %}
+                    <div style="margin-top: 5px; font-size: 11px;">
+                        <a href="{{ badge.get_equip_doc_url('equip_control_technique_doc') }}" target="_blank" style="color: #10b981; text-decoration: none;"><i class="fas fa-file-pdf"></i> Voir Contrôle Technique actuel</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Habilitation opérateur -->
+            <div class="nb5-field">
+                <label for="equip_hab_operateur">Habilitation de l'opérateur (Engins)</label>
+                <div class="nb5-r2">
+                    <input type="text" name="equip_hab_operateur" id="equip_hab_operateur" placeholder="Référence d'habilitation" value="{{ badge.equip_hab_operateur or '' }}">
+                    <select name="equip_hab_operateur_color" id="equip_hab_operateur_color">
+                        <option value="vert" {% if badge and badge.equip_hab_operateur_color == 'vert' %}selected{% endif %}>Vert</option>
+                        <option value="rouge" {% if badge and badge.equip_hab_operateur_color == 'rouge' %}selected{% endif %}>Rouge</option>
+                        <option value="jaune" {% if badge and badge.equip_hab_operateur_color == 'jaune' %}selected{% endif %}>Jaune</option>
+                        <option value="bleu" {% if badge and badge.equip_hab_operateur_color == 'bleu' %}selected{% endif %}>Bleu</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Certificat de conduite -->
+            <div class="nb5-field">
+                <label for="equip_certif_conduite">Certificat / Autorisation de conduite</label>
+                <div class="nb5-r2">
+                    <input type="text" name="equip_certif_conduite" id="equip_certif_conduite" placeholder="Référence certificat" value="{{ badge.equip_certif_conduite or '' }}">
+                    <select name="equip_certif_conduite_color" id="equip_certif_conduite_color">
+                        <option value="vert" {% if badge and badge.equip_certif_conduite_color == 'vert' %}selected{% endif %}>Vert</option>
+                        <option value="rouge" {% if badge and badge.equip_certif_conduite_color == 'rouge' %}selected{% endif %}>Rouge</option>
+                        <option value="jaune" {% if badge and badge.equip_certif_conduite_color == 'jaune' %}selected{% endif %}>Jaune</option>
+                        <option value="bleu" {% if badge and badge.equip_certif_conduite_color == 'bleu' %}selected{% endif %}>Bleu</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Autres Documents -->
+            <div class="nb5-field">
+                <label for="equip_autres_file">Autres Documents</label>
+                <input type="file" name="equip_autres_file" id="equip_autres_file" accept=".pdf,.jpg,.jpeg,.png">
+                {% if badge and badge.equip_autres_doc %}
+                    <div style="margin-top: 5px; font-size: 11px;">
+                        <a href="{{ badge.get_equip_doc_url('equip_autres_doc') }}" target="_blank" style="color: #10b981; text-decoration: none;"><i class="fas fa-file-pdf"></i> Voir Autre document actuel</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="nb5-submit">
+                <i class="fas fa-save me-2"></i> Enregistrer les Équipements
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

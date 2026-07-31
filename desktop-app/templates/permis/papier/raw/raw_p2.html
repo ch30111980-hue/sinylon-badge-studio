@@ -1,0 +1,18 @@
+<div class="fiat-header" style="position: relative; margin-bottom: 5px;">
+    <div style="font-size: 16px; font-weight: bold; padding: 2px;">Permis de Travail de Sécurité Générale</div>
+    <div style="font-size: 10px; margin-left: 20px;">(à afficher sur le site de travail)</div>
+    <div class="fiat-logo-box" style="position: absolute; right: 120px; top: 0; font-size: 26px;">SINYLON FIAT<span class="black-box">FIAT</span></div>
+    <div style="position: absolute; right: 0; top: 0; border: 1px solid black; padding: 2px; font-size: 10px; text-align: center;">
+        Identifiant du permis<br><strong id="val-permit-id-p2" contenteditable="true" style="outline:none; cursor:text; min-width: 50px; display:inline-block; font-size: 14px;"></strong>
+    </div>
+</div>
+
+<div class="yellow-header" style="text-align: center; font-size: 11px; padding: 2px; margin-top: 10px;">REVALIDATION DU PERMIS</div>
+<table class="table-fiat" style="font-size: 10px; margin-top: 2px; width: 100%; border-collapse: collapse; table-layout: fixed;">
+    <tr style="background: #eef2f5;">
+        <th style="width: 12%; border: 1px solid black; padding: 4px;">JOUR</th>
+        <th style="width: 15%; border: 1px solid black; padding: 4px;">DATE</th>
+        <th style="width: 36.5%; border: 1px solid black; padding: 4px;">Validation FIAT - Ingénieur / Responsable<br>(Nom, Fonction, Signature)</th>
+        <th style="width: 36.5%; border: 1px solid black; padding: 4px;">Responsable d'exécution<br>(Nom, Fonction, Signature)</th>
+    </tr>
+    ${Array(6).fill(0).map((_, i) =>

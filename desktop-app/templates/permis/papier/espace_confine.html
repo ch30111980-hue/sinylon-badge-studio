@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+{% block title %}Formulaire E - Espace Confiné{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        .btn, .navbar, .alert, .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { border: none !important; }
+    }
+    .x-small { font-size: 0.65rem; }
+</style>
+<div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Tableau de Bord
+        </a>
+        <div class="dropdown">
+            <button class="btn btn-outline-success shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-plus-circle me-2"></i> Nouvelle Demande de Permis
+            </button>
+            <ul class="dropdown-menu shadow border-0">
+                <li><a class="dropdown-item" href="{{ url_for('permis.nouveau') }}">
+                    <i class="fas fa-file-signature me-2 text-primary"></i> <strong>DEMANDE DE PERMIS (SINYLON FIAT)</strong> — En ligne
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header small text-uppercase fw-bold">Choisir le type de permis</h6></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='securite_generale') }}">
+                    <i class="fas fa-file-contract me-2 text-dark"></i> <strong>RECTO (P1)</strong> — Sécurité Générale
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='revalidation', theme='espace_confine') }}">
+                    <i class="fas fa-sync me-2 text-secondary"></i> <strong>VERSO (P2)</strong> — Revalidation
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='hauteur') }}">
+                    <i class="fas fa-hard-hat me-2 text-primary"></i> <strong>BLEUE (A)</strong> — Travail en Hauteur
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='chaud') }}">
+                    <i class="fas fa-fire me-2 text-danger"></i> <strong>ROUGE (B)</strong> — Travail à Chaud
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='levage') }}">
+                    <i class="fas fa-dolly me-2 text-warning"></i> <strong>JAUNE (C)</strong> — Permis de Levage
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='vehicule') }}">
+                    <i class="fas fa-car me-2 text-info"></i> <strong>VIOLETTE (D)</strong> — Inspection Engins
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='espace_confine') }}">
+                    <i class="fas fa-door-closed me-2 text-success"></i> <strong>CYAN (E)</strong> — Espace Confiné
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='fouille') }}">
+                    <i class="fas fa-shovel me-2 text-info"></i> <strong>PERMIS D'EXCAVATION (F)</strong>
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='electrique') }}">
+                    <i class="fas fa-bolt me-2 text-warning"></i> <strong>ORANGE (G)</strong> — Travail Électrique
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    {% if permis %}
+    <button onclick="window.print()" class="btn btn-3d btn-chic-gold shadow-sm">
+        <i class="fas fa-print me-2"></i> Imprimer / Enregistrer en PDF
+    </button>
+    {% else %}
+    <button onclick="submitForPrint()" class="btn btn-3d btn-chic-gold shadow-sm">
+        <i class="fas fa-print me-2"></i> Enregistrer & Imprimer
+    </button>
+    {% endif %}
+</div>
+<script src="{{ url_for("static", filename="js/signature_pad.umd.min.js") }}"></script>
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+        <div class="card shadow-sm border-0 mb-5">
+            <div class="card-body p-4 bg-white border border-dark" style="border-left: 15px solid #30b0c7 !important; border-right: 15px solid #30b0c7 !important;">
+                
+                <!-- HEADER -->
+                <div class="d-flex align-items-center mb-3 flex-wrap gap-2">
+                    <div class="bg-dark text-white fw-bold px-3 py-2 me-3" style="font-size: 2rem; background-color: #30b0c7 !important;">E</div>
+                    <div class="flex-grow-1 text-center">
+                        <h3 class="fw-bold mb-0">Permis de travail en espace confiné</h3>
+                        <div class="x-small fw-bold text-muted">SINYLON FIAT</div>
+                    </div>
+                    <div style="font-weight: 900; font-size: 1.5rem;">SINYLON FIAT <span style="color: #30b0c7;">STELLANTIS</span></div>
+                    {% if qr_code %}
+                    <div class="ms-2 p-1 bg-white border border-dark text-center" style="width: 80px;">
+                        <img src="data:image/png;base64,{{ qr_code }}" alt="QR Verification" style="height: 70px; width: 70px;">
+                        <div class="text-dark fw-bold" style="font-size: 8px; margin-top: 1px;">VERIFY</div>
+                    </div>
+                    {% endif %}
+                    <div class="ms-3 border border-dark p-1 text-center" style="min-width: 120px;">
+                        <div class="x-small fw-bold">Identifiant du permis</div>
+                        <div class="fw-bold">{% if form_id %}{{ form_id }}{% elif form %}{{ form.id }}{% else %}AUTO{% endif %}</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border border-dark py-2 px-3 mb-3 small" style="background:#fffaf0; font-size: 0.75rem;">
+                    <ul class="mb-0 ps-3">
+                        <li>Ce formulaire doit obligatoirement accompagner le permis de travail de sécurité générale pour toute entrée dans un espace confiné (cuve, citerne, fosse, galerie, etc.).</li>
+                        <li>Aucun accès n'est autorisé sans test atmosphérique préalable effectué par un technicien qualifié.</li>
+                        <li>La présence d'un surveillant d'entrée formé à l'extérieur est obligatoire pendant toute la durée de l'intervention.</li>
+                    </ul>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="type_formulaire" value="espace_confine">
+                    <input type="hidden" name="pre_allocated_id" value="{{ form_id }}">
+
+                    <!-- SECTION 1: RESPONSABILITES -->
+                    <div class="border border-dark p-2 mb-3 bg-light bg-opacity-50">
+                        <div class="row g-2">
+                            <div class="col-md-4 border-end border-dark">
+                                <div class="fw-bold x-small text-uppercase mb-1 text-primary">SINYLON FIAT Validateur</div>
+                                <div><label class="x-small">Nom :</label> <input type="text" name="SINYLON FIAT_nom" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0" required></div>
+                                <div class="mt-1"><label class="x-small">Fonction :</label> <input type="text" name="SINYLON FIAT_fonction" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0" required></div>
+                                <div class="mt-1"><label class="x-small">Entreprise :</label> <input type="text" name="SINYLON FIAT_entreprise" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0" required></div>
+                            </div>
+                            <div class="col-md-4 border-end border-dark ps-2">
+                                <div class="fw-bold x-small text-uppercase mb-1 text-success">Entreprise extérieure</div>
+                                <div><label class="x-small">Nom :</label> <input type="text" name="entreprise_nom" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0" required></div>
+                                <div class="mt-1"><label class="x-small">Zone de travail :</label> <input type="text" name="zone_travail" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0" required></div>
+                                <div class="mt-1"><label class="x-small">Type d'espace :</label> <input type="text" name="type_espace_confine" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0" placeholder="Ex: Galerie, Cuve..."></div>
+                            </div>
+                            <div class="col-md-4 ps-2">
+                                <div class="fw-bold x-small text-uppercase mb-1 text-danger">HSE</div>
+                                <div><label class="x-small">Nom :</label> <input type="text" name="hse_nom" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0"></div>
+                                <div class="mt-1"><label class="x-small">Fonction :</label> <input type="text" name="hse_fonction" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MESURES DE GAZ (ATMOSPHERIQUES) -->
+                    <div class="border border-dark p-2 mb-3 bg-light">
+                        <div class="fw-bold x-small text-uppercase text-info mb-2"><i class="fas fa-wind me-1"></i> Tests Atmosphériques préalables à l'entrée</div>
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-3">
+                                <label class="x-small fw-bold">Nom du testeur :</label>
+                                <input type="text" name="gas_tester_name" class="form-control form-control-sm border-dark">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="x-small fw-bold">Taux Oxygène (O2) [%] :</label>
+                                <input type="text" name="gas_o2_level" class="form-control form-control-sm border-dark" placeholder="19.5 - 23.5%">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="x-small fw-bold">Lim. Inf. Explosivité (LIE) :</label>
+                                <input type="text" name="gas_lel_level" class="form-control form-control-sm border-dark" placeholder="< 10%">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="x-small fw-bold">Gaz toxiques (H2S / CO) :</label>
+                                <input type="text" name="gas_toxic_level" class="form-control form-control-sm border-dark" placeholder="0 ppm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CHECKLISTS -->
+                    <div class="row g-3 mb-3">
+                        <!-- PREPARATIONS -->
+                        <div class="col-md-6">
+                            <div class="border border-dark p-2 h-100">
+                                <div class="fw-bold x-small border-bottom border-dark pb-1 mb-2 text-uppercase text-success"><i class="fas fa-clipboard-check me-1"></i> Mesures de Sécurité requises (Y=Vérifié, N=Non concerné)</div>
+                                {% for label, name in [
+                                    ('Isolation physique de l\'espace (Vannes fermées, Brides pleines, MALT)', 'ec_isolation'),
+                                    ('Nettoyage / Vidange / Dégazage de l\'espace effectué avant entrée', 'ec_vidange'),
+                                    ('Ventilation mécanique forcée continue assurée pendant le travail', 'ec_ventilation'),
+                                    ('Surveillant d\'entrée désigné présent en permanence à l\'extérieur', 'ec_surveillant'),
+                                    ('Registre de suivi des entrées/sorties disponible et à jour', 'ec_registre'),
+                                    ('Moyen de communication fiable (Radio ATEX, visuel) établi', 'ec_communication')
+                                ] %}
+                                <div class="d-flex justify-content-between align-items-center mb-1 border-bottom border-light">
+                                    <span class="x-small">{{ label }}</span>
+                                    <div class="border border-dark px-2 bg-white" style="font-size:0.7rem;"><label class="me-1"><input type="radio" name="{{ name }}" value="Y"> Y</label> <label><input type="radio" name="{{ name }}" value="N" checked> N</label></div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- EPI ET EVACUATION -->
+                        <div class="col-md-6">
+                            <div class="border border-dark p-2 mb-2">
+                                <div class="fw-bold x-small border-bottom border-dark pb-1 mb-2 text-uppercase text-primary"><i class="fas fa-toolbox me-1"></i> Équipements de protection requis</div>
+                                <div class="d-flex flex-wrap gap-2 mb-2" style="font-size:0.75rem;">
+                                    <label class="me-2"><input type="checkbox" name="epi_harnais_anti_chute" value="1"> Harnais de sécurité complet</label>
+                                    <label class="me-2"><input type="checkbox" name="epi_tripode_elevateur" value="1"> Trépied et treuil de sauvetage</label>
+                                    <label class="me-2"><input type="checkbox" name="epi_detecteur_portatif" value="1"> Détecteur multigaz portatif</label>
+                                    <label class="me-2"><input type="checkbox" name="epi_eclairage_basse_tension" value="1"> Éclairage basse tension (24V) ou ATEX</label>
+                                    <label class="me-2"><input type="checkbox" name="epi_masque_cartouche" value="1"> Masque respiratoire autonome/filtrant</label>
+                                </div>
+                            </div>
+
+                            <div class="border border-dark p-2">
+                                <div class="fw-bold x-small border-bottom border-dark pb-1 mb-2 text-uppercase text-danger"><i class="fas fa-heartbeat me-1"></i> Plan d'urgence &amp; Évacuation</div>
+                                {% for label, name in [
+                                    ('Plan d\'urgence et de sauvetage formalisé et compris par l\'équipe', 'ec_plan_urgence'),
+                                    ('Personnel d\'intervention en bonne forme physique (sans contre-indication)', 'ec_forme_physique'),
+                                    ('Les voies d\'accès et de sortie sont libres de tout encombrement', 'ec_voies_libres')
+                                ] %}
+                                <div class="d-flex justify-content-between align-items-center mb-1 border-bottom border-light">
+                                    <span class="x-small">{{ label }}</span>
+                                    <div class="border border-dark px-2 bg-white" style="font-size:0.7rem;"><label class="me-1"><input type="radio" name="{{ name }}" value="Y"> Y</label> <label><input type="radio" name="{{ name }}" value="N" checked> N</label></div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OBSERVATIONS -->
+                    <div class="border border-dark p-2 mb-3">
+                        <div class="fw-bold x-small text-uppercase mb-1">OBSERVATIONS &amp; INSTRUCTIONS COMPLÉMENTAIRES</div>
+                        <textarea name="observations" class="form-control form-control-sm border-dark" rows="3" placeholder="Renseigner ici d'éventuelles observations (ex: type de ventilation, équipement de sécurité spécifique...)"></textarea>
+                    </div>
+
+                    <!-- SIGNATURES BOTTOM -->
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="border border-dark">
+                                <div class="text-center fw-bold x-small py-1 border-bottom border-dark d-flex justify-content-between align-items-center px-2" style="background-color: #ffe0b2;">
+                                    <span>CHARGÉ D'ENTRÉE / CHEF DE PROJET</span>
+                                    <div class="no-print d-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-primary" style="font-size: 0.55rem; padding: 0 4px;" onclick="loadSignature('chef')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-success" style="font-size: 0.55rem; padding: 0 4px;" onclick="saveSignature('chef')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                </div>
+                                <div class="d-flex g-0 border-bottom border-dark">
+                                    <input type="text" name="nom_chef" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; border-right: 1px solid #333 !important;" placeholder="Nom (Majuscule)">
+                                    <input type="text" name="nom_signature_chef" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                </div>
+                                <div style="height: 80px; position: relative;">
+                                    <canvas id="sig_espace_confine_chef" class="w-100 h-100"></canvas>
+                                    <input type="hidden" name="sig_espace_confine_chef_data" id="sig_espace_confine_chef_data">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border border-dark">
+                                <div class="text-center fw-bold x-small py-1 border-bottom border-dark d-flex justify-content-between align-items-center px-2" style="background-color: #ffe0b2;">
+                                    <span>SURVEILLANT EXTÉRIEUR</span>
+                                    <div class="no-print d-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-primary" style="font-size: 0.55rem; padding: 0 4px;" onclick="loadSignature('surveillant')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-success" style="font-size: 0.55rem; padding: 0 4px;" onclick="saveSignature('surveillant')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                </div>
+                                <div class="d-flex g-0 border-bottom border-dark">
+                                    <input type="text" name="nom_surveillant" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; border-right: 1px solid #333 !important;" placeholder="Nom (Majuscule)">
+                                    <input type="text" name="nom_signature_surveillant" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                </div>
+                                <div style="height: 80px; position: relative;">
+                                    <canvas id="sig_espace_confine_surveillant" class="w-100 h-100"></canvas>
+                                    <input type="hidden" name="sig_espace_confine_surveillant_data" id="sig_espace_confine_surveillant_data">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border border-dark">
+                                <div class="text-center fw-bold x-small py-1 border-bottom border-dark d-flex justify-content-between align-items-center px-2" style="background-color: #ffe0b2;">
+                                    <span>SUPERVISEUR HSE / SINYLON FIAT</span>
+                                    <div class="no-print d-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-primary" style="font-size: 0.55rem; padding: 0 4px;" onclick="loadSignature('hse')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-success" style="font-size: 0.55rem; padding: 0 4px;" onclick="saveSignature('hse')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                </div>
+                                <div class="d-flex g-0 border-bottom border-dark">
+                                    <input type="text" name="nom_hse" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; border-right: 1px solid #333 !important;" placeholder="Nom (Majuscule)">
+                                    <input type="text" name="nom_signature_hse" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                </div>
+                                <div style="height: 80px; position: relative;">
+                                    <canvas id="sig_espace_confine_hse" class="w-100 h-100"></canvas>
+                                    <input type="hidden" name="sig_espace_confine_hse_data" id="sig_espace_confine_hse_data">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SCAN OU PHOTO (PIÈCE JOINTE) -->
+                    <div class="border border-dark p-2 mb-3 mt-3 bg-light no-print">
+                        <div class="fw-bold x-small text-uppercase mb-1"><i class="fas fa-paperclip me-1"></i> Pièce Jointe / Scan du Formulaire (Optionnel)</div>
+                        <input type="file" name="fichier_joint" class="form-control form-control-sm border-dark rounded-0" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between align-items-center opacity-75 no-print" style="font-size: 0.6rem; border-top: 1px solid #ccc; pt-2;">
+                        <div style="text-transform: lowercase;">système de sécurité © 2026</div>
+                        <div class="fw-bold">Formulaire E - Espace Confiné</div>
+                    </div>
+
+                    <div class="mt-4 text-center no-print">
+                        <button type="button" onclick="submitForm()" class="btn btn-warning px-5 fw-bold text-dark" style="background-color: #30b0c7 !important; border: none; color: white !important;">ENREGISTRER FORMULAIRE E</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ids = ['chef', 'surveillant', 'hse'];
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        ids.forEach(id => {
+            const canvas = document.getElementById('sig_espace_confine_' + id);
+            if(canvas) {
+                const currentWidth = canvas.offsetWidth * ratio;
+                const currentHeight = canvas.offsetHeight * ratio;
+                if (currentWidth > 0 && currentHeight > 0) {
+                    canvas.width = currentWidth;
+                    canvas.height = currentHeight;
+                    canvas.getContext("2d").scale(ratio, ratio);
+                }
+                
+                // Draw initial state (cursive fallback or saved sig)
+                drawSignatureText(id, getSignatureText(id));
+                
+                if (window.isPermisReadOnly) {
+                    {% if permis and permis.signatures %}
+                        const savedSigs = {{ permis.signatures|tojson }};
+                        const base64Data = savedSigs['sig_espace_confine_' + id];
+                        if (base64Data) {
+                            const img = new Image();
+                            img.onload = function() {
+                                const ctx = canvas.getContext('2d');
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                ctx.drawImage(img, 0, 0, canvas.width / ratio, canvas.height / ratio);
+                            };
+                            img.src = base64Data;
+                        }
+                    {% endif %}
+                    return;
+                }
+                
+                // Bind input listeners
+                const inputName = document.querySelector('input[name="nom_' + id + '"]');
+                const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+                
+                function updateSig() {
+                    drawSignatureText(id, getSignatureText(id));
+                }
+                
+                if(inputName) inputName.addEventListener('input', updateSig);
+                if(inputSig) inputSig.addEventListener('input', updateSig);
+                
+                // Draw initial state
+                updateSig();
+            }
+        });
+
+        if (window.isPermisReadOnly) return;
+
+        // Force redraw when font is loaded to ensure it displays correctly
+        document.fonts.load("24px 'Dancing Script'").then(function() {
+            ids.forEach(id => {
+                drawSignatureText(id, getSignatureText(id));
+            });
+        });
+    });
+
+    function getSignatureText(id) {
+        const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+        const inputName = document.querySelector('input[name="nom_' + id + '"]');
+        return (inputSig && inputSig.value) ? inputSig.value : (inputName ? inputName.value : '');
+    }
+
+    function drawSignatureText(id, text) {
+        const canvas = document.getElementById('sig_espace_confine_' + id);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        // Dynamic resize if dimensions are not set or changed
+        const currentWidth = canvas.offsetWidth * ratio;
+        const currentHeight = canvas.offsetHeight * ratio;
+        if (currentWidth > 0 && currentHeight > 0 && (canvas.width !== currentWidth || canvas.height !== currentHeight)) {
+            canvas.width = currentWidth;
+            canvas.height = currentHeight;
+            ctx.scale(ratio, ratio);
+        }
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if(!text) return;
+        
+        ctx.save();
+        ctx.font = "italic 24px 'Dancing Script', 'Brush Script MT', cursive";
+        ctx.fillStyle = "blue";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, canvas.width / (2 * ratio), canvas.height / (2 * ratio));
+        ctx.restore();
+    }
+
+    function saveSignature(id) {
+        const inputName = document.querySelector('input[name="nom_' + id + '"]');
+        const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+        
+        const nameVal = inputName ? inputName.value.trim() : '';
+        const sigVal = inputSig ? inputSig.value.trim() : '';
+        
+        if (nameVal || sigVal) {
+            localStorage.setItem('noro_saved_sig_name_' + id, nameVal);
+            localStorage.setItem('noro_saved_sig_text_' + id, sigVal);
+            alert("✅ Votre signature numérique a été enregistrée !");
+        } else {
+            alert("⚠️ Veuillez saisir votre nom ou votre texte de signature avant d'enregistrer.");
+        }
+    }
+
+    function loadSignature(id) {
+        const savedName = localStorage.getItem('noro_saved_sig_name_' + id);
+        const savedSig = localStorage.getItem('noro_saved_sig_text_' + id);
+        
+        if (savedName || savedSig) {
+            const inputName = document.querySelector('input[name="nom_' + id + '"]');
+            const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+            
+            if (inputName && savedName !== null) inputName.value = savedName;
+            if (inputSig && savedSig !== null) inputSig.value = savedSig;
+            
+            drawSignatureText(id, getSignatureText(id));
+        } else {
+            alert("⚠️ Aucune signature enregistrée pour cet acteur.");
+        }
+    }
+
+    function submitForm() {
+        const ids = ['chef', 'surveillant', 'hse'];
+        ids.forEach(id => {
+            const canvas = document.getElementById('sig_espace_confine_' + id);
+            if(canvas) {
+                const inputName = document.querySelector('input[name="nom_' + id + '"]');
+                const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+                if ((inputName && inputName.value) || (inputSig && inputSig.value)) {
+                    document.getElementById('sig_espace_confine_' + id + '_data').value = canvas.toDataURL();
+                }
+            }
+        });
+        document.querySelector('form').submit();
+    }
+</script>
+{% endblock %}

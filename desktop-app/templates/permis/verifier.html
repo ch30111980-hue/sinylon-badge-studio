@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Vérification du Permis - SINYLON FIAT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 overflow-hidden" style="border-radius: 20px;">
+                <!-- Header with Status Color -->
+                {% if permis.statut == 'approuve' %}
+                <div class="bg-success text-white text-center py-4">
+                    <i class="fas fa-check-circle fa-4x mb-3 animate__animated animate__bounceIn"></i>
+                    <h2 class="fw-bold mb-0">PERMIS VALIDE</h2>
+                    <p class="mb-0 opacity-75">Authenticité confirmée par SINYLON FIAT</p>
+                </div>
+                {% elif permis.statut in ['en_attente', 'attente_FIAT', 'attente_SINYLON FIAT'] %}
+                <div class="bg-warning text-dark text-center py-4">
+                    <i class="fas fa-clock fa-4x mb-3 animate__animated animate__pulse animate__infinite"></i>
+                    <h2 class="fw-bold mb-0">EN ATTENTE</h2>
+                    <p class="mb-0 opacity-75">
+                        {% if permis.statut == 'attente_FIAT' %}
+                            En attente de validation FIAT
+                        {% elif permis.statut == 'attente_SINYLON FIAT' %}
+                            En attente de validation SINYLON FIAT
+                        {% else %}
+                            Ce permis est en cours de révision
+                        {% endif %}
+                    </p>
+                </div>
+                {% else %}
+                <div class="bg-danger text-white text-center py-4">
+                    <i class="fas fa-times-circle fa-4x mb-3 animate__animated animate__headShake"></i>
+                    <h2 class="fw-bold mb-0">PERMIS INVALIDE</h2>
+                    <p class="mb-0 opacity-75">Ce document n'est plus valide ou a été rejeté ({{ permis.statut }})</p>
+                </div>
+                {% endif %}
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h5 class="text-uppercase text-muted ls-1 fw-bold">Détails du Document</h5>
+                        <div class="h3 fw-bold text-dark">{{ permis.numero_permis }}</div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-6">
+                            <div class="small text-muted text-uppercase fw-bold">Type de Permis</div>
+                            <div class="fw-bold text-dark">{{ permis.type_formulaire|replace('_', ' ')|upper if is_papier else permis.type_permis|upper }}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small text-muted text-uppercase fw-bold">Entreprise</div>
+                            <div class="fw-bold text-dark">{{ (permis.data.get('entreprise') or (permis.demandeur.entreprise if permis.demandeur else 'N/A')) if is_papier else permis.entreprise_intervenante }}</div>
+                        </div>
+                        <div class="col-12">
+                            <hr class="my-2">
+                        </div>
+                        <div class="col-6">
+                            <div class="small text-muted text-uppercase fw-bold">Date de Création</div>
+                            <div class="fw-bold text-dark">{{ permis.created_at.strftime('%d/%m/%Y') }}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small text-muted text-uppercase fw-bold">Lieu / Zone</div>
+                            <div class="fw-bold text-dark">{{ permis.data.get('endroit_travail', 'Site Industriel') if is_papier else permis.zone_travail }}</div>
+                        </div>
+                        
+                        {% if is_papier %}
+                        <div class="col-12">
+                            <div class="small text-muted text-uppercase fw-bold">Description des Travaux</div>
+                            <div class="p-3 bg-light rounded mt-2 border-start border-4 border-primary">
+                                {{ permis.data.get('travail_desc', 'Non spécifié') }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-5 pt-4 border-top text-center">
+                        <img src="{{ url_for('static', filename='img/logo_noro.png') }}" alt="Logo NORO" style="height: 40px; filter: grayscale(1); opacity: 0.5;">
+                        <p class="small text-muted mt-3 mb-0">
+                            Système de Sécurité SINYLON FIAT 5.0 — © 2026<br>
+                            Vérification digitale en temps réel
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <div class="card shadow-lg border-0 mt-4 overflow-hidden no-print" style="border-radius: 20px;">
+                <div class="card-header bg-dark text-white p-3 fw-bold text-center">
+                    <i class="fas fa-user-shield text-warning me-2"></i> Actions de Supervision
+                </div>
+                <div class="card-body p-4 bg-light">
+                    <div class="d-grid gap-2 mb-3">
+                        {% if (permis.statut in ['en_attente', 'attente_FIAT'] and (current_user.role == 'admin' or (current_user.entreprise and current_user.entreprise.upper() == 'FIAT'))) or (permis.statut == 'attente_SINYLON FIAT' and (current_user.role == 'admin' or current_user.role == 'SINYLON FIAT')) %}
+                        <a href="{{ url_for('permis.approuver', id=permis.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-success p-3 fw-bold">
+                            <i class="fas fa-check-circle me-2"></i> Valider le Permis
+                        </a>
+                        {% endif %}
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <a href="{{ url_for('permis.refaire', id=permis.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-warning w-100 p-2 fw-bold text-dark">
+                                    <i class="fas fa-redo me-1"></i> À Refaire
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="{{ url_for('permis.revoquer', id=permis.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-danger w-100 p-2 fw-bold" onclick="return confirm('Êtes-vous sûr de vouloir révoquer ce permis ?');">
+                                    <i class="fas fa-ban me-1"></i> Révoquer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="text-danger fw-bold mb-2"><i class="fas fa-lock me-1"></i> Blocage Sécurité (Désactivation)</h6>
+                    <form action="{{ url_for('permis.bloquer', id=permis.id, is_papier='true' if is_papier else 'false') }}" method="POST" class="p-3 border border-danger rounded" style="background-color: #fff5f5;">
+                        <div class="d-flex gap-3 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="statut_blocage" id="p_v_actif" value="actif" {% if not permis.is_blocked %}checked{% endif %} onchange="document.getElementById('p_v_motif_field').style.display='none';">
+                                <label class="form-check-label text-success fw-bold" for="p_v_actif">
+                                    Actif
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="statut_blocage" id="p_v_bloque" value="bloque" {% if permis.is_blocked %}checked{% endif %} onchange="document.getElementById('p_v_motif_field').style.display='block';">
+                                <label class="form-check-label text-danger fw-bold" for="p_v_bloque">
+                                    Bloqué
+                                </label>
+                            </div>
+                        </div>
+                        <div id="p_v_motif_field" style="{% if not permis.is_blocked %}display:none;{% endif %}">
+                            <label class="form-label small text-danger fw-bold mb-1">Motif du Blocage</label>
+                            <textarea name="motif_blocage" rows="2" class="form-control form-control-sm border-danger" placeholder="Indiquez la raison du blocage...">{{ permis.motif_blocage or '' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-dark btn-sm w-100 mt-2">
+                            <i class="fas fa-save me-1"></i> Confirmer le Statut
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="text-center mt-4 no-print">
+                <button onclick="window.print()" class="btn btn-outline-secondary btn-sm rounded-pill px-4">
+                    <i class="fas fa-print me-2"></i> Imprimer cette preuve
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 1px; }
+    .card { transition: transform 0.3s ease; }
+    .card:hover { transform: translateY(-5px); }
+    @media print {
+        .no-print { display: none !important; }
+        body { background: white !important; }
+        .container { padding: 0 !important; }
+        .card { box-shadow: none !important; border: 1px solid #eee !important; }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block title %}SINYLON FIAT - Tableau de Bord Entreprises{% endblock %}
+
+{% block content %}
+<style>
+    .SINYLON FIAT-dashboard .btn-group .btn {
+        font-size: 10px;
+        padding: 4px 6px;
+        margin: 0 1px;
+    }
+    .SINYLON FIAT-dashboard .card {
+        overflow:hidden;
+    }
+</style>
+
+<div class="container-fluid py-4 SINYLON FIAT-dashboard">
+
+    <!-- Header bannière SINYLON FIAT Entreprises -->
+    <div class="rounded-3 mb-4 px-4 py-3 d-flex align-items-center justify-content-between flex-wrap gap-3"
+         style="background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #0f172a 100%);
+                border-left: 5px solid #0ea5e9;
+                box-shadow: 0 4px 20px rgba(14,165,233,0.15);">
+        <div class="d-flex align-items-center gap-3">
+            <div style="width:46px; height:46px; border-radius:12px;
+                        background:linear-gradient(135deg,#0ea5e9,#0369a1);
+                        display:flex; align-items:center; justify-content:center;
+                        box-shadow:0 0 16px rgba(14,165,233,0.4); flex-shrink:0;">
+                <i class="fas fa-building text-white" style="font-size:1.3rem;"></i>
+            </div>
+            <div>
+                <div style="font-size:10px; letter-spacing:3px; color:#7dd3fc; text-transform:uppercase; font-weight:600;">Tableau de Bord</div>
+                <h2 class="mb-0 fw-bold text-white" style="font-size:1.4rem; letter-spacing:0.5px;">
+                    SINYLON FIAT — <span style="color:#38bdf8;">Entreprises</span>
+                </h2>
+            </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('main.rapport_hebdo_SINYLON FIAT_pdf') }}" target="_blank" class="btn btn-sm btn-light fw-bold px-3 text-dark shadow-sm" style="border-radius:20px;">
+                <i class="fas fa-file-pdf text-danger me-1"></i> Rapport Hebdo FIAT (PDF)
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-light px-3" style="border-radius:20px;">
+                <i class="fas fa-arrow-left me-1"></i> Retour
+            </a>
+            <a href="{{ url_for('main.test_whatsapp') }}" class="btn btn-sm btn-success fw-bold px-3" style="border-radius:20px;">
+                <i class="fab fa-whatsapp me-1"></i> Testeur WhatsApp
+            </a>
+            <a href="{{ url_for('badge.admin_dashboard') }}" class="btn btn-sm px-3 text-dark fw-bold" style="background:#fbbf24; border-radius:20px; border:none;">
+                <i class="fas fa-id-badge me-1"></i> Admin Badges
+            </a>
+        </div>
+    </div>
+
+
+<div class="row">
+    {% for stat in stats %}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100" style="border-top: 4px solid {{ stat.entreprise.couleur or '#10b981' }}; border-radius: 16px; border: 1px solid #e2e8f0;">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2 py-3 border-bottom" style="border-radius: 16px 16px 0 0;">
+                <div>
+                    <h5 class="mb-0 fw-bold d-inline-block me-2 text-dark">{{ stat.entreprise.nom }}</h5>
+                    <span class="badge bg-secondary">#{{ stat.entreprise.id }}</span>
+                    {% if stat.entreprise.is_blocked %}
+                    <span class="badge bg-danger ms-1"><i class="fas fa-ban me-1"></i> SUSPENDUE</span>
+                    {% endif %}
+                </div>
+                <div class="d-flex align-items-center gap-1 flex-wrap">
+                    {% if stat.b_attente or stat.p_attente %}
+                    <a href="{{ url_for('main.valider_lot_SINYLON FIAT_entreprise', id=stat.entreprise.id) }}" class="btn btn-sm btn-success fw-bold py-1 px-2.5 shadow-sm" style="border-radius: 8px; font-size: 0.78rem;" title="Valider tous les permis et badges conformes">
+                        <i class="fas fa-check-double me-1"></i> Valider Lot ({{ stat.b_attente|length + stat.p_attente|length }})
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('main.envoyer_relance_expiration_whatsapp', entreprise_id=stat.entreprise.id) }}" class="btn btn-sm btn-outline-warning text-dark fw-bold py-1 px-2" style="border-radius: 8px; font-size: 0.78rem;" title="Relancer documents expirant sous 7j par WhatsApp">
+                        <i class="fas fa-clock-rotate-left me-1"></i> Relancer Expirations
+                    </a>
+                    <a href="{{ stat.wa_link }}" target="_blank" class="btn btn-sm btn-outline-success fw-bold py-1 px-2" style="border-radius: 8px; font-size: 0.78rem;" title="Contacter par WhatsApp">
+                        <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                    </a>
+                    <a href="{{ url_for('permis.bloquer_entreprise', nom=stat.entreprise.nom) }}" class="btn btn-sm {% if stat.entreprise.is_blocked %}btn-success{% else %}btn-outline-danger{% endif %} fw-bold py-1 px-2" style="border-radius: 8px; font-size: 0.78rem;">
+                        <i class="fas fa-ban me-1"></i> {% if stat.entreprise.is_blocked %}Débloquer{% else %}Bloquer{% endif %}
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Statistiques Générales -->
+                <div class="row text-center mb-3">
+                    <div class="col-6 border-end">
+                        <div class="text-muted small text-uppercase fw-bold">Permis En Cours</div>
+                        <h3 class="text-success mb-0">{{ stat.p_en_cours }}</h3>
+                        <div class="small text-muted">Sur {{ stat.p_total }} total</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted small text-uppercase fw-bold">Badges Actifs</div>
+                        <h3 class="text-primary mb-0">{{ stat.b_actifs }}</h3>
+                        <div class="small text-muted">Sur {{ stat.b_total }} total</div>
+                    </div>
+                </div>
+                
+                <hr>
+
+                <!-- Éléments Bloqués -->
+                <h6 class="text-danger fw-bold"><i class="fas fa-ban me-1"></i> Sécurité : Éléments Bloqués</h6>
+                
+                {% if stat.b_bloques or stat.p_bloques %}
+                    <ul class="list-group list-group-flush mb-3">
+                        {% for bb in stat.b_bloques %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start px-0" style="font-size: 0.9rem;">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold"><span class="badge bg-danger">BADGE</span> {{ bb.numero_badge }} - {{ bb.nom }} {{ bb.prenom }}</div>
+                                <span class="text-muted small"><i class="fas fa-info-circle me-1"></i>{{ bb.motif_blocage or 'Infraction de sécurité' }}</span>
+                            </div>
+                            <a href="{{ url_for('badge.admin_dashboard') }}" class="btn btn-sm btn-outline-danger" title="Aller dans la gestion de badges">Gérer</a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% for pb in stat.p_bloques %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start px-0" style="font-size: 0.9rem;">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold"><span class="badge bg-danger">PERMIS</span> Permis n°{{ pb.id }}</div>
+                                <span class="text-muted small"><i class="fas fa-info-circle me-1"></i>{{ pb.motif_blocage or 'Infraction de sécurité' }}</span>
+                            </div>
+                            {% set is_pb_pap = 'true' if pb.type_formulaire is defined else 'false' %}
+                            <a href="{{ url_for('permis.detail', id=pb.id, is_papier=is_pb_pap) }}" class="btn btn-sm btn-outline-danger" title="Voir le permis">Gérer</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="py-2 px-3 text-center rounded" style="font-size:0.9rem; background:#166534; color:#ffffff; font-weight:700; letter-spacing:0.3px;"><i class="fas fa-check-circle me-2"></i>Aucun blocage de sécurité</div>
+                {% endif %}
+
+                <!-- Actions en Attente SINYLON FIAT -->
+                <h6 class="text-warning text-dark fw-bold mt-3"><i class="fas fa-clock me-1"></i> Validation SINYLON FIAT Requise</h6>
+                
+                {% if stat.b_attente or stat.p_attente %}
+                    <ul class="list-group list-group-flush">
+                        {% for b in stat.b_attente %}
+                        <li class="list-group-item px-0" style="font-size: 0.9rem;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="fw-bold">
+                                    <span class="badge bg-warning text-dark">BADGE</span>
+                                    {{ b.nom }} {{ b.prenom }} ({{ b.fonction }})
+                                </div>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('badge.valider_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-success py-0 px-2" title="Valider et Notifier"><i class="fas fa-check"></i></a>
+                                    <a href="{{ url_for('badge.refaire_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-warning py-0 px-2" title="À refaire (Incomplet)"><i class="fas fa-redo"></i></a>
+                                    <a href="{{ url_for('badge.refuser_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-danger py-0 px-2" title="Refuser définitivement"><i class="fas fa-times"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+
+                        {% for p in stat.p_attente %}
+                        {% set is_p = 'true' if p.type_formulaire is defined else 'false' %}
+                        <li class="list-group-item px-0" style="font-size: 0.9rem;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="fw-bold"><span class="badge bg-warning text-dark">PERMIS</span> Zone : {{ p.zone_travail or p.type_formulaire }}</div>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('permis.approuver', id=p.id) }}?is_papier={{is_p}}" class="btn btn-sm btn-success py-0 px-2" title="Valider le Permis"><i class="fas fa-check"></i></a>
+                                    <a href="{{ url_for('permis.refaire', id=p.id) }}?is_papier={{is_p}}" class="btn btn-sm btn-warning py-0 px-2" title="À Refaire"><i class="fas fa-redo"></i></a>
+                                    <a href="{{ url_for('permis.revoquer', id=p.id) }}?is_papier={{is_p}}" class="btn btn-sm btn-danger py-0 px-2" title="Refuser"><i class="fas fa-times"></i></a>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center mt-2 rounded py-2 px-3" style="font-size:0.9rem; background:#166534; color:#ffffff; font-weight:700; letter-spacing:0.3px;"><i class="fas fa-thumbs-up me-2"></i>Tout est validé pour cette entreprise</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5">
+        <h4 class="text-muted">Aucune entreprise trouvée.</h4>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal d'édition de l'email de notification d'une entreprise (pour l'admin/SINYLON FIAT) -->
+<div class="modal fade" id="editEmailModal" tabindex="-1" aria-labelledby="editEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="background: #ffffff; color: #1e293b; border-radius: 12px; overflow: hidden;">
+            <div class="modal-header border-bottom border-light" style="background: #f8fafc;">
+                <h5 class="modal-title fw-bold" id="editEmailModalLabel" style="color: #0f172a; font-size:15px;">
+                    📧 Configurer l'email d'alerte
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="edit-email-form" onsubmit="submitEmailChange(event)">
+                <input type="hidden" id="modal-entreprise-id">
+                <div class="modal-body p-4">
+                    <p class="text-muted" style="font-size: 13px;">
+                        Configurez l'adresse email réelle de <strong id="modal-entreprise-name" class="text-primary"></strong> sur laquelle envoyer toutes les alertes HSE (expirations, suspensions de badges, etc.).
+                    </p>
+                    <div class="mb-3">
+                        <label for="modal-email-input" class="form-label fw-bold" style="font-size: 12px; color: #475569;">
+                            Adresse email d'alertes
+                        </label>
+                        <input type="email" class="form-control" id="modal-email-input" required 
+                               placeholder="ex: alertes@kortiso.com" style="border-radius: 8px; font-size: 14px; border: 1px solid #cbd5e1;">
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-light" style="background: #f8fafc;">
+                    <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" data-bs-dismiss="modal" style="border-radius: 8px;">
+                        Annuler
+                    </button>
+                    <button type="submit" id="modal-submit-btn" class="btn btn-primary btn-sm fw-bold px-3" style="border-radius: 8px; background: #0ea5e9; border: none; color: #fff;">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let bootstrapModalObj = null;
+
+function openEditEmailModal(entrepriseId, entrepriseNom, currentEmail) {
+    document.getElementById('modal-entreprise-id').value = entrepriseId;
+    document.getElementById('modal-entreprise-name').textContent = entrepriseNom;
+    document.getElementById('modal-email-input').value = currentEmail;
+    
+    bootstrapModalObj = new bootstrap.Modal(document.getElementById('editEmailModal'));
+    bootstrapModalObj.show();
+}
+
+function submitEmailChange(event) {
+    event.preventDefault();
+    const entId = document.getElementById('modal-entreprise-id').value;
+    const email = document.getElementById('modal-email-input').value;
+    const submitBtn = document.getElementById('modal-submit-btn');
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enregistrement...';
+    
+    fetch('/entreprise/set_email_notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `entreprise_id=${entId}&email_notifications=${encodeURIComponent(email)}`
+    })
+    .then(res => {
+        if (res.ok) {
+            const textEl = document.getElementById(`notif-email-text-${entId}`);
+            if (textEl) textEl.textContent = email ? email : 'Aucun (par defaut)';
+            bootstrapModalObj.hide();
+        } else {
+            alert("Erreur lors de la mise à jour.");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Erreur réseau.");
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Enregistrer';
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,643 @@
+{% extends "base.html" %}
+{% block title %}Page 2/2 - Revalidation{% endblock %}
+
+{% block content %}
+{# Theme dynamic color configuration #}
+{% set theme_param = request.args.get('theme') or request.args.get('from') or 'jaune' %}
+{% set theme_color = '#ffeb3b' %} {# Default Yellow #}
+{% set text_color = '#000000' %}
+{% set border_color = '#000000' %}
+{% set print_border = '#000000' %}
+
+{% if theme_param in ['fouille', 'vert', 'green', 'f'] %}
+    {% set theme_color = '#2e7d32' %}
+    {% set text_color = '#ffffff' %}
+    {% set border_color = '#2e7d32' %}
+    {% set print_border = '#2e7d32' %}
+{% elif theme_param in ['hauteur', 'bleu', 'blue', 'a'] %}
+    {% set theme_color = '#0071e3' %}
+    {% set text_color = '#ffffff' %}
+    {% set border_color = '#0071e3' %}
+    {% set print_border = '#0071e3' %}
+{% elif theme_param in ['chaud', 'rouge', 'red', 'b'] %}
+    {% set theme_color = '#ff453a' %}
+    {% set text_color = '#ffffff' %}
+    {% set border_color = '#ff453a' %}
+    {% set print_border = '#ff453a' %}
+{% elif theme_param in ['levage', 'jaune_c', 'c'] %}
+    {% set theme_color = '#ff9f0a' %}
+    {% set text_color = '#ffffff' %}
+    {% set border_color = '#ff9f0a' %}
+    {% set print_border = '#ff9f0a' %}
+{% elif theme_param in ['vehicule', 'violet', 'd'] %}
+    {% set theme_color = '#5856d6' %}
+    {% set text_color = '#ffffff' %}
+    {% set border_color = '#5856d6' %}
+    {% set print_border = '#5856d6' %}
+{% elif theme_param in ['espace_confine', 'cyan', 'e'] %}
+    {% set theme_color = '#30b0c7' %}
+    {% set text_color = '#ffffff' %}
+    {% set border_color = '#30b0c7' %}
+    {% set print_border = '#30b0c7' %}
+{% elif theme_param in ['electrique', 'orange', 'g'] %}
+    {% set theme_color = '#ff9500' %}
+    {% set text_color = '#ffffff' %}
+    {% set border_color = '#ff9500' %}
+    {% set print_border = '#ff9500' %}
+{% endif %}
+
+<style>
+    @media print {
+        .btn, .navbar, .alert, .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { border: none !important; }
+        .card-body { padding: 0 !important; }
+        .border-theme-print { border-color: {{ print_border }} !important; }
+    }
+</style>
+<div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Tableau de Bord
+        </a>
+        <div class="dropdown">
+            <button class="btn btn-outline-success shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-plus-circle me-2"></i> Nouvelle Demande de Permis
+            </button>
+            <ul class="dropdown-menu shadow border-0">
+                <li><a class="dropdown-item" href="{{ url_for('permis.nouveau') }}">
+                    <i class="fas fa-file-signature me-2 text-primary"></i> <strong>DEMANDE DE PERMIS (SINYLON FIAT)</strong> — En ligne
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header small text-uppercase fw-bold">Choisir le type de permis</h6></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='securite_generale') }}">
+                    <i class="fas fa-file-contract me-2 text-dark"></i> <strong>RECTO (P1)</strong> — Sécurité Générale
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='revalidation', theme=theme_param) }}">
+                    <i class="fas fa-sync me-2 text-secondary"></i> <strong>VERSO (P2)</strong> — Revalidation
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='hauteur') }}">
+                    <i class="fas fa-hard-hat me-2 text-primary"></i> <strong>BLEUE (A)</strong> — Travail en Hauteur
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='chaud') }}">
+                    <i class="fas fa-fire me-2 text-danger"></i> <strong>ROUGE (B)</strong> — Travail à Chaud
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='levage') }}">
+                    <i class="fas fa-dolly me-2 text-warning"></i> <strong>JAUNE (C)</strong> — Permis de Levage
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='vehicule') }}">
+                    <i class="fas fa-car me-2 text-info"></i> <strong>VIOLETTE (D)</strong> — Inspection Engins
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='espace_confine') }}">
+                    <i class="fas fa-door-closed me-2 text-success"></i> <strong>CYAN (E)</strong> — Espace Confiné
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='fouille') }}">
+                    <i class="fas fa-shovel me-2" style="color: #2e7d32;"></i> <strong>PERMIS D'EXCAVATION (F)</strong>
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='electrique') }}">
+                    <i class="fas fa-bolt me-2" style="color: #ff9500;"></i> <strong>ORANGE (G)</strong> — Travail Électrique
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    {% if permis %}
+    <button onclick="window.print()" class="btn btn-3d btn-chic-gold shadow-sm">
+        <i class="fas fa-print me-2"></i> Imprimer / Enregistrer en PDF
+    </button>
+    {% else %}
+    <button onclick="submitForPrint()" class="btn btn-3d btn-chic-gold shadow-sm">
+        <i class="fas fa-print me-2"></i> Enregistrer & Imprimer
+    </button>
+    {% endif %}
+</div>
+<script src="{{ url_for("static", filename="js/signature_pad.umd.min.js") }}"></script>
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+        <div class="card shadow-sm border-0 mb-5">
+            <div class="card-body p-4 bg-white border border-dark border-theme-print" style="border-left: 15px solid {{ theme_color }} !important; border-right: 15px solid {{ theme_color }} !important;">
+                
+                <!-- HEADER -->
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div class="fw-bold">Permis de Travail de Sécurité Générale</div>
+                    <div class="d-flex align-items-center gap-2">
+                        {% if qr_code %}
+                        <div class="p-1 bg-white border border-dark text-center" style="width: 80px;">
+                            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Verification" style="height: 70px; width: 70px;">
+                            <div class="text-dark fw-bold" style="font-size: 8px; margin-top: 1px;">VERIFY</div>
+                        </div>
+                        {% endif %}
+                        <div style="font-weight: 900; font-size: 1.5rem;">SINYLON FIAT <span style="color: #ea580c;">STELLANTIS</span></div>
+                    </div>
+                </div>
+
+                <form method="POST" id="revalForm" enctype="multipart/form-data">
+                    <input type="hidden" name="type_formulaire" value="revalidation">
+                    <input type="hidden" name="pre_allocated_id" value="{{ form_id }}">
+
+                    <!-- CONDITIONAL LAYOUTS -->
+                    {% if theme_param in ['fouille', 'vert', 'green', 'f'] %}
+                    
+                    <!-- EXCAVATION SPECIFIC LAYOUT (GREEN THEME) -->
+                    <!-- 7. REVALIDATION DE PERMIS -->
+                    <div class="fw-bold p-2 text-center text-white mb-0" style="background-color: #2e7d32; border: 1px solid #2e7d32; font-size: 0.95rem;">7. REVALIDATION DE PERMIS</div>
+                    <div class="p-3 bg-white border border-dark border-top-0 mb-4">
+                        <div class="row align-items-center g-2 text-dark small">
+                            <div class="col-md-7 fw-bold text-uppercase d-flex align-items-center flex-wrap gap-2">
+                                <span>Le permis a été approuvé pour :</span>
+                                <input type="text" name="reval_jours_approbation" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-2 py-0 text-center fw-bold bg-transparent" placeholder="........" style="width: 100px; display: inline-block;">
+                                <span>jours consécutifs</span>
+                            </div>
+                            <div class="col-md-5 fw-bold text-uppercase d-flex align-items-center flex-wrap gap-2 justify-content-md-end">
+                                <span>à compter du :</span>
+                                <input type="date" name="reval_date_compter" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-2 py-0 text-center fw-bold bg-transparent" style="width: 150px; display: inline-block;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TABLEAU 1: AUTORISATION DE CONTINUATION / REPRISE DE TRAVAIL (10 Rows) -->
+                    <div class="fw-bold p-1 text-center text-white mb-0 small" style="background-color: #2e7d32; border: 1px solid #2e7d32;">AUTORISATION DE CONTINUATION / REPRISE DE TRAVAIL</div>
+                    <table class="table table-bordered border-dark text-center align-middle small mb-4">
+                        <thead class="bg-light text-dark fw-bold">
+                            <tr>
+                                <th rowspan="2" style="width: 40px;">N°</th>
+                                <th colspan="2" style="width: 260px;">Période de validité</th>
+                                <th colspan="2">Autorité de Zone (AZ)</th>
+                                <th colspan="2">Responsable d'Exécution (RE)</th>
+                                <th rowspan="2" style="width: 80px;">Fin des travaux</th>
+                            </tr>
+                            <tr class="x-small">
+                                <th>Du (Date & Heure)</th>
+                                <th>Au (Date & Heure)</th>
+                                <th>Nom</th>
+                                <th>Signature</th>
+                                <th>Nom</th>
+                                <th>Signature</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(1, 11) %}
+                            <tr>
+                                <td class="fw-bold bg-light">{{ i }}</td>
+                                <td>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <input type="date" name="reval_du_date_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent" style="font-size: 0.72rem;">
+                                        <input type="time" name="reval_du_heure_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent" style="font-size: 0.72rem;">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <input type="date" name="reval_au_date_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent" style="font-size: 0.72rem;">
+                                        <input type="time" name="reval_au_heure_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent" style="font-size: 0.72rem;">
+                                    </div>
+                                </td>
+                                <td><input type="text" name="reval_az_nom_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent text-center"></td>
+                                <td style="width: 130px; padding: 0; position: relative;">
+                                    <div class="no-print position-absolute top-0 end-0 bg-light border border-dark border-top-0 border-end-0 d-flex gap-1" style="z-index: 10; opacity: 0.8;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-primary p-0 px-1" style="font-size: 0.6rem;" onclick="loadSignature('reval_az_{{ i }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-success p-0 px-1" style="font-size: 0.6rem;" onclick="saveSignature('reval_az_{{ i }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                    <input type="text" name="nom_signature_reval_az_{{ i }}" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    <div style="height: 45px; position: relative;">
+                                        <canvas id="sig_reval_az_{{ i }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_reval_az_{{ i }}_data" id="sig_reval_az_{{ i }}_data">
+                                    </div>
+                                </td>
+                                <td><input type="text" name="reval_re_nom_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent text-center"></td>
+                                <td style="width: 130px; padding: 0; position: relative;">
+                                    <div class="no-print position-absolute top-0 end-0 bg-light border border-dark border-top-0 border-end-0 d-flex gap-1" style="z-index: 10; opacity: 0.8;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-primary p-0 px-1" style="font-size: 0.6rem;" onclick="loadSignature('reval_re_{{ i }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-success p-0 px-1" style="font-size: 0.6rem;" onclick="saveSignature('reval_re_{{ i }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                    <input type="text" name="nom_signature_reval_re_{{ i }}" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    <div style="height: 45px; position: relative;">
+                                        <canvas id="sig_reval_re_{{ i }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_reval_re_{{ i }}_data" id="sig_reval_re_{{ i }}_data">
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="checkbox" name="reval_fin_travaux_{{ i }}" value="Y" style="width: 18px; height: 18px; cursor: pointer;">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- TABLEAU 2: APPROBATION DE CHANGEMENT DE RESPONSABLE D'EXÉCUTION (2 Rows) -->
+                    <div class="fw-bold p-1 text-center text-white mb-0 small" style="background-color: #2e7d32; border: 1px solid #2e7d32;">APPROBATION DE CHANGEMENT DE RESPONSABLE D'EXÉCUTION</div>
+                    <table class="table table-bordered border-dark text-center align-middle small mb-4">
+                        <thead class="bg-light text-dark fw-bold">
+                            <tr>
+                                <th rowspan="2" style="width: 40px;">N°</th>
+                                <th rowspan="2" style="width: 260px;">Date & Heure</th>
+                                <th colspan="2">Autorité de Zone (AZ) - Autorisation</th>
+                                <th colspan="2">Responsable d'Exécution (RE) Reprenant</th>
+                            </tr>
+                            <tr class="x-small">
+                                <th>Nom</th>
+                                <th>Signature</th>
+                                <th>Nom</th>
+                                <th>Signature</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(1, 3) %}
+                            <tr>
+                                <td class="fw-bold bg-light">{{ i }}</td>
+                                <td>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        <input type="date" name="chg_re_date_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent" style="font-size: 0.72rem;">
+                                        <input type="time" name="chg_re_heure_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent" style="font-size: 0.72rem;">
+                                    </div>
+                                </td>
+                                <td><input type="text" name="chg_re_az_nom_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent text-center"></td>
+                                <td style="width: 150px; padding: 0; position: relative;">
+                                    <div class="no-print position-absolute top-0 end-0 bg-light border border-dark border-top-0 border-end-0 d-flex gap-1" style="z-index: 10; opacity: 0.8;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-primary p-0 px-1" style="font-size: 0.6rem;" onclick="loadSignature('chg_re_az_{{ i }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-success p-0 px-1" style="font-size: 0.6rem;" onclick="saveSignature('chg_re_az_{{ i }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                    <input type="text" name="nom_signature_chg_re_az_{{ i }}" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    <div style="height: 45px; position: relative;">
+                                        <canvas id="sig_chg_re_az_{{ i }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_chg_re_az_{{ i }}_data" id="sig_chg_re_az_{{ i }}_data">
+                                    </div>
+                                </td>
+                                <td><input type="text" name="chg_re_re_nom_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent text-center"></td>
+                                <td style="width: 150px; padding: 0; position: relative;">
+                                    <div class="no-print position-absolute top-0 end-0 bg-light border border-dark border-top-0 border-end-0 d-flex gap-1" style="z-index: 10; opacity: 0.8;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-primary p-0 px-1" style="font-size: 0.6rem;" onclick="loadSignature('chg_re_re_{{ i }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-success p-0 px-1" style="font-size: 0.6rem;" onclick="saveSignature('chg_re_re_{{ i }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                    <input type="text" name="nom_signature_chg_re_re_{{ i }}" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    <div style="height: 45px; position: relative;">
+                                        <canvas id="sig_chg_re_re_{{ i }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_chg_re_re_{{ i }}_data" id="sig_chg_re_re_{{ i }}_data">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- TABLEAU 3: ENREGISTREMENT DES CONTRÔLES HSE OU SÉCURITÉ (3 Rows) -->
+                    <div class="fw-bold p-1 text-center text-white mb-0 small" style="background-color: #2e7d32; border: 1px solid #2e7d32;">ENREGISTREMENT DES CONTRÔLES EFFECTUÉS PAR LA STRUCTURE HSE OU SÉCURITÉ</div>
+                    <table class="table table-bordered border-dark text-center align-middle small mb-4">
+                        <thead class="bg-light text-dark fw-bold">
+                            <tr>
+                                <th style="width: 40px;">N°</th>
+                                <th style="width: 120px;">Date</th>
+                                <th style="width: 80px;">Heure</th>
+                                <th>Observations / Remarques</th>
+                                <th style="width: 150px;">Nom</th>
+                                <th style="width: 150px;">Fonction</th>
+                                <th style="width: 150px;">Signature</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(1, 4) %}
+                            <tr>
+                                <td class="fw-bold bg-light">{{ i }}</td>
+                                <td><input type="date" name="ctrl_hse_date_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent"></td>
+                                <td><input type="time" name="ctrl_hse_heure_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent"></td>
+                                <td><input type="text" name="ctrl_hse_obs_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent"></td>
+                                <td><input type="text" name="ctrl_hse_nom_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent text-center"></td>
+                                <td><input type="text" name="ctrl_hse_fonc_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent text-center"></td>
+                                <td style="padding: 0; position: relative;">
+                                    <div class="no-print position-absolute top-0 end-0 bg-light border border-dark border-top-0 border-end-0 d-flex gap-1" style="z-index: 10; opacity: 0.8;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-primary p-0 px-1" style="font-size: 0.6rem;" onclick="loadSignature('ctrl_hse_{{ i }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-success p-0 px-1" style="font-size: 0.6rem;" onclick="saveSignature('ctrl_hse_{{ i }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                    <input type="text" name="nom_signature_ctrl_hse_{{ i }}" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    <div style="height: 45px; position: relative;">
+                                        <canvas id="sig_ctrl_hse_{{ i }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_ctrl_hse_{{ i }}_data" id="sig_ctrl_hse_{{ i }}_data">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    {% else %}
+                    <!-- GENERIC REVALIDATION LAYOUT (DEFAULT YELLOW/OTHER) -->
+                    <!-- TABLEAU 1: REVALIDATION DU PERMIS -->
+                    <div class="fw-bold p-1 text-center small mb-0" style="background-color: {{ theme_color }}; color: {{ text_color }}; border: 1px solid {{ border_color if border_color != '#000000' else '#000000' }};">REVALIDATION DU PERMIS</div>
+                    <table class="table table-bordered border-dark text-center align-middle small mb-4">
+                        <thead class="bg-light">
+                            <tr>
+                                <th rowspan="2" style="width: 40px;">JOUR</th>
+                                <th rowspan="2" style="width: 100px;">DATE</th>
+                                <th colspan="3">Validation FIAT - Ingénieur / Responsable</th>
+                                <th colspan="3">Responsable d'exécution</th>
+                            </tr>
+                            <tr class="x-small">
+                                <th>Nom</th><th>Fonction</th><th>Signature</th>
+                                <th>Nom</th><th>Fonction</th><th>Signature</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(1, 8) %}
+                            <tr>
+                                <td>{{ i }}</td>
+                                <td><input type="text" name="date_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent"></td>
+                                <td><input type="text" name="FIAT_nom_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent"></td>
+                                <td><input type="text" name="FIAT_fonc_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent"></td>
+                                <td style="width: 120px; padding: 0; position: relative;">
+                                    <div class="no-print position-absolute top-0 end-0 bg-light border border-dark border-top-0 border-end-0 d-flex gap-1" style="z-index: 10; opacity: 0.8;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-primary p-0 px-1" style="font-size: 0.6rem;" onclick="loadSignature('FIAT_{{ i }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-success p-0 px-1" style="font-size: 0.6rem;" onclick="saveSignature('FIAT_{{ i }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                    <input type="text" name="nom_signature_FIAT_{{ i }}" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    <div style="height: 45px; position: relative;">
+                                        <canvas id="sig_FIAT_{{ i }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_FIAT_{{ i }}_data" id="sig_FIAT_{{ i }}_data">
+                                    </div>
+                                </td>
+                                <td><input type="text" name="resp_nom_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent"></td>
+                                <td><input type="text" name="resp_fonc_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent"></td>
+                                <td style="width: 120px; padding: 0; position: relative;">
+                                    <div class="no-print position-absolute top-0 end-0 bg-light border border-dark border-top-0 border-end-0 d-flex gap-1" style="z-index: 10; opacity: 0.8;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-primary p-0 px-1" style="font-size: 0.6rem;" onclick="loadSignature('resp_{{ i }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-success p-0 px-1" style="font-size: 0.6rem;" onclick="saveSignature('resp_{{ i }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                    <input type="text" name="nom_signature_resp_{{ i }}" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    <div style="height: 45px; position: relative;">
+                                        <canvas id="sig_resp_{{ i }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_resp_{{ i }}_data" id="sig_resp_{{ i }}_data">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- TABLEAU 2: REVALIDATION DU PERMIS PAR SINYLON FIAT -->
+                    <div class="fw-bold p-1 text-center small mb-0" style="background-color: {{ theme_color }}; color: {{ text_color }}; border: 1px solid {{ border_color if border_color != '#000000' else '#000000' }};">REVALIDATION DU PERMIS PAR SINYLON FIAT</div>
+                    <table class="table table-bordered border-dark text-center align-middle small mb-4">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 40px;">JOUR</th>
+                                <th style="width: 100px;">DATE</th>
+                                <th>Nom</th>
+                                <th>Fonction</th>
+                                <th>Signature</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(1, 8) %}
+                            <tr>
+                                <td>{{ i }}</td>
+                                <td><input type="text" name="SINYLON FIAT_date_{{ i }}" class="form-control form-control-sm border-0 p-0 text-center bg-transparent"></td>
+                                <td><input type="text" name="SINYLON FIAT_nom_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent"></td>
+                                <td><input type="text" name="SINYLON FIAT_fonc_{{ i }}" class="form-control form-control-sm border-0 p-0 bg-transparent"></td>
+                                <td style="padding: 0; position: relative;">
+                                    <div class="no-print position-absolute top-0 end-0 bg-light border border-dark border-top-0 border-end-0 d-flex gap-1" style="z-index: 10; opacity: 0.8;">
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-primary p-0 px-1" style="font-size: 0.6rem;" onclick="loadSignature('SINYLON FIAT_reval_{{ i }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border-0 text-success p-0 px-1" style="font-size: 0.6rem;" onclick="saveSignature('SINYLON FIAT_reval_{{ i }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i></button>
+                                    </div>
+                                    <input type="text" name="nom_signature_SINYLON FIAT_reval_{{ i }}" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    <div style="height: 45px; position: relative;">
+                                        <canvas id="sig_SINYLON FIAT_reval_{{ i }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_SINYLON FIAT_reval_{{ i }}_data" id="sig_SINYLON FIAT_reval_{{ i }}_data">
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endif %}
+
+                    <!-- SCAN OU PHOTO (PIÈCE JOINTE) -->
+                    <div class="border border-dark p-2 mb-3 bg-light no-print">
+                        <div class="fw-bold x-small text-uppercase mb-1"><i class="fas fa-paperclip me-1"></i> Pièce Jointe / Scan de la Revalidation (Optionnel)</div>
+                        <input type="file" name="fichier_joint" class="form-control form-control-sm border-dark rounded-0" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between align-items-center opacity-75 no-print" style="font-size: 0.6rem; border-top: 1px solid #ccc; pt-2;">
+                        <div style="text-transform: lowercase;">système de sécurité © 2026</div>
+                        <div class="fw-bold">Page 2/2</div>
+                    </div>
+                    <div class="mt-4 text-center no-print">
+                        <button type="button" onclick="submitForm()" class="btn btn-dark btn-3d px-5 fw-bold shadow">
+                            ENREGISTRER LA REVALIDATION
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const canvases = document.querySelectorAll('#revalForm canvas');
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvases.forEach(canvas => {
+            const id = canvas.id.replace('sig_', '');
+            
+            const currentWidth = canvas.offsetWidth * ratio;
+            const currentHeight = canvas.offsetHeight * ratio;
+            if (currentWidth > 0 && currentHeight > 0) {
+                canvas.width = currentWidth;
+                canvas.height = currentHeight;
+                canvas.getContext("2d").scale(ratio, ratio);
+            }
+            
+            // Draw initial state (cursive fallback or saved sig)
+            drawSignatureText(id, getSignatureText(id));
+            
+            if (window.isPermisReadOnly) {
+                {% if permis and permis.signatures %}
+                    const savedSigs = {{ permis.signatures|tojson }};
+                    const base64Data = savedSigs['sig_' + id];
+                    if (base64Data) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const ctx = canvas.getContext('2d');
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            ctx.drawImage(img, 0, 0, canvas.width / ratio, canvas.height / ratio);
+                        };
+                        img.src = base64Data;
+                    }
+                {% endif %}
+                return;
+            }
+            
+            // Bind input listeners
+            let inputNameStr = '';
+            let inputSigStr = 'nom_signature_' + id;
+            const match = id.match(/^(.+)_(\d+)$/);
+            if (match) {
+                const prefix = match[1];
+                const index = match[2];
+                if (prefix === 'SINYLON FIAT_reval') {
+                    inputNameStr = 'SINYLON FIAT_nom_' + index;
+                } else {
+                    inputNameStr = prefix + '_nom_' + index;
+                }
+            }
+            
+            const inputName = document.querySelector('input[name="' + inputNameStr + '"]');
+            const inputSig = document.querySelector('input[name="' + inputSigStr + '"]');
+            
+            function updateSig() {
+                drawSignatureText(id, getSignatureText(id));
+            }
+            
+            if (inputName) {
+                inputName.addEventListener('input', updateSig);
+            }
+            if (inputSig) {
+                inputSig.addEventListener('input', updateSig);
+            }
+            
+            // Draw initial state
+            updateSig();
+        });
+
+        if (window.isPermisReadOnly) return;
+
+        // Force redraw when font is loaded to ensure it displays correctly
+        document.fonts.load("24px 'Dancing Script'").then(function() {
+            const canvases = document.querySelectorAll('#revalForm canvas');
+            canvases.forEach(canvas => {
+                const id = canvas.id.replace('sig_', '');
+                drawSignatureText(id, getSignatureText(id));
+            });
+        });
+    });
+
+    function getSignatureText(id) {
+        let inputNameStr = '';
+        let inputSigStr = 'nom_signature_' + id;
+        const match = id.match(/^(.+)_(\d+)$/);
+        if (match) {
+            const prefix = match[1];
+            const index = match[2];
+            if (prefix === 'SINYLON FIAT_reval') {
+                inputNameStr = 'SINYLON FIAT_nom_' + index;
+            } else {
+                inputNameStr = prefix + '_nom_' + index;
+            }
+        }
+        const inputSig = document.querySelector('input[name="' + inputSigStr + '"]');
+        const inputName = document.querySelector('input[name="' + inputNameStr + '"]');
+        return (inputSig && inputSig.value) ? inputSig.value : (inputName ? inputName.value : '');
+    }
+
+    function drawSignatureText(id, text) {
+        const canvas = document.getElementById('sig_' + id);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        // Dynamic resize if dimensions are not set or changed
+        const currentWidth = canvas.offsetWidth * ratio;
+        const currentHeight = canvas.offsetHeight * ratio;
+        if (currentWidth > 0 && currentHeight > 0 && (canvas.width !== currentWidth || canvas.height !== currentHeight)) {
+            canvas.width = currentWidth;
+            canvas.height = currentHeight;
+            ctx.scale(ratio, ratio);
+        }
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if(!text) return;
+        
+        ctx.save();
+        ctx.font = "italic 20px 'Dancing Script', 'Brush Script MT', cursive";
+        ctx.fillStyle = "blue";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, canvas.width / (2 * ratio), canvas.height / (2 * ratio));
+        ctx.restore();
+    }
+
+    function saveSignature(id) {
+        let inputNameStr = '';
+        let inputSigStr = 'nom_signature_' + id;
+        const match = id.match(/^(.+)_(\d+)$/);
+        if (match) {
+            const prefix = match[1];
+            const index = match[2];
+            if (prefix === 'SINYLON FIAT_reval') {
+                inputNameStr = 'SINYLON FIAT_nom_' + index;
+            } else {
+                inputNameStr = prefix + '_nom_' + index;
+            }
+        }
+        const inputName = document.querySelector('input[name="' + inputNameStr + '"]');
+        const inputSig = document.querySelector('input[name="' + inputSigStr + '"]');
+        
+        const nameVal = inputName ? inputName.value.trim() : '';
+        const sigVal = inputSig ? inputSig.value.trim() : '';
+        
+        if (nameVal || sigVal) {
+            localStorage.setItem('noro_saved_sig_name_' + id, nameVal);
+            localStorage.setItem('noro_saved_sig_text_' + id, sigVal);
+            alert("✅ Votre signature numérique a été enregistrée !");
+        } else {
+            alert("⚠️ Veuillez saisir votre nom ou votre texte de signature avant d'enregistrer.");
+        }
+    }
+
+    function loadSignature(id) {
+        const savedName = localStorage.getItem('noro_saved_sig_name_' + id);
+        const savedSig = localStorage.getItem('noro_saved_sig_text_' + id);
+        
+        if (savedName || savedSig) {
+            let inputNameStr = '';
+            let inputSigStr = 'nom_signature_' + id;
+            const match = id.match(/^(.+)_(\d+)$/);
+            if (match) {
+                const prefix = match[1];
+                const index = match[2];
+                if (prefix === 'SINYLON FIAT_reval') {
+                    inputNameStr = 'SINYLON FIAT_nom_' + index;
+                } else {
+                    inputNameStr = prefix + '_nom_' + index;
+                }
+            }
+            const inputName = document.querySelector('input[name="' + inputNameStr + '"]');
+            const inputSig = document.querySelector('input[name="' + inputSigStr + '"]');
+            
+            if (inputName && savedName !== null) inputName.value = savedName;
+            if (inputSig && savedSig !== null) inputSig.value = savedSig;
+            
+            drawSignatureText(id, getSignatureText(id));
+        } else {
+            alert("⚠️ Aucune signature enregistrée pour cet acteur.");
+        }
+    }
+
+    function submitForm() {
+        const canvases = document.querySelectorAll('#revalForm canvas');
+        canvases.forEach(canvas => {
+            const id = canvas.id.replace('sig_', '');
+            let inputNameStr = '';
+            let inputSigStr = 'nom_signature_' + id;
+            const match = id.match(/^(.+)_(\d+)$/);
+            if (match) {
+                const prefix = match[1];
+                const index = match[2];
+                if (prefix === 'SINYLON FIAT_reval') {
+                    inputNameStr = 'SINYLON FIAT_nom_' + index;
+                } else {
+                    inputNameStr = prefix + '_nom_' + index;
+                }
+            }
+            const inputName = document.querySelector('input[name="' + inputNameStr + '"]');
+            const inputSig = document.querySelector('input[name="' + inputSigStr + '"]');
+            if ((inputName && inputName.value) || (inputSig && inputSig.value)) {
+                document.getElementById('sig_' + id + '_data').value = canvas.toDataURL();
+            }
+        });
+        document.getElementById('revalForm').submit();
+    }
+</script>
+<style>
+    .x-small { font-size: 0.7rem; }
+    table input { background: transparent !important; }
+</style>
+{% endblock %}

@@ -1,0 +1,7 @@
+desktop-app/node_modules/
+desktop-app/dist/
+scratch/
+*.pyc
+__pycache__/
+.DS_Store
+*.db

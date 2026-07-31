@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block title %}Signalement Incidents & Fiches HSE | SINYLON FIAT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <!-- Header Glassmorphism -->
+    <div class="card border-0 shadow-lg text-white p-4 mb-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px;">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-4 bg-danger text-white shadow" style="width: 56px; height: 56px;">
+                    <i class="fas fa-camera-retro fs-3"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h2 class="h3 fw-bold mb-0 text-white">Registre des Incidents & Non-Conformités HSE</h2>
+                        <span class="badge bg-warning text-dark text-uppercase px-2.5 py-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Réservé Admin Nouri</span>
+                    </div>
+                    <p class="text-white-50 small mb-0 mt-1">Saisie des fiches d'inspection terrain, suivi des écarts de sécurité et actions correctives.</p>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-danger fw-bold px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#nouveauIncidentModal" style="border-radius: 10px;">
+                    <i class="fas fa-plus-circle me-1"></i> Signaler un Incident
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs Incidents -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 bg-white" style="border-radius: 14px;">
+                <span class="text-muted small fw-bold">TOTAL SIGNALEMENTS</span>
+                <h3 class="fw-bold mb-0 text-dark mt-1">{{ stats.total }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 bg-white" style="border-radius: 14px;">
+                <span class="text-muted small fw-bold">INCIDENTS OUVERTS</span>
+                <h3 class="fw-bold mb-0 text-danger mt-1">{{ stats.ouvert }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 bg-white" style="border-radius: 14px;">
+                <span class="text-muted small fw-bold">EN COURS DE TRAITEMENT</span>
+                <h3 class="fw-bold mb-0 text-warning mt-1">{{ stats.en_cours }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 bg-white" style="border-radius: 14px;">
+                <span class="text-muted small fw-bold">CLÔTURÉS & RÉSORUS</span>
+                <h3 class="fw-bold mb-0 text-success mt-1">{{ stats.cloture }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des Incidents -->
+    <div class="card border-0 shadow-sm p-4" style="border-radius: 16px; background: #ffffff;">
+        <h5 class="fw-bold text-dark mb-3"><i class="fas fa-clipboard-list text-danger me-2"></i> Historique des Fiches d'Inspection</h5>
+        
+        {% if incidents %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                        <tr>
+                            <th>#ID</th>
+                            <th>Date</th>
+                            <th>Titre & Description</th>
+                            <th>Zone Chantier</th>
+                            <th>Gravité</th>
+                            <th>Entreprise Concernée</th>
+                            <th>Statut</th>
+                            <th>Actions Correctives</th>
+                            <th>Mettre à Jour</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inc in incidents %}
+                        <tr>
+                            <td class="fw-bold font-monospace">#INC-{{ inc.id }}</td>
+                            <td class="small text-muted">{{ inc.created_at.strftime('%Y-%m-%d %H:%M') if inc.created_at else '' }}</td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ inc.titre }}</div>
+                                <div class="text-muted x-small">{{ inc.description[:80] }}...</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ inc.zone }}</span></td>
+                            <td>
+                                {% if inc.gravite == 'Critique' %}
+                                <span class="badge bg-danger">🚨 CRITIQUE</span>
+                                {% elif inc.gravite == 'Moyenne' %}
+                                <span class="badge bg-warning text-dark">⚠️ MOYENNE</span>
+                                {% else %}
+                                <span class="badge bg-info text-dark">ℹ️ MINEURE</span>
+                                {% endif %}
+                            </td>
+                            <td class="fw-bold text-primary">{{ inc.entreprise_nom or 'N/A' }}</td>
+                            <td>
+                                {% if inc.statut == 'Ouvert' %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">🔴 OUVERT</span>
+                                {% elif inc.statut == 'En cours' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">🟡 EN COURS</span>
+                                {% else %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">🟢 CLÔTURÉ</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">{{ inc.actions_correctives or 'Aucune spécifiée' }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('analytics_bp.incident_update_statut', incident_id=inc.id) }}" class="d-flex gap-1">
+                                    <select name="statut" class="form-select form-select-sm fw-semibold" style="font-size: 0.75rem; border-radius: 8px;">
+                                        <option value="Ouvert" {% if inc.statut == 'Ouvert' %}selected{% endif %}>🔴 Ouvert</option>
+                                        <option value="En cours" {% if inc.statut == 'En cours' %}selected{% endif %}>🟡 En cours</option>
+                                        <option value="Clôturé" {% if inc.statut == 'Clôturé' %}selected{% endif %}>🟢 Clôturé</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary px-2" style="border-radius: 8px;"><i class="fas fa-save"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fas fa-shield-alt fs-1 mb-2 text-success"></i>
+            <h6>Aucun incident signalé à ce jour. Le chantier est en parfaite sécurité !</h6>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Modal Nouveau Signalement Incident -->
+<div class="modal fade" id="nouveauIncidentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header bg-danger text-white p-4" style="border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-circle me-2"></i> Signaler une Non-Conformité ou Incident HSE</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('analytics_bp.incident_nouveau') }}">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Titre du Signalement *</label>
+                        <input type="text" name="titre" class="form-control" placeholder="ex: Non-port de harnais en hauteur" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Zone du Chantier FIAT</label>
+                            <select name="zone" class="form-select">
+                                <option value="RECTO (P1)">RECTO (P1)</option>
+                                <option value="VERSO (P2)">VERSO (P2)</option>
+                                <option value="BLEUE (A)">BLEUE (A)</option>
+                                <option value="ROUGE (B)">ROUGE (B)</option>
+                                <option value="JAUNE (C)">JAUNE (C)</option>
+                                <option value="VIOLETTE (D)">VIOLETTE (D)</option>
+                                <option value="CYAN (E)">CYAN (E)</option>
+                                <option value="EXCAVATION (F)">EXCAVATION (F)</option>
+                                <option value="ORANGE (G)">ORANGE (G)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Niveau de Gravité</label>
+                            <select name="gravite" class="form-select">
+                                <option value="Mineure">ℹ️ Mineure</option>
+                                <option value="Moyenne">⚠️ Moyenne</option>
+                                <option value="Critique">🚨 CRITIQUE</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Entreprise En Cause / Responsable</label>
+                        <select name="entreprise_nom" class="form-select">
+                            <option value="">-- Sélectionner l'entreprise --</option>
+                            {% for e in entreprises %}
+                            <option value="{{ e.nom }}">{{ e.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Description Détaillée du Constat *</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Précisez le lieu exact, l'heure et la situation observée..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Actions Correctives Exigées</label>
+                        <textarea name="actions_correctives" class="form-control" rows="2" placeholder="ex: Arrêt immédiat des travaux + causerie sécurité obligatoire..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light p-3" style="border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4"><i class="fas fa-paper-plane me-1"></i> Enregistrer l'Incident</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

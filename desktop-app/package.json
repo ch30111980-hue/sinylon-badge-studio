@@ -1,0 +1,29 @@
+{
+  "name": "sinylon-badge-studio",
+  "version": "1.0.0",
+  "author": "Sinylon Team",
+  "description": "SINYLON Badge Studio - Client Desktop macOS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac dmg"
+  },
+  "build": {
+    "appId": "com.sinylon.badgestudio",
+    "productName": "SINYLON Badge Studio",
+    "electronVersion": "28.2.0",
+    "asar": false,
+    "directories": {
+      "output": "dist"
+    },
+    "publish": [],
+    "mac": {
+      "category": "public.app-category.business",
+      "target": ["dmg"]
+    }
+  },
+  "devDependencies": {
+    "electron": "28.2.0",
+    "electron-builder": "24.9.1"
+  }
+}

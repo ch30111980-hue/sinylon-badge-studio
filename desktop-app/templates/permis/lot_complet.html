@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Impression du Lot Complet{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        .page-break { page-break-after: always; }
+        body { background-color: white !important; }
+        .card { border: none !important; box-shadow: none !important; }
+    }
+    .permit-preview {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 30px;
+        position: relative;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4 no-print">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark">
+        <i class="fas fa-arrow-left me-2"></i> Retour
+    </a>
+    <div class="text-center">
+        <h3 class="mb-0">Impression du Lot de Permis</h3>
+        <p class="text-muted small">Total : {{ pagination.total if pagination else forms|length }} permis détectés</p>
+    </div>
+    <button onclick="window.print()" class="btn btn-primary btn-lg">
+        <i class="fas fa-print me-2"></i> Lancer l'Impression / Enregistrer PDF
+    </button>
+</div>
+
+<div class="lot-container">
+    {% for f in forms %}
+    <div class="permit-preview page-break">
+        <!-- HEADER IDENTIFIANT -->
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-dark pb-2">
+            <div>
+                <span class="badge bg-dark text-uppercase">{{ f.type_formulaire }}</span>
+                <span class="ms-2 fw-bold text-muted small">Créé le {{ f.created_at.strftime('%d/%m/%Y') }}</span>
+            </div>
+            <div class="d-flex align-items-center">
+                {% if f.qr_code %}
+                <div class="me-3">
+                    <img src="data:image/png;base64,{{ f.qr_code }}" alt="QR Verification" style="width: 70px; height: 70px; border: 1px solid #000;">
+                </div>
+                {% endif %}
+                <div class="border border-dark px-3 py-1 text-center">
+                    <div class="x-small fw-bold">ID: P-2026-{{ f.id }}</div>
+                    <div class="fw-bold">{{ f.data.get('entreprise') or (f.demandeur.entreprise if f.demandeur else 'N/A') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENU DYNAMIQUE SELON LE TYPE -->
+        <div class="small">
+            {% if f.type_formulaire == 'securite_generale' %}
+                <h5 class="text-center fw-bold">PAGE 1/2 : SÉCURITÉ GÉNÉRALE</h5>
+                <hr>
+                <p><strong>Description:</strong> {{ f.data.get('travail_desc', '') }}</p>
+                <p><strong>Endroit:</strong> {{ f.data.get('endroit_travail', '') }} | <strong>Zone:</strong> {{ f.data.get('equipement_zone', '') }}</p>
+                <p><strong>Valide de:</strong> {{ f.data.get('heure_debut', '') }} <strong>à</strong> {{ f.data.get('heure_fin', '') }}</p>
+            {% elif f.type_formulaire == 'revalidation' %}
+                <h5 class="text-center fw-bold">PAGE 2/2 : REVALIDATION</h5>
+                <hr>
+                <p>Ce document contient les signatures de revalidation pour {{ f.data.get('entreprise') or (f.demandeur.entreprise if f.demandeur else '') }}.</p>
+            {% elif f.type_formulaire == 'hauteur' %}
+                <h5 class="text-center fw-bold">FORMULAIRE A : TRAVAIL EN HAUTEUR</h5>
+                <hr>
+                <p><strong>Conditions:</strong> {{ 'Claire' if f.data.get('h_vis_claire') }} | {{ 'Sec' if f.data.get('h_surface_sec') }}</p>
+            {% elif f.type_formulaire == 'chaud' %}
+                <h5 class="text-center fw-bold">FORMULAIRE B : TRAVAIL À CHAUD</h5>
+                <hr>
+                <p><strong>Mesures:</strong> {{ f.data.get('c_mesures', 'Standard') }}</p>
+            {% endif %}
+        </div>
+
+        <div class="mt-3 x-small text-muted text-center border-top pt-2" style="text-transform: lowercase;">
+            système de sécurité © 2026
+        </div>
+    </div>
+    {% endfor %}
+    
+    {% if pagination and pagination.pages > 1 %}
+    <div class="d-flex justify-content-between align-items-center py-3 mt-4 border-top no-print">
+        <small class="text-muted">
+            Permis {{ ((pagination.page - 1) * 20) + 1 }}–{{ [pagination.page * 20, pagination.total] | min }} sur {{ pagination.total }}
+        </small>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                {% if pagination.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('permis.lot_complet', page=pagination.prev_num) }}">‹</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">‹</span></li>
+                {% endif %}
+                {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if p %}
+                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('permis.lot_complet', page=p) }}">{{ p }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if pagination.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('permis.lot_complet', page=pagination.next_num) }}">›</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">›</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+{% if not forms %}
+<div class="alert alert-info text-center py-5 mt-5 no-print">
+    <h5>Aucun permis n'a été trouvé pour le moment.</h5>
+    <p>Remplissez d'abord des formulaires pour pouvoir les imprimer en lot.</p>
+</div>
+{% endif %}
+{% endblock %}

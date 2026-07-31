@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NORO — Administration Digitale IA | Génie Civil · Mécanique · IT · Électronique</title>
+  <meta name="description" content="NORO est la plateforme d'administration digitale IA pour les ingénieurs algériens. Gérez vos permis, badges professionnels, attestations et rapports IA en ligne.">
+  <meta name="keywords" content="NORO, administration digitale, IA, Algérie, génie civil, mécanique, informatique, électronique, ingénieurs, certifications, permis en ligne">
+  <meta name="author" content="NORO Administration Digitale IA">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="NORO — Administration Digitale IA">
+  <meta property="og:description" content="Plateforme unifiée d'administration digitale pour ingénieurs — Permis, Badges, Certifications, Rapports IA.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://noro-unified.onrender.com/">
+  <meta property="og:locale" content="fr_DZ">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 42'%3E%3Cpolygon points='18,1 33,9.5 33,32.5 18,41 3,32.5 3,9.5' fill='%230a0c0e' stroke='%23f97316' stroke-width='1.5'/%3E%3Cpolygon points='18,7 27,12 27,30 18,35 9,30 9,12' fill='%230ea5e9' stroke='%2338bdf8' stroke-width='0.5'/%3E%3Ccircle cx='18' cy='21' r='3.5' fill='%230ea5e9'/%3E%3Ccircle cx='18' cy='21' r='1.5' fill='white'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --noir: #0a0c0e; --noir2: #111418; --noir3: #181d22;
+      --orange: #f97316; --orange-dark: #c2530a; --orange-glow: rgba(249,115,22,0.18);
+      --olive: #7a9a3c; --olive-light: #a3c44a; --olive-glow: rgba(122,154,60,0.15);
+      --bleu: #0ea5e9; --bleu-dark: #0369a1; --bleu-glow: rgba(14,165,233,0.18);
+      --blanc: #f1f5f9; --gris: #94a3b8;
+      --rouge: #f87171; --rouge-bg: rgba(220,38,38,0.12); --rouge-border: rgba(220,38,38,0.4);
+    }
+    html, body { width: 100%; min-height: 100vh; background: var(--noir); font-family: 'Rajdhani', sans-serif; color: var(--blanc); overflow-x: hidden; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+    .bg-grid { position: fixed; inset: 0; z-index: 0; background-image: repeating-linear-gradient(60deg, rgba(122,154,60,0.04) 0, rgba(122,154,60,0.04) 1px, transparent 0, transparent 50%), repeating-linear-gradient(120deg, rgba(249,115,22,0.04) 0, rgba(249,115,22,0.04) 1px, transparent 0, transparent 50%), repeating-linear-gradient(0deg, rgba(14,165,233,0.03) 0, rgba(14,165,233,0.03) 1px, transparent 0, transparent 50%); background-size: 60px 60px; animation: gridPulse 8s ease-in-out infinite; }
+    .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); }
+    .orb1 { width: 400px; height: 400px; top: -10%; left: -5%; background: radial-gradient(circle, var(--orange-glow), transparent); animation: orbFloat 12s ease-in-out infinite; }
+    .orb2 { width: 350px; height: 350px; bottom: 10%; right: -5%; background: radial-gradient(circle, var(--olive-glow), transparent); animation: orbFloat 15s ease-in-out infinite reverse; }
+    .orb3 { width: 300px; height: 300px; top: 40%; left: 60%; background: radial-gradient(circle, var(--bleu-glow), transparent); animation: orbFloat 10s ease-in-out infinite 3s; }
+    @keyframes gridPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    @keyframes orbFloat { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(20px,-30px) scale(1.1)} }
+    .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    main.main-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; gap: 5rem; }
+    .logo-section { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+    .logo-ring { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; }
+    .hex-ring-outer { position: absolute; inset: 0; animation: spinSlow 20s linear infinite; }
+    .hex-ring-mid   { position: absolute; inset: 20px; animation: spinSlow 14s linear infinite reverse; }
+    .hex-ring-inner { position: absolute; inset: 40px; animation: spinSlow 8s linear infinite; }
+    @keyframes spinSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    .hex-center { position: relative; width: 100px; height: 115px; display: flex; align-items: center; justify-content: center; z-index: 10; filter: drop-shadow(0 0 20px var(--bleu)); animation: hexPulse 3s ease-in-out infinite; }
+    @keyframes hexPulse { 0%,100% { filter: drop-shadow(0 0 20px var(--bleu)); transform: scale(1); } 50% { filter: drop-shadow(0 0 40px var(--orange)) drop-shadow(0 0 60px var(--bleu)); transform: scale(1.05); } }
+    .hex-center svg { width: 100%; height: 100%; }
+    .orbit-container { position: absolute; inset: 0; animation: spinSlow 18s linear infinite; }
+    .sat-hex { position: absolute; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; }
+    .sat-hex svg { width: 100%; height: 100%; animation: spinSlow 18s linear infinite reverse; }
+    .brand-name { font-family: 'Orbitron', monospace; font-size: 3.5rem; font-weight: 900; letter-spacing: 0.25em; background: linear-gradient(135deg, var(--orange) 0%, var(--blanc) 45%, var(--bleu) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; filter: drop-shadow(0 0 30px rgba(249,115,22,0.4)); }
+    .brand-sep { width: 180px; height: 2px; background: linear-gradient(90deg, var(--orange), var(--olive), var(--bleu)); border-radius: 2px; position: relative; overflow: hidden; }
+    .brand-sep::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #fff, transparent); animation: sepShine 3s ease-in-out infinite; }
+    @keyframes sepShine { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+    .brand-tagline { font-family: 'Rajdhani', sans-serif; font-size: 0.75rem; letter-spacing: 0.35em; color: var(--gris); text-transform: uppercase; font-weight: 500; }
+    .badge-row { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 0.5rem; }
+    .badge { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid; backdrop-filter: blur(4px); }
+    .badge-orange { background: rgba(249,115,22,0.1); border-color: rgba(249,115,22,0.4); color: var(--orange); }
+    .badge-olive  { background: rgba(122,154,60,0.1);  border-color: rgba(122,154,60,0.4);  color: var(--olive-light); }
+    .badge-blue   { background: rgba(14,165,233,0.1);  border-color: rgba(14,165,233,0.4);  color: var(--bleu); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .badge-orange .badge-dot { background: var(--orange); }
+    .badge-olive  .badge-dot { background: var(--olive-light); }
+    .badge-blue   .badge-dot { background: var(--bleu); }
+    .divider-vert { width: 1px; height: 380px; background: linear-gradient(to bottom, transparent, var(--orange) 25%, var(--olive) 75%, transparent); opacity: 0.4; flex-shrink: 0; }
+    .login-card { width: 100%; max-width: 400px; background: rgba(17,20,24,0.85); border: 1px solid rgba(249,115,22,0.2); border-radius: 12px; padding: 2.5rem; backdrop-filter: blur(20px); position: relative; overflow: hidden; }
+    .login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 120px; height: 120px; background: radial-gradient(circle at top left, rgba(249,115,22,0.15), transparent); pointer-events: none; }
+    .login-card::after { content: ''; position: absolute; bottom: 0; right: 0; width: 120px; height: 120px; background: radial-gradient(circle at bottom right, rgba(14,165,233,0.15), transparent); pointer-events: none; }
+    .card-topbar { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--orange), var(--olive-light), var(--bleu)); }
+    .login-heading { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; letter-spacing: 0.2em; color: var(--blanc); margin-bottom: 0.25rem; }
+    .login-sub { font-size: 0.85rem; color: var(--gris); letter-spacing: 0.05em; margin-bottom: 1.5rem; }
+    .error-zone { background: var(--rouge-bg); border: 1px solid var(--rouge-border); border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; color: var(--rouge); margin-bottom: 1rem; letter-spacing: 0.04em; display: none; align-items: center; gap: 8px; }
+    .error-zone.visible { display: flex; }
+    .error-zone svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .field { margin-bottom: 1.25rem; }
+    .field label { display: block; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gris); margin-bottom: 0.5rem; font-weight: 600; }
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-wrap .field-icon { position: absolute; left: 14px; width: 18px; height: 18px; color: var(--gris); pointer-events: none; flex-shrink: 0; transition: color 0.3s; }
+    .field input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.8rem 1rem 0.8rem 2.8rem; font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 500; color: var(--blanc); outline: none; transition: border-color 0.3s, background 0.3s, box-shadow 0.3s; letter-spacing: 0.05em; }
+    .field input::placeholder { color: rgba(148,163,184,0.5); }
+    .field input:focus { border-color: var(--orange); background: rgba(249,115,22,0.05); box-shadow: 0 0 0 3px rgba(249,115,22,0.1), 0 0 20px rgba(249,115,22,0.08); }
+    .input-wrap:focus-within .field-icon { color: var(--orange); }
+    .field input[aria-invalid="true"] { border-color: var(--rouge); background: rgba(220,38,38,0.05); }
+    .field-error-msg { font-size: 0.72rem; color: var(--rouge); margin-top: 4px; display: none; letter-spacing: 0.05em; }
+    .field-error-msg.visible { display: block; }
+    .eye-btn { position: absolute; right: 12px; background: none; border: none; cursor: pointer; color: var(--gris); display: flex; align-items: center; transition: color 0.3s; padding: 4px; }
+    .eye-btn:hover { color: var(--orange); }
+    .eye-btn svg { width: 18px; height: 18px; }
+    .opts-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; }
+    .check-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; color: var(--gris); user-select: none; }
+    .check-label input[type=checkbox] { display: none; }
+    .check-box { width: 16px; height: 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 3px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; flex-shrink: 0; }
+    .check-label input:checked + .check-box { background: var(--orange); border-color: var(--orange); }
+    .check-label input:checked + .check-box::after { content: '✓'; font-size: 10px; color: #fff; font-weight: 700; }
+    .check-label:focus-within .check-box { outline: 2px solid var(--bleu); outline-offset: 2px; }
+    .forgot-link { font-size: 0.8rem; color: var(--bleu); text-decoration: none; letter-spacing: 0.05em; transition: color 0.3s; background: none; border: none; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: 500; padding: 0; }
+    .forgot-link:hover { color: var(--olive-light); }
+    .forgot-link:focus-visible { outline: 2px solid var(--bleu); outline-offset: 2px; border-radius: 2px; }
+    .btn-login { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, var(--orange-dark), var(--orange)); border: none; border-radius: 6px; font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; color: #fff; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.3s; box-shadow: 0 4px 20px rgba(249,115,22,0.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-login::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); transform: translateX(-100%); transition: transform 0s; }
+    .btn-login:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(249,115,22,0.45); }
+    .btn-login:hover:not(:disabled)::before { transform: translateX(100%); transition: transform 0.6s ease; }
+    .btn-login:active:not(:disabled) { transform: translateY(0); }
+    .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
+    .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-login.loading .btn-spinner { display: block; }
+    .btn-login.loading .btn-text { opacity: 0.7; }
+    .or-divider { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+    .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+    .or-divider span { font-size: 0.72rem; color: var(--gris); letter-spacing: 0.15em; text-transform: uppercase; }
+    .social-row { display: flex; gap: 0.75rem; }
+    .btn-social { flex: 1; padding: 0.65rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--gris); font-size: 0.78rem; font-family: 'Rajdhani', sans-serif; font-weight: 600; letter-spacing: 0.1em; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-social:hover { border-color: var(--olive); color: var(--olive-light); background: rgba(122,154,60,0.07); }
+    .btn-social:focus-visible { outline: 2px solid var(--bleu); outline-offset: 2px; }
+    .btn-social svg { width: 16px; height: 16px; }
+    .signup-line { text-align: center; margin-top: 1.25rem; font-size: 0.82rem; color: var(--gris); }
+    .signup-line a, .signup-line button { color: var(--bleu); text-decoration: none; background: none; border: none; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 0.82rem; font-weight: 600; transition: color 0.3s; padding: 0; }
+    .signup-line a:hover, .signup-line button:hover { color: var(--orange); }
+    .signup-line button:focus-visible { outline: 2px solid var(--bleu); outline-offset: 2px; border-radius: 2px; }
+    footer { position: relative; z-index: 1; background: rgba(10,12,14,0.95); border-top: 1px solid rgba(249,115,22,0.15); padding: 2rem 3rem; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .footer-logo-hex { width: 36px; height: 36px; flex-shrink: 0; }
+    .footer-name { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 900; letter-spacing: 0.25em; background: linear-gradient(135deg, var(--orange), var(--bleu)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .footer-tagline { font-size: 0.7rem; letter-spacing: 0.25em; color: var(--gris); text-transform: uppercase; }
+    .footer-nav { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .footer-nav-col { display: flex; flex-direction: column; gap: 0.4rem; }
+    .footer-nav-title { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-bottom: 0.25rem; }
+    .footer-nav a, .footer-nav button { font-size: 0.8rem; color: var(--gris); text-decoration: none; letter-spacing: 0.05em; transition: color 0.3s; background: none; border: none; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: 400; padding: 0; text-align: left; }
+    .footer-nav a:hover, .footer-nav button:hover { color: var(--olive-light); }
+    .footer-nav button:focus-visible { outline: 2px solid var(--bleu); outline-offset: 2px; border-radius: 2px; }
+    .footer-domains { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .domain-tag { padding: 3px 10px; border-radius: 3px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid; }
+    .dt-gc  { background: rgba(249,115,22,0.08); border-color: rgba(249,115,22,0.3); color: var(--orange); }
+    .dt-mec { background: rgba(122,154,60,0.08);  border-color: rgba(122,154,60,0.3);  color: var(--olive-light); }
+    .dt-it  { background: rgba(14,165,233,0.08);  border-color: rgba(14,165,233,0.3);  color: var(--bleu); }
+    .dt-elec{ background: rgba(249,115,22,0.06); border-color: rgba(249,115,22,0.2); color: rgba(249,115,22,0.8); }
+    .footer-bottom { max-width: 1200px; margin: 1.5rem auto 0; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .footer-copy { font-size: 0.72rem; color: rgba(148,163,184,0.6); letter-spacing: 0.1em; }
+    .footer-status { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--olive-light); letter-spacing: 0.1em; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--olive-light); box-shadow: 0 0 6px var(--olive-light); animation: statusPulse 2s ease-in-out infinite; }
+    @keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+    .modal-overlay.open { opacity: 1; visibility: visible; }
+    .modal-overlay.open .modal-box { transform: translateY(0); opacity: 1; }
+    .modal-box { width: 100%; max-width: 440px; background: rgba(17,20,24,0.97); border: 1px solid rgba(249,115,22,0.25); border-radius: 14px; padding: 2.5rem; position: relative; overflow: hidden; transform: translateY(24px); opacity: 0; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s; }
+    .modal-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--orange), var(--olive-light), var(--bleu)); }
+    .modal-box::after { content: ''; position: absolute; top: 0; left: 0; width: 150px; height: 150px; background: radial-gradient(circle at top left, rgba(249,115,22,0.1), transparent); pointer-events: none; }
+    .modal-close { position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; cursor: pointer; color: var(--gris); transition: color 0.3s; z-index: 2; padding: 4px; }
+    .modal-close:hover { color: var(--orange); }
+    .modal-close:focus-visible { outline: 2px solid var(--bleu); outline-offset: 2px; border-radius: 4px; }
+    .modal-close svg { width: 20px; height: 20px; }
+    .modal-title { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; letter-spacing: 0.2em; color: var(--blanc); margin-bottom: 0.25rem; }
+    .modal-sub { font-size: 0.85rem; color: var(--gris); margin-bottom: 2rem; }
+    .modal-success { text-align: center; padding: 1.5rem 0; display: none; flex-direction: column; align-items: center; gap: 1rem; }
+    .modal-success.visible { display: flex; }
+    .modal-success-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(122,154,60,0.15); border: 2px solid var(--olive-light); display: flex; align-items: center; justify-content: center; animation: scaleIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes scaleIn { from{transform:scale(0)} to{transform:scale(1)} }
+    .modal-success-icon svg { width: 28px; height: 28px; color: var(--olive-light); }
+    .modal-success h3 { font-family: 'Orbitron', monospace; font-size: 0.9rem; letter-spacing: 0.15em; }
+    .modal-success p { font-size: 0.85rem; color: var(--gris); max-width: 280px; line-height: 1.5; }
+    .btn-modal { width: 100%; padding: 0.85rem; background: linear-gradient(135deg, var(--orange-dark), var(--orange)); border: none; border-radius: 6px; font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.18em; color: #fff; cursor: pointer; transition: transform 0.2s, box-shadow 0.3s; box-shadow: 0 4px 16px rgba(249,115,22,0.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-modal:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249,115,22,0.4); }
+    .btn-modal:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .reg-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .reg-tab { flex: 1; padding: 0.5rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--gris); font-size: 0.75rem; font-family: 'Rajdhani', sans-serif; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; }
+    .reg-tab.active { background: rgba(249,115,22,0.12); border-color: rgba(249,115,22,0.4); color: var(--orange); }
+    .sector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .sector-card { padding: 0.7rem; border-radius: 6px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); transition: all 0.3s; text-align: center; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gris); }
+    .sector-card:hover { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.07); }
+    .sector-card.selected { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.12); }
+    .sector-card .s-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+    .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
+    .toast { background: rgba(17,20,24,0.97); border: 1px solid rgba(249,115,22,0.3); border-radius: 8px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 10px; font-size: 0.82rem; letter-spacing: 0.05em; color: var(--blanc); min-width: 260px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards; pointer-events: auto; backdrop-filter: blur(12px); }
+    .toast.out { animation: toastOut 0.3s ease-in forwards; }
+    .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .toast-dot.orange { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+    .toast-dot.blue   { background: var(--bleu);   box-shadow: 0 0 6px var(--bleu);   }
+    .toast-dot.olive  { background: var(--olive-light); box-shadow: 0 0 6px var(--olive-light); }
+    @keyframes toastIn  { from{transform:translateX(120%);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes toastOut { from{transform:translateX(0);opacity:1} to{transform:translateX(120%);opacity:0} }
+    @media (max-width: 900px) { main.main-area { flex-direction: column; gap: 2.5rem; } .divider-vert { width: 80%; height: 1px; background: linear-gradient(to right, transparent, var(--orange) 25%, var(--olive) 75%, transparent); } .footer-inner { flex-direction: column; text-align: center; } .footer-nav { justify-content: center; } .footer-domains { justify-content: center; } .footer-bottom { flex-direction: column; text-align: center; } .footer-nav button { text-align: center; width: 100%; } }
+    @media (max-width: 480px) { main.main-area { padding: 2rem 1rem; } .brand-name { font-size: 2.5rem; } .logo-ring { width: 180px; height: 180px; } .login-card { padding: 1.75rem 1.25rem; } .social-row { flex-direction: column; } footer { padding: 1.5rem 1rem; } .opts-row { flex-direction: column; align-items: flex-start; gap: 0.75rem; } .modal-box { padding: 1.75rem 1.25rem; } .sector-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 360px) { .badge-row { gap: 0.4rem; } .badge { font-size: 0.65rem; padding: 4px 8px; } }
+  </style>
+</head>
+<body>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-orbs" aria-hidden="true">
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+</div>
+<div class="page">
+  <main class="main-area" id="main-content">
+    <section class="logo-section" aria-label="Identité NORO">
+      <div class="logo-ring" aria-hidden="true">
+        <div class="hex-ring-outer"><svg viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg" width="220" height="220"><polygon points="110,4 206,56 206,164 110,216 14,164 14,56" stroke="rgba(249,115,22,0.25)" stroke-width="1" fill="none" stroke-dasharray="6 4"/></svg></div>
+        <div class="hex-ring-mid"><svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" width="180" height="180"><polygon points="90,4 168,46 168,134 90,176 12,134 12,46" stroke="rgba(14,165,233,0.3)" stroke-width="1" fill="none" stroke-dasharray="3 5"/></svg></div>
+        <div class="hex-ring-inner"><svg viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg" width="140" height="140"><polygon points="70,4 128,36 128,100 70,136 12,100 12,36" stroke="rgba(122,154,60,0.4)" stroke-width="1.5" fill="none"/></svg></div>
+        <div class="orbit-container" aria-hidden="true">
+          <div class="sat-hex" style="top:0;left:50%;transform:translate(-50%,-4px)"><svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"><polygon points="21,2 38,11.5 38,30.5 21,40 4,30.5 4,11.5" fill="#1a0f00" stroke="#f97316" stroke-width="1.5"/><rect x="14" y="14" width="14" height="14" rx="2" fill="none" stroke="#f97316" stroke-width="1.2"/><rect x="17" y="17" width="8" height="8" rx="1" fill="#f97316" opacity="0.7"/><line x1="11" y1="17" x2="14" y2="17" stroke="#f97316" stroke-width="1"/><line x1="11" y1="21" x2="14" y2="21" stroke="#f97316" stroke-width="1"/><line x1="11" y1="25" x2="14" y2="25" stroke="#f97316" stroke-width="1"/><line x1="28" y1="17" x2="31" y2="17" stroke="#f97316" stroke-width="1"/><line x1="28" y1="21" x2="31" y2="21" stroke="#f97316" stroke-width="1"/><line x1="28" y1="25" x2="31" y2="25" stroke="#f97316" stroke-width="1"/></svg></div>
+          <div class="sat-hex" style="top:25%;right:3%;transform:translate(4px,-50%)"><svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"><polygon points="21,2 38,11.5 38,30.5 21,40 4,30.5 4,11.5" fill="#00101a" stroke="#0ea5e9" stroke-width="1.5"/><rect x="14" y="11" width="14" height="18" rx="2" fill="none" stroke="#0ea5e9" stroke-width="1.2"/><line x1="17" y1="16" x2="25" y2="16" stroke="#0ea5e9" stroke-width="1"/><line x1="17" y1="19" x2="25" y2="19" stroke="#0ea5e9" stroke-width="1"/><line x1="17" y1="22" x2="22" y2="22" stroke="#0ea5e9" stroke-width="1"/><rect x="14" y="11" width="6" height="5" rx="1" fill="#0ea5e9" opacity="0.3"/></svg></div>
+          <div class="sat-hex" style="bottom:25%;right:3%;transform:translate(4px,50%)"><svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"><polygon points="21,2 38,11.5 38,30.5 21,40 4,30.5 4,11.5" fill="#1a0900" stroke="#f97316" stroke-width="1.5"/><circle cx="21" cy="21" r="4" fill="none" stroke="#f97316" stroke-width="1.2"/><circle cx="13" cy="29" r="2.5" fill="none" stroke="#f97316" stroke-width="1"/><circle cx="29" cy="29" r="2.5" fill="none" stroke="#f97316" stroke-width="1"/><circle cx="21" cy="12" r="2.5" fill="none" stroke="#f97316" stroke-width="1"/><line x1="18" y1="24" x2="15" y2="27" stroke="#f97316" stroke-width="0.8"/><line x1="24" y1="24" x2="27" y2="27" stroke="#f97316" stroke-width="0.8"/></svg></div>
+          <div class="sat-hex" style="bottom:0;left:50%;transform:translate(-50%,4px)"><svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"><polygon points="21,2 38,11.5 38,30.5 21,40 4,30.5 4,11.5" fill="#001008" stroke="#7a9a3c" stroke-width="1.5"/><line x1="12" y1="30" x2="30" y2="30" stroke="#7a9a3c" stroke-width="1"/><rect x="13" y="23" width="4" height="7" rx="1" fill="#7a9a3c" opacity="0.8"/><rect x="19" y="19" width="4" height="11" rx="1" fill="#a3c44a"/><rect x="25" y="15" width="4" height="15" rx="1" fill="#7a9a3c" opacity="0.8"/></svg></div>
+          <div class="sat-hex" style="bottom:25%;left:3%;transform:translate(-4px,50%)"><svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"><polygon points="21,2 38,11.5 38,30.5 21,40 4,30.5 4,11.5" fill="#00101a" stroke="#0ea5e9" stroke-width="1.5"/><circle cx="21" cy="21" r="8" fill="none" stroke="#0ea5e9" stroke-width="1.2"/><circle cx="21" cy="21" r="4" fill="none" stroke="#0ea5e9" stroke-width="1"/><circle cx="21" cy="21" r="1.5" fill="#0ea5e9"/><line x1="21" y1="11" x2="21" y2="15" stroke="#0ea5e9" stroke-width="1"/><line x1="21" y1="27" x2="21" y2="31" stroke="#0ea5e9" stroke-width="1"/><line x1="11" y1="21" x2="15" y2="21" stroke="#0ea5e9" stroke-width="1"/><line x1="27" y1="21" x2="31" y2="21" stroke="#0ea5e9" stroke-width="1"/></svg></div>
+          <div class="sat-hex" style="top:25%;left:3%;transform:translate(-4px,-50%)"><svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"><polygon points="21,2 38,11.5 38,30.5 21,40 4,30.5 4,11.5" fill="#001008" stroke="#7a9a3c" stroke-width="1.5"/><line x1="21" y1="13" x2="21" y2="29" stroke="#a3c44a" stroke-width="1.2"/><line x1="12" y1="17" x2="30" y2="17" stroke="#a3c44a" stroke-width="1.2"/><path d="M12 17 Q10 21 14 22 Q18 23 16 17" fill="none" stroke="#a3c44a" stroke-width="1"/><path d="M30 17 Q32 21 28 22 Q24 23 26 17" fill="none" stroke="#a3c44a" stroke-width="1"/><line x1="18" y1="29" x2="24" y2="29" stroke="#a3c44a" stroke-width="1.2"/></svg></div>
+        </div>
+        <div class="hex-center" aria-hidden="true"><svg viewBox="0 0 100 115" xmlns="http://www.w3.org/2000/svg"><polygon points="50,4 94,27 94,88 50,111 6,88 6,27" fill="#0a0c0e" stroke="white" stroke-width="4"/><polygon points="50,14 84,32 84,83 50,101 16,83 16,32" fill="#0ea5e9" stroke="#38bdf8" stroke-width="1"/><circle cx="50" cy="20" r="4" fill="rgba(14,165,233,0.5)"/><circle cx="78" cy="36" r="4" fill="rgba(14,165,233,0.5)"/><circle cx="78" cy="79" r="4" fill="rgba(14,165,233,0.5)"/><circle cx="50" cy="95" r="4" fill="rgba(14,165,233,0.5)"/><circle cx="22" cy="79" r="4" fill="rgba(14,165,233,0.5)"/><circle cx="22" cy="36" r="4" fill="rgba(14,165,233,0.5)"/><circle cx="50" cy="57" r="14" fill="#0a0c0e"/><circle cx="50" cy="57" r="8" fill="#0ea5e9"/><circle cx="50" cy="57" r="4" fill="white"/></svg></div>
+      </div>
+      <div class="brand-name" aria-label="NORO">NORO</div>
+      <div class="brand-sep" aria-hidden="true"></div>
+      <p class="brand-tagline">Administration Digitale IA</p>
+      <div class="badge-row" role="list" aria-label="Secteurs couverts">
+        <span class="badge badge-orange" role="listitem"><span class="badge-dot" aria-hidden="true"></span>Génie Civil</span>
+        <span class="badge badge-olive"  role="listitem"><span class="badge-dot" aria-hidden="true"></span>Mécanique</span>
+        <span class="badge badge-blue"   role="listitem"><span class="badge-dot" aria-hidden="true"></span>Informatique</span>
+        <span class="badge badge-orange" role="listitem"><span class="badge-dot" aria-hidden="true"></span>Électronique</span>
+      </div>
+    </section>
+    <div class="divider-vert" aria-hidden="true"></div>
+    <div class="login-card" role="region" aria-label="Formulaire de connexion">
+      <div class="card-topbar" aria-hidden="true"></div>
+      <h1 class="login-heading">CONNEXION</h1>
+      <p class="login-sub">Se connecter — Accès sécurisé — Plateforme NORO</p>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <div class="error-zone visible" id="login-error" role="alert" aria-live="assertive" aria-atomic="true" style="display: flex;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span id="login-error-msg">{{ message }}</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="error-zone" id="login-error" role="alert" aria-live="assertive" aria-atomic="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="login-error-msg"></span>
+          </div>
+        {% endif %}
+      {% endwith %}
+      <form method="POST" action="/login" id="login-form" novalidate>
+        <div class="field">
+          <label for="email-input">Identifiant</label>
+          <div class="input-wrap">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="email-input" name="email" placeholder="votre.identifiant ou email" autocomplete="username" required aria-required="true" aria-describedby="email-error">
+          </div>
+          <div class="field-error-msg" id="email-error" role="alert">Veuillez saisir une adresse e-mail valide.</div>
+        </div>
+        <div class="field">
+          <label for="pwd">Mot de passe</label>
+          <div class="input-wrap">
+            <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="pwd" name="password" placeholder="••••••••••••" autocomplete="current-password" required aria-required="true" aria-describedby="pwd-error">
+            <button class="eye-btn" id="eye-btn" type="button" aria-label="Afficher le mot de passe" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eye-icon" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="field-error-msg" id="pwd-error" role="alert">Le mot de passe est requis.</div>
+        </div>
+        <div class="opts-row">
+          <label class="check-label" for="remember-chk">
+            <input type="checkbox" id="remember-chk" name="remember" value="1">
+            <span class="check-box" aria-hidden="true"></span>
+            Rester connecté
+          </label>
+          <button type="button" class="forgot-link" id="forgot-btn" aria-haspopup="dialog">Mot de passe oublié ?</button>
+        </div>
+        <button class="btn-login" type="submit" id="submit-btn">
+          <div class="btn-spinner" aria-hidden="true"></div>
+          <span class="btn-text">ACCÉDER AU SYSTÈME</span>
+        </button>
+      </form>
+      <div class="or-divider" aria-hidden="true"><span>ou continuer avec</span></div>
+      <div class="social-row">
+        <button class="btn-social" type="button" id="google-btn" aria-label="Connexion avec Google">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </button>
+        <button class="btn-social" type="button" id="sso-btn" aria-label="Connexion SSO Entreprise">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M12 7v5l3 3"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+          SSO Entreprise
+        </button>
+      </div>
+      <p class="signup-line">Pas encore de compte ? <button type="button" id="register-btn" aria-haspopup="dialog">Créer un accès NORO</button></p>
+    </div>
+  </main>
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <svg class="footer-logo-hex" viewBox="0 0 36 42" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polygon points="18,1 33,9.5 33,32.5 18,41 3,32.5 3,9.5" fill="#0a0c0e" stroke="#f97316" stroke-width="1.5"/><polygon points="18,7 27,12 27,30 18,35 9,30 9,12" fill="#0ea5e9" stroke="#38bdf8" stroke-width="0.5"/><circle cx="18" cy="21" r="6" fill="#0a0c0e"/><circle cx="18" cy="21" r="3.5" fill="#0ea5e9"/><circle cx="18" cy="21" r="1.5" fill="white"/></svg>
+        <div><div class="footer-name">NORO</div><div class="footer-tagline">Administration Digitale IA</div></div>
+      </div>
+      <nav class="footer-nav" aria-label="Navigation secondaire">
+        <div class="footer-nav-col">
+          <div class="footer-nav-title">Services</div>
+          <button onclick="comingSoon('Permis en ligne')">Permis en ligne</button>
+          <button onclick="comingSoon('Badges pro')">Badges pro</button>
+          <button onclick="comingSoon('Attestations')">Attestations</button>
+          <button onclick="comingSoon('Rapports IA')">Rapports IA</button>
+        </div>
+        <div class="footer-nav-col">
+          <div class="footer-nav-title">Secteurs</div>
+          <button onclick="comingSoon('Génie Civil')">Génie Civil</button>
+          <button onclick="comingSoon('Mécanique')">Mécanique</button>
+          <button onclick="comingSoon('Informatique')">Informatique</button>
+          <button onclick="comingSoon('Électronique')">Électronique</button>
+        </div>
+        <div class="footer-nav-col">
+          <div class="footer-nav-title">Plateforme</div>
+          <button onclick="comingSoon('Documentation')">Documentation</button>
+          <button onclick="comingSoon('API NORO')">API NORO</button>
+          <a href="/dashboard">Tableau de bord</a>
+          <button onclick="comingSoon('Support')">Support</button>
+        </div>
+      </nav>
+      <div style="display:flex;flex-direction:column;gap:.75rem;align-items:flex-end">
+        <div class="footer-domains" aria-label="Codes secteurs">
+          <span class="domain-tag dt-gc">GC</span><span class="domain-tag dt-mec">MEC</span><span class="domain-tag dt-it">IT</span><span class="domain-tag dt-elec">ELEC</span>
+        </div>
+        <div style="font-size:0.72rem;color:var(--gris);letter-spacing:.08em;text-align:right">Certifications · Permis · Badges Officiels</div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 NORO — Administration Digitale IA. Tous droits réservés. Algeria, DZ</div>
+      <div class="footer-status" role="status" aria-live="polite"><div class="status-dot" aria-hidden="true"></div>Système opérationnel — Sécurisé SSL 256-bit</div>
+    </div>
+  </footer>
+</div>
+
+<div class="modal-overlay" id="modal-forgot" role="dialog" aria-modal="true" aria-labelledby="forgot-title">
+  <div class="modal-box">
+    <button class="modal-close" id="forgot-close" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div id="forgot-form-view">
+      <h2 class="modal-title" id="forgot-title">MOT DE PASSE OUBLIÉ</h2>
+      <p class="modal-sub">Entrez votre adresse e-mail pour recevoir un lien de réinitialisation sécurisé.</p>
+      <div class="field">
+        <label for="forgot-email">Adresse e-mail</label>
+        <div class="input-wrap">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input type="email" id="forgot-email" name="forgot-email" placeholder="votre.email@noro.dz" autocomplete="email">
+        </div>
+      </div>
+      <button class="btn-modal" id="forgot-submit-btn" type="button" onclick="submitForgot()">
+        <div class="btn-spinner" id="forgot-spinner" aria-hidden="true" style="display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+        <span id="forgot-btn-text">ENVOYER LE LIEN</span>
+      </button>
+    </div>
+    <div class="modal-success" id="forgot-success">
+      <div class="modal-success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h3>E-mail envoyé !</h3>
+      <p>Vérifiez votre boîte de réception. Le lien est valide pendant 15 minutes.</p>
+      <button class="btn-modal" onclick="closeModal('modal-forgot')">FERMER</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-register" role="dialog" aria-modal="true" aria-labelledby="register-title">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" id="register-close" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div id="register-form-view">
+      <h2 class="modal-title" id="register-title">CRÉER UN ACCÈS NORO</h2>
+      <p class="modal-sub">Rejoignez la plateforme d'administration digitale pour ingénieurs algériens.</p>
+      <div id="reg-step-1">
+        <p style="font-size:0.78rem;color:var(--gris);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem">Choisissez votre secteur :</p>
+        <div class="sector-grid" role="radiogroup" aria-label="Secteur professionnel">
+          <button class="sector-card" onclick="selectSector(this,'GC')" role="radio" aria-checked="false"><span class="s-icon" aria-hidden="true">🏗️</span>Génie Civil</button>
+          <button class="sector-card" onclick="selectSector(this,'MEC')" role="radio" aria-checked="false"><span class="s-icon" aria-hidden="true">⚙️</span>Mécanique</button>
+          <button class="sector-card" onclick="selectSector(this,'IT')" role="radio" aria-checked="false"><span class="s-icon" aria-hidden="true">💻</span>Informatique</button>
+          <button class="sector-card" onclick="selectSector(this,'ELEC')" role="radio" aria-checked="false"><span class="s-icon" aria-hidden="true">⚡</span>Électronique</button>
+        </div>
+        <button class="btn-modal" id="reg-next-btn" onclick="goRegStep2()" disabled>CONTINUER →</button>
+      </div>
+      <div id="reg-step-2" style="display:none">
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem">
+          <div class="field" style="flex:1;margin:0"><label for="reg-fname">Prénom</label><div class="input-wrap"><svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input type="text" id="reg-fname" name="first_name" placeholder="Ahmed" autocomplete="given-name"></div></div>
+          <div class="field" style="flex:1;margin:0"><label for="reg-lname">Nom</label><div class="input-wrap"><svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input type="text" id="reg-lname" name="last_name" placeholder="Benali" autocomplete="family-name"></div></div>
+        </div>
+        <div class="field"><label for="reg-email">E-mail professionnel</label><div class="input-wrap"><svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><input type="email" id="reg-email" name="email" placeholder="a.benali@entreprise.dz" autocomplete="email"></div></div>
+        <div class="field" style="margin-bottom:1.5rem"><label for="reg-pwd">Mot de passe</label><div class="input-wrap"><svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input type="password" id="reg-pwd" name="new_password" placeholder="Min. 8 caractères" autocomplete="new-password"></div></div>
+        <div style="display:flex;gap:0.75rem">
+          <button class="btn-modal" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);box-shadow:none;color:var(--gris)" onclick="goRegStep1()">← Retour</button>
+          <button class="btn-modal" style="flex:2" onclick="submitRegister()">CRÉER MON ACCÈS</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-success" id="register-success">
+      <div class="modal-success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h3>Accès créé !</h3>
+      <p>Un e-mail de confirmation vous a été envoyé. Vérifiez votre boîte de réception pour activer votre compte.</p>
+      <button class="btn-modal" onclick="closeModal('modal-register')">SE CONNECTER</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container" aria-live="polite" aria-label="Notifications"></div>
+
+<script>
+  const eyeBtn=document.getElementById('eye-btn'),pwdInput=document.getElementById('pwd'),eyeIcon=document.getElementById('eye-icon');
+  eyeBtn.addEventListener('click',()=>{const h=pwdInput.type==='password';pwdInput.type=h?'text':'password';eyeBtn.setAttribute('aria-pressed',h?'true':'false');eyeBtn.setAttribute('aria-label',h?'Masquer le mot de passe':'Afficher le mot de passe');eyeIcon.innerHTML=h?'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>':'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';});
+  const loginForm=document.getElementById('login-form'),submitBtn=document.getElementById('submit-btn'),emailInput=document.getElementById('email-input');
+  function showFieldError(i,m,t){i.setAttribute('aria-invalid','true');m.textContent=t;m.classList.add('visible');}
+  function clearFieldError(i,m){i.removeAttribute('aria-invalid');m.classList.remove('visible');}
+  emailInput.addEventListener('blur',()=>{const m=document.getElementById('email-error');if(!emailInput.value.trim())showFieldError(emailInput,m,"L'identifiant est requis.");else clearFieldError(emailInput,m);});
+  pwdInput.addEventListener('blur',()=>{const m=document.getElementById('pwd-error');if(!pwdInput.value)showFieldError(pwdInput,m,"Le mot de passe est requis.");else clearFieldError(pwdInput,m);});
+  loginForm.addEventListener('submit',(e)=>{const ev=emailInput.value.trim(),pv=pwdInput.value;let ok=true;const em=document.getElementById('email-error'),pm=document.getElementById('pwd-error');if(!ev){showFieldError(emailInput,em,"L'identifiant est requis.");ok=false;}else clearFieldError(emailInput,em);if(!pv){showFieldError(pwdInput,pm,"Le mot de passe est requis.");ok=false;}else clearFieldError(pwdInput,pm);if(!ok){e.preventDefault();return;}submitBtn.disabled=true;submitBtn.classList.add('loading');submitBtn.querySelector('.btn-text').textContent='AUTHENTIFICATION...';submitBtn.querySelector('.btn-spinner').style.display='block';});
+  function openModal(id){const o=document.getElementById(id);o.classList.add('open');document.body.style.overflow='hidden';const f=o.querySelector('button,input,[tabindex]');setTimeout(()=>f&&f.focus(),100);}
+  function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+  document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id);}));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>closeModal(m.id));});
+  document.getElementById('forgot-btn').addEventListener('click',()=>openModal('modal-forgot'));
+  document.getElementById('register-btn').addEventListener('click',()=>openModal('modal-register'));
+  document.getElementById('forgot-close').addEventListener('click',()=>closeModal('modal-forgot'));
+  document.getElementById('register-close').addEventListener('click',()=>closeModal('modal-register'));
+  document.getElementById('google-btn').addEventListener('click',()=>showToast('Google OAuth — Connexion en cours...','blue'));
+  document.getElementById('sso-btn').addEventListener('click',()=>showToast('SSO Entreprise — Contactez votre administrateur.','orange'));
+  function submitForgot(){const e=document.getElementById('forgot-email').value.trim();if(!e||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){document.getElementById('forgot-email').setAttribute('aria-invalid','true');document.getElementById('forgot-email').focus();return;}const b=document.getElementById('forgot-submit-btn'),s=document.getElementById('forgot-spinner'),t=document.getElementById('forgot-btn-text');b.disabled=true;s.style.display='block';t.textContent='ENVOI EN COURS...';fetch('/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e})}).then(()=>{document.getElementById('forgot-form-view').style.display='none';document.getElementById('forgot-success').classList.add('visible');}).catch(()=>{document.getElementById('forgot-form-view').style.display='none';document.getElementById('forgot-success').classList.add('visible');});}
+  let selectedSector=null;
+  function selectSector(el,s){document.querySelectorAll('.sector-card').forEach(c=>{c.classList.remove('selected');c.setAttribute('aria-checked','false');});el.classList.add('selected');el.setAttribute('aria-checked','true');selectedSector=s;document.getElementById('reg-next-btn').disabled=false;}
+  function goRegStep2(){document.getElementById('reg-step-1').style.display='none';document.getElementById('reg-step-2').style.display='block';document.getElementById('reg-fname').focus();}
+  function goRegStep1(){document.getElementById('reg-step-2').style.display='none';document.getElementById('reg-step-1').style.display='block';}
+  function submitRegister(){const fn=document.getElementById('reg-fname').value.trim(),ln=document.getElementById('reg-lname').value.trim(),em=document.getElementById('reg-email').value.trim(),pw=document.getElementById('reg-pwd').value;if(!fn||!ln||!em||!pw){showToast('Veuillez remplir tous les champs.','orange');return;}if(pw.length<8){showToast('Le mot de passe doit contenir au moins 8 caractères.','orange');return;}fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name:fn,last_name:ln,email:em,password:pw,sector:selectedSector})}).then(r=>{if(r.ok){document.getElementById('register-form-view').style.display='none';document.getElementById('register-success').classList.add('visible');}else return r.json().then(d=>showToast(d.message||"Erreur lors de l'inscription.",'orange'));}).catch(()=>{document.getElementById('register-form-view').style.display='none';document.getElementById('register-success').classList.add('visible');});}
+  function showToast(msg,type='orange'){const c=document.getElementById('toast-container'),t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.innerHTML=`<div class="toast-dot ${type}"></div><span>${msg}</span>`;c.appendChild(t);setTimeout(()=>{t.classList.add('out');t.addEventListener('animationend',()=>t.remove());},4000);}
+  function comingSoon(f){const colors=['orange','blue','olive'];showToast(`${f} — Disponible prochainement 🚀`,colors[Math.floor(Math.random()*colors.length)]);}
+</script>
+</body>
+</html>

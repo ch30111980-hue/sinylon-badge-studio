@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Configuration WhatsApp Business API — SINYLON FIAT{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1"><i class="fab fa-whatsapp text-success me-2"></i>Configuration Meta WhatsApp API</h2>
+            <p class="text-muted small mb-0">Configurez l'envoi automatique 24h/24 via l'API officielle WhatsApp Business (Meta) ou CallMeBot.</p>
+        </div>
+        <a href="{{ url_for('main.SINYLON FIAT_dashboard') }}" class="btn btn-outline-secondary btn-sm fw-bold">← Retour Dashboard</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Formulaire de Configuration -->
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0" style="border-radius:14px;">
+                <div class="card-header bg-dark text-white fw-bold py-3" style="border-radius:14px 14px 0 0;">
+                    <i class="fas fa-key me-2 text-warning"></i> Paramètres WhatsApp Business Cloud API (Meta)
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('main.config_whatsapp') }}">
+                        <div class="alert alert-info border-0 mb-4" style="border-radius:10px;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Meta WhatsApp Cloud API</strong> permet d'envoyer jusqu'à <strong>1 000 messages gratuits par mois</strong> de manière 100% automatique à tous les intervenants et sous-traitants.
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Meta Phone Number ID</label>
+                            <input type="text" name="whatsapp_phone_number_id" class="form-control font-monospace" placeholder="ex: 109823746509123" value="{{ phone_number_id or '' }}">
+                            <div class="form-text small">Trouvé dans la console Meta Developer (WhatsApp > Configuration de l'API).</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Meta Permanent Access Token</label>
+                            <textarea name="whatsapp_access_token" class="form-control font-monospace" rows="3" placeholder="ex: EAAG... (Token système ou jeton d'accès utilisateur de test)">{{ access_token or '' }}</textarea>
+                            <div class="form-text small">Token d'accès généré depuis votre application Meta Business Manager.</div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="fw-bold text-dark mb-3"><i class="fas fa-robot me-2 text-primary"></i>Passerelle Secondaire CallMeBot (Fallback)</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Clé API Globale CallMeBot</label>
+                            <input type="text" name="callmebot_api_key" class="form-control font-monospace" placeholder="ex: 849204" value="{{ callmebot_key or '' }}">
+                            <div class="form-text small">Utilisé comme passerelle de secours si Meta API n'est pas configurée.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 fw-bold py-2 shadow-sm">
+                            <i class="fas fa-save me-2"></i> Enregistrer les Paramètres WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guide & Test Rapide -->
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 mb-4" style="border-radius:14px; background:#f8fafc;">
+                <div class="card-header bg-success text-white fw-bold py-3" style="border-radius:14px 14px 0 0;">
+                    <i class="fas fa-vial me-2"></i> Testeur & Diagnostic
+                </div>
+                <div class="card-body p-4 text-center">
+                    <p class="small text-muted mb-3">Après avoir enregistré vos clés, cliquez ci-dessous pour effectuer un test d'envoi en direct vers votre numéro.</p>
+                    <a href="{{ url_for('main.test_whatsapp') }}" class="btn btn-outline-success w-100 fw-bold py-2 shadow-sm">
+                        <i class="fab fa-whatsapp me-2"></i> Ouvrir le Testeur WhatsApp en Direct
+                    </a>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0" style="border-radius:14px;">
+                <div class="card-header bg-dark text-white fw-bold py-3" style="border-radius:14px 14px 0 0;">
+                    <i class="fas fa-book me-2 text-info"></i> Comment obtenir les clés Meta ?
+                </div>
+                <div class="card-body p-4 small text-muted">
+                    <ol class="ps-3 mb-0">
+                        <li class="mb-2">Rendez-vous sur <a href="https://developers.facebook.com/" target="_blank" class="fw-bold">developers.facebook.com</a> et créez une app de type <strong>Business</strong>.</li>
+                        <li class="mb-2">Ajoutez le produit <strong>WhatsApp</strong>.</li>
+                        <li class="mb-2">Copiez votre <strong>Phone Number ID</strong> et le <strong>Temporary/Permanent Access Token</strong> dans ce formulaire.</li>
+                        <li>Cliquez sur <strong>Enregistrer</strong>. C'est tout ! Le serveur enverra désormais toutes les alertes automatiquement.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

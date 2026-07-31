@@ -1,0 +1,214 @@
+<div class="fiat-header" style="position: relative; margin-bottom: 5px;">
+    <div style="font-size: 16px; font-weight: bold; padding: 2px;">Permis de Travail de Sécurité Générale</div>
+    <div style="font-size: 10px; margin-left: 20px;">(à afficher sur le site de travail)</div>
+    <div class="fiat-logo-box" style="position: absolute; right: 120px; top: 0; font-size: 26px;">SINYLON FIAT<span class="black-box">FIAT</span></div>
+    <div style="position: absolute; right: 0; top: 0; border: 1px solid black; padding: 2px; font-size: 10px; text-align: center;">
+        Identifiant du permis<br><strong id="val-permit-id" contenteditable="true" style="outline:none; cursor:text; min-width: 50px; display:inline-block; font-size: 14px;"></strong>
+    </div>
+</div>
+
+<div class="yellow-header" style="text-align: center; font-size: 11px; padding: 2px;">Brève description du travail</div>
+<div class="field-box" style="min-height: 40px; border: 1px solid black; margin-bottom: 2px; padding: 4px;">
+    <div contenteditable="true" data-field="work-desc" id="val-work-desc" data-placeholder="Description des travaux..." style="min-height:30px; font-size: 12px; outline:none; font-weight: bold; text-transform: uppercase;"></div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; font-size: 11px;">
+    <div style="border: 1px solid black; border-right: none; padding: 2px;">
+        <div style="text-align: center; border-bottom: 1px solid black; background: #ffff00;">Endroit de travail:</div>
+        <div contenteditable="true" data-field="location" id="val-location" data-placeholder="Lieu..." style="min-height:20px; font-size: 12px; padding:2px; outline:none; font-weight: bold; text-transform: uppercase;"></div>
+    </div>
+    <div style="border: 1px solid black; padding: 2px;">
+        <div style="text-align: center; border-bottom: 1px solid black; background: #ffff00;">Equipement/Machinerie / Zone sur lequel s'effectue le travail</div>
+        <div style="min-height:20px; font-size: 12px; padding:2px; display:flex; gap: 5px;">
+            <span contenteditable="true" data-field="ouvrage" id="val-ouvrage" data-placeholder="Ouvrage" style="min-width:60px; outline:none; font-weight: bold; text-transform: uppercase;"></span>
+            <span contenteditable="true" data-field="zone" id="val-zone" data-placeholder="Zone" style="min-width:60px; outline:none; font-weight: bold; text-transform: uppercase;"></span>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; font-size: 11px; margin-bottom: 5px; border: 1px solid black; border-top: none;">
+    <div style="padding: 2px; border-right: 1px solid black;">
+        <div>Entreprise Intervenante :</div>
+        <div contenteditable="true" data-field="company" id="val-company" data-placeholder="Nom société" style="font-weight: bold; text-transform: uppercase; min-height: 15px; outline:none;"></div>
+        <div>Avant de commencer le travail, veuillez contacter: <strong contenteditable="true" data-field="contact" id="val-contact" data-placeholder="Nom contact" style="outline:none;"></strong></div>
+        <div style="font-weight:bold; font-size: 12px;">Nom: SINYLON FIAT - <span contenteditable="true" data-field="SINYLON FIAT-name" id="val-SINYLON FIAT-name" data-placeholder="NOM" style="outline:none;"></span></div>
+    </div>
+    <div style="padding: 2px;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid black; padding-bottom: 2px; margin-bottom: 2px;">
+            <span>Plan d'urgence du site attaché</span>
+            <span style="font-weight: bold;"><span id="check-auto-1" class="check-box-click" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; margin-right:1px; background:#fff; color:black;"> </span> Y <span id="check-auto-2" class="check-box-click" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; margin-right:1px; background:#fff; color:black;"> </span> N PECS PS</span>
+        </div>
+        <div>
+            Ouvrage : <strong contenteditable="true" data-field="ouvrage-2" id="val-ouvrage-2" data-placeholder="FIAT" style="outline:none;"></strong> 
+            ZONE : <strong contenteditable="true" data-field="zone-2" id="val-zone-2" data-placeholder="OR 02" style="outline:none;"></strong> 
+            Tél. <strong contenteditable="true" data-field="tel" id="val-tel" data-placeholder="de _____" style="outline:none;"></strong>
+        </div>
+    </div>
+</div>
+
+<div style="font-size: 10px; margin-bottom: 2px;">si oui, la liste de verification des grands danger suivante doit etre attachée &nbsp; &nbsp; &nbsp; &nbsp; de &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; de</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 11px; margin-bottom: 5px;">
+    <div style="display:flex; flex-direction:column; gap:2px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Travail en hauteur</span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-a" data-check="check-a" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-a-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">A</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Travail dans un espace confiné</span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-b-conf" data-check="check-b-conf" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-b-conf-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">B</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Travail sur un système électrique</span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-c-elec" data-check="check-c-elec" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-c-elec-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">C</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Ouvrir un système/ligne de rupture <span style="font-size:8px;">(ligne Hydraulique etc.)</span></span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-d-rup" data-check="check-d-rup" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-d-rup-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">D</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Autre travaux dangereux: <span style="font-size:8px;">(si oui veuillez specifier ci-dessous)</span></span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-e-autre" data-check="check-e-autre" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-e-autre-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">E</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 5px;">
+            <span>Declaration de methode requis</span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-g-met" data-check="check-g-met" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-g-met-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">G</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Autre listes de verification attachées <span style="font-size:8px;">(si oui specifier ci-dessous)</span></span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-x-autre" data-check="check-x-autre" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-x-autre-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N </span>
+        </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:2px; justify-content: flex-start; padding-left: 30px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; width: 80%;">
+            <span>Travail à chaud</span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-b-hot" data-check="check-b-hot" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-b-hot-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">B</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; width: 80%;">
+            <span>Excavation</span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-d-exc" data-check="check-d-exc" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-d-exc-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">D</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; width: 80%;">
+            <span>Travail sur equipement sous tension</span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-e-tens" data-check="check-e-tens" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-e-tens-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">E</strong></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; width: 80%;">
+            <span>Exposition/Cond. Atmosphérique</span>
+            <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-f-atm" data-check="check-f-atm" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-f-atm-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N <strong style="border-left: 1px solid black; padding-left: 2px; margin-left: 2px;">F</strong></span>
+        </div>
+        <div style="margin-top: 25px;">
+            <div contenteditable="true" style="outline:none; border-bottom: 1px dashed black; min-width: 100%; min-height: 20px;"></div>
+        </div>
+    </div>
+</div>
+
+<div style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 2px; font-size: 11px; margin-bottom: 5px; display:flex; justify-content: space-between;">
+    <span>Est ce travail, une modification couverte par MOC?</span>
+    <span style="border: 2px solid black; padding: 1px;"><span class="check-box-click" id="check-moc" data-check="check-moc" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>Y <span class="check-box-click" id="check-moc-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; vertical-align:middle; font-weight:bold; font-size:20px; background:#fff; color:black;"> </span>N </span>
+    <span>MOC Ref. Nr. / Id. <strong contenteditable="true" data-field="moc-ref" data-placeholder="_________" style="min-width:60px; outline:none; border: 1px solid black; padding: 0 10px;"></strong></span>
+</div>
+
+<div style="border: 1px solid black; background: #eef2f5; padding: 5px; font-size: 11px;">
+    <div style="font-weight: bold; margin-bottom: 5px; font-size: 12px;">validité du permis et signatures</div>
+    <div style="display: flex; gap: 20px; margin-bottom: 5px;">
+        <span>Date du permis <strong contenteditable="true" data-field="date-main" id="val-date-main" data-placeholder="JJ/MM/AAAA" style="outline:none; border: 1px solid black; padding: 1px 15px; background: white;"></strong></span>
+        <span>heure de début <strong contenteditable="true" data-field="time-start" id="val-time-start" data-placeholder="08h00" style="outline:none; border: 1px solid black; padding: 1px 15px; background: white;"></strong></span>
+        <span>heure de fin <strong contenteditable="true" data-field="time-end" id="val-time-end" data-placeholder="17h30" style="outline:none; border: 1px solid black; padding: 1px 15px; background: white;"></strong></span>
+    </div>
+    <div style="font-size: 8px; line-height: 1.1; margin-bottom: 5px;">
+        Ce permis de travail de sécurité générale et sa liste de verification des grands danger avec le meme identifiant du permis sont uniquement valide pour la date et la période spécifiée ci-dessus. Toute les signatures doivent etre obtenues avant l'entame du travail. Permis affiché sur le lieu de travail.<br>
+        Copies: Emetteur du permis,receveur du permis et si applicable: Coordinateur, chef de quart et/ou salle de controle.
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px;">
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">Chef de Projet Entreprise</div>
+            <div style="text-align: center; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" data-field="chef-nom" id="val-chef-nom" data-placeholder="..." style="text-align:center; font-weight:bold; font-size: 11px; margin-top:10px; outline:none; min-height:22px;"></div>
+        </div>
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">Validation FIAT - Ingénieur / Responsable</div>
+            <div style="text-align: center; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" data-field="FIAT-nom" id="val-FIAT-nom" data-placeholder="..." style="text-align:center; font-weight:bold; font-size: 11px; margin-top:10px; outline:none; min-height:22px;"></div>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">Coordonnateur SINYLON FIAT</div>
+            <div style="text-align: center; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" data-field="coord-nom" id="val-coord-nom" data-placeholder="..." style="text-align:center; font-weight:bold; font-size: 11px; margin-top:10px; outline:none; min-height:22px;"></div>
+        </div>
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">HSE Entreprise</div>
+            <div style="text-align: center; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" data-field="hse-nom" id="val-hse-nom" data-placeholder="..." style="text-align:center; font-weight:bold; font-size: 11px; margin-top:10px; outline:none; min-height:22px;"></div>
+            <div style="text-align: center; font-size: 8px; padding: 2px;">Confirmation que toutes les précautions et les vérifications nécessaires sont en place, comme la liste de vérification appliquée</div>
+        </div>
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">Receveur du permis</div>
+            <div style="text-align: center; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" data-field="receveur-nom" id="val-receveur-nom" data-placeholder="..." style="text-align:center; font-weight:bold; font-size: 11px; margin-top:10px; outline:none; min-height:22px;"></div>
+            <div style="text-align: center; font-size: 8px; padding: 2px;">Information que toutes les précautions et les vérifications nécessaires sont en place ont été reçues. Les instructions fournies dans le permis de travail seront suivies. Tout les travailleurs ont été informés.</div>
+        </div>
+    </div>
+</div>
+
+<div style="border: 1px solid black; background: #eef2f5; padding: 5px; font-size: 11px; margin-top: 5px;">
+    <div style="font-weight: bold; font-size: 12px; margin-bottom: 2px;">Permit Hand-Back <span style="font-size: 9px; font-weight: normal;">(renvoyer à l'emetteur du permis après signature)</span></div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 5px; padding-left: 5px;">
+        <div>
+            <div style="font-size: 9px; font-style: italic;">(superviseur d'unité: veuillez cocher les caases appropriées ci-dessous)</div>
+            <div style="margin-top: 5px;">Etat de travail</div>
+            <div style="display:flex; justify-content: space-between; align-items:center; width: 70%; margin-top: 2px;">Achevé <span id="check-hb-ach" class="check-box-click" style="display:inline-block; width:18px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; background:#fff; color:black;"> </span></div>
+            <div style="display:flex; justify-content: space-between; align-items:center; width: 70%; margin-top: 2px;">Inachevé <span style="font-size: 8px;">(veuillez spécifier ci-dessous)</span> <span id="check-hb-inach" class="check-box-click" style="display:inline-block; width:18px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; background:#fff; color:black;"> </span></div>
+        </div>
+        <div style="display:flex; flex-direction: column; justify-content: flex-end; align-items:flex-end; padding-right: 20px;">
+            <div style="margin-top: 5px;">Etat de la surface/installation/équipmer</div>
+            <div style="display:flex; justify-content: space-between; align-items:center; width: 80%; margin-top: 2px;">pret pour l'operation normale <span id="check-hb-pret" class="check-box-click" style="display:inline-block; width:18px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; background:#fff; color:black;"> </span></div>
+            <div style="display:flex; justify-content: space-between; align-items:center; width: 80%; margin-top: 2px;">pas pret <span style="font-size: 8px;">(veuillez spécifier ci-dessous)</span> <span id="check-hb-pas" class="check-box-click" style="display:inline-block; width:18px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; background:#fff; color:black;"> </span></div>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px;">
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">Receveur du permis</div>
+            <div style="text-align: left; padding-left: 2px; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" id="val-hb-receveur" style="text-align:center; font-weight:bold; font-size: 11px; margin-top:5px; outline:none; min-height:20px;"></div>
+            <div style="text-align: center; font-size: 8px; font-style: italic; position: absolute; bottom: 2px; width: 100%;">Signature</div>
+        </div>
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">Validation FIAT - Ingénieur / Responsable</div>
+            <div style="text-align: left; padding-left: 2px; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" id="val-hb-FIAT" style="text-align:center; font-weight:bold; font-size: 11px; margin-top:5px; outline:none; min-height:20px;"></div>
+            <div style="text-align: center; font-size: 8px; font-style: italic; position: absolute; bottom: 2px; width: 100%;">Signature</div>
+        </div>
+        <div style="font-size: 11px; display:flex; flex-direction:column; justify-content:center; padding-left: 10px;">
+            <div style="margin-bottom: 5px;">Date: <strong contenteditable="true" style="outline:none; border: 1px solid black; padding: 1px 15px; display:inline-block; width: 60px; background: white;"></strong></div>
+            <div>Heure: <strong contenteditable="true" style="outline:none; border: 1px solid black; padding: 1px 15px; display:inline-block; width: 60px; background: white;"></strong></div>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">Chef de Projet Entreprise</div>
+            <div style="text-align: left; padding-left: 2px; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" id="val-hb-chef" style="text-align:center; font-weight:bold; font-size: 11px; margin-top:5px; outline:none; min-height:20px;"></div>
+            <div style="text-align: center; font-size: 8px; font-style: italic; position: absolute; bottom: 2px; width: 100%;">Signature</div>
+        </div>
+        <div style="border: 1px solid black; background: white; min-height: 40px; position: relative;">
+            <div style="background: #b0c4de; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 1px; font-weight: bold;">HSE Entreprise</div>
+            <div style="text-align: left; padding-left: 2px; font-size: 8px; font-style: italic;">Nom (lettres en majuscule) et signature:</div>
+            <div contenteditable="true" id="val-hb-hse" style="text-align:center; font-weight:bold; font-size: 11px; margin-top:5px; outline:none; min-height:20px;"></div>
+            <div style="text-align: center; font-size: 8px; font-style: italic; position: absolute; bottom: 2px; width: 100%;">Signature</div>
+        </div>
+        <div></div>
+    </div>
+</div>
+
+<div style="display:flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-top: 5px;">
+    <div>Numéro d'urgence :</div>
+    <div>Mobile :</div>
+    <div>Page 1/2</div>
+</div>

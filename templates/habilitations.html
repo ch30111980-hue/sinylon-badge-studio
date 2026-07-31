@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Registre des Habilitations Par Entreprise | SINYLON FIAT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <!-- Header Glassmorphism -->
+    <div class="card border-0 shadow-lg text-white p-4 mb-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px;">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-4 bg-warning text-dark shadow" style="width: 56px; height: 56px;">
+                    <i class="fas fa-hard-hat fs-3"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h2 class="h3 fw-bold mb-0 text-white">Registre des Habilitations &amp; Certifications Engins</h2>
+                        <span class="badge bg-primary text-uppercase px-2.5 py-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Réservé Nouri Admin</span>
+                    </div>
+                    <p class="text-white-50 small mb-0 mt-1">Contrôle centralisé des autorisations CACES Nacelle (PEMP 3B), Travaux en Hauteur et Électriques — Classé par Entreprise.</p>
+                </div>
+            </div>
+            <div>
+                <button onclick="window.print()" class="btn btn-outline-light btn-sm fw-bold px-3 py-2" style="border-radius: 10px;">
+                    <i class="fas fa-print me-1"></i> Imprimer le Registre Global
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Types d'habilitations reconnues -->
+    <div class="card border-0 shadow-sm p-3 mb-4" style="border-radius: 16px; background: #ffffff;">
+        <h6 class="fw-bold text-muted text-uppercase mb-2" style="font-size: 0.72rem; letter-spacing: 1px;">HABILITATIONS &amp; CERTIFICATIONS EXIGÉES (USINE STELLANTIS FIAT)</h6>
+        <div class="d-flex flex-wrap gap-2">
+            {% for th in types_habilitations %}
+            <span class="badge bg-warning-subtle text-dark border border-warning-subtle px-3 py-1.5 font-monospace" style="font-size: 0.78rem;">
+                <i class="fas fa-certificate me-1 text-warning"></i> {{ th }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Barre de Recherche et Filtre Entreprise -->
+    <div class="card border-0 shadow-sm p-3 mb-4" style="border-radius: 16px; background: #ffffff;">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="habSearchInput" class="form-control border-0 bg-light fw-medium" placeholder="Rechercher par Nom, Prénom, Badge ou Entreprise..." onkeyup="filterHabilitations()">
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="btn-group flex-wrap" role="group" id="companyTabs">
+                    <button type="button" class="btn btn-sm btn-primary active fw-bold" onclick="filterByCompany('ALL', this)">Toutes ({{ badges_by_entreprise|length }})</button>
+                    {% for ent_nom, b_list in badges_by_entreprise.items() %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" onclick="filterByCompany('{{ ent_nom|e }}', this)">
+                        {{ ent_nom }} ({{ b_list|length }})
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTRE DÉCOUPÉ PAR ENTREPRISE -->
+    <div id="companyContainer">
+        {% for ent_nom, b_list in badges_by_entreprise.items() %}
+        <div class="company-card card border-0 shadow-sm mb-4" data-company="{{ ent_nom }}" style="border-radius: 18px; background: #ffffff; overflow: hidden;">
+            <!-- Header Entreprise -->
+            <div class="card-header bg-light border-0 p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="badge bg-primary fs-6 px-3 py-2" style="border-radius: 10px;">
+                        <i class="fas fa-building me-1"></i> {{ ent_nom }}
+                    </div>
+                    <span class="badge bg-secondary-subtle text-dark border px-2.5 py-1" style="font-size: 0.8rem;">
+                        {{ b_list|length }} Travailleur(s) Enregistré(s)
+                    </span>
+                </div>
+                <button onclick="printCompanyRegister('{{ ent_nom|e }}')" class="btn btn-sm btn-outline-dark fw-bold" style="border-radius: 8px;">
+                    <i class="fas fa-file-pdf me-1 text-danger"></i> Imprimer Registre {{ ent_nom }}
+                </button>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark" style="font-size: 0.82rem;">
+                            <tr>
+                                <th>Intervenant / Badge</th>
+                                <th>Poste / Fonction</th>
+                                <th>🚜 Certifications CACES Engins</th>
+                                <th>🪜 Habilitations Sécurité</th>
+                                <th>🩺 Visite Médicale</th>
+                                <th>Statut Chantier</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in b_list %}
+                            <tr class="hab-row" data-search="{{ (b.nom or '').lower() }} {{ (b.prenom or '').lower() }} {{ (b.numero_badge or '').lower() }} {{ (b.societe_affichee or '').lower() }}">
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% set photo = b.get_photo_url() if (b.photo_filename and b.get_photo_url) else None %}
+                                        {% if photo %}
+                                        <img src="{{ photo }}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid #ccc;" alt="Photo">
+                                        {% else %}
+                                        <div style="width:36px; height:36px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#64748b;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.9rem;">{{ (b.nom or '').upper() }} {{ (b.prenom or '').capitalize() }}</div>
+                                            <div class="font-monospace text-primary" style="font-size: 0.75rem;">{{ b.numero_badge or 'PROV' }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border fw-semibold">{{ b.fonction or 'Intervenant Chantier' }}</span>
+                                </td>
+                                <td>
+                                    {% if b.habilitation_engins or (b.fonction and ('nacelle' in b.fonction.lower() or 'caces' in b.fonction.lower() or 'grue' in b.fonction.lower() or 'chariot' in b.fonction.lower())) %}
+                                    <span class="badge bg-success text-white mb-1"><i class="fas fa-truck-monster me-1"></i> CACES PEMP 3B / Engins</span>
+                                    {% else %}
+                                    <span class="text-muted small"><i class="fas fa-minus me-1"></i> Non requis</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% if b.habilitation_hauteur %}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Hauteur (HSE-01)</span>
+                                        {% endif %}
+                                        {% if b.habilitation_electricite %}
+                                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle">Élec HO/BO</span>
+                                        {% endif %}
+                                        {% if b.habilitation_confine %}
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle">Confiné</span>
+                                        {% endif %}
+                                        {% if b.habilitation_sst %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">SST Secouriste</span>
+                                        {% endif %}
+                                        {% if not b.habilitation_hauteur and not b.habilitation_electricite and not b.habilitation_confine and not b.habilitation_sst %}
+                                        <span class="badge bg-secondary-subtle text-secondary">HSE Standard</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if b.visite_medicale_statut == 'valide' or b.aptitude_medicale %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="fas fa-check-circle me-1"></i> Apte</span>
+                                    {% else %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle"><i class="fas fa-clock me-1"></i> À Régulariser</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if b.is_blocked %}
+                                    <span class="badge bg-danger"><i class="fas fa-ban me-1"></i> SUSPENDU</span>
+                                    {% else %}
+                                    <span class="badge bg-success"><i class="fas fa-user-check me-1"></i> CONFORME</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('badge.liste') }}?search={{ b.numero_badge }}" class="btn btn-sm btn-outline-primary fw-bold" style="border-radius: 8px; font-size: 0.78rem;">
+                                        <i class="fas fa-edit me-1"></i> Gérer Badge
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script>
+    function filterHabilitations() {
+        const query = document.getElementById('habSearchInput').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.hab-row');
+        rows.forEach(row => {
+            const searchData = row.getAttribute('data-search');
+            if (!query || searchData.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function filterByCompany(companyName, btn) {
+        // Toggle active button
+        const buttons = document.querySelectorAll('#companyTabs button');
+        buttons.forEach(b => b.classList.remove('active', 'btn-primary'));
+        buttons.forEach(b => b.classList.add('btn-outline-secondary'));
+
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('active', 'btn-primary');
+
+        const cards = document.querySelectorAll('.company-card');
+        cards.forEach(card => {
+            if (companyName === 'ALL' || card.getAttribute('data-company') === companyName) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function printCompanyRegister(companyName) {
+        filterByCompany(companyName, document.querySelector(`[onclick*="${companyName}"]`));
+        window.print();
+    }
+</script>
+{% endblock %}

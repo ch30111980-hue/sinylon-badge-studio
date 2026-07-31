@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Autorisation Matériels{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        .btn, .navbar, .alert, .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { border: none !important; }
+    }
+    .x-small { font-size: 0.65rem; }
+    
+    .border-autorisation {
+        border: 2px solid black; 
+        font-family: Arial, sans-serif; 
+        font-size: 12px; 
+        padding: 10px; 
+        box-sizing: border-box; 
+        background: white; 
+    }
+    .print-input {
+        border: none;
+        border-bottom: 1px dotted black;
+        outline: none;
+        background: transparent;
+        width: 100%;
+    }
+</style>
+<div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Tableau de Bord
+        </a>
+    </div>
+    {% if permis %}
+    <button onclick="window.print()" class="btn btn-3d btn-primary-3d shadow-sm">
+        <i class="fas fa-print me-2"></i> Imprimer / Enregistrer en PDF
+    </button>
+    {% else %}
+    <button onclick="submitFormulaire()" class="btn btn-3d btn-primary-3d shadow-sm">
+        <i class="fas fa-save me-2"></i> Enregistrer & Imprimer
+    </button>
+    {% endif %}
+</div>
+
+<form id="materiel-form" action="{{ url_for('permis.formulaire_papier', type_form='materiel') }}" method="POST">
+    {% include 'permis/papier/raw/raw_autorisation_mat.html' %}
+</form>
+
+<script>
+function submitFormulaire() {
+    const form = document.getElementById('materiel-form');
+    document.querySelectorAll('[data-field]').forEach(el => {
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = el.getAttribute('data-field');
+        input.value = el.innerText || el.value;
+        form.appendChild(input);
+    });
+    form.submit();
+}
+</script>
+{% endblock %}

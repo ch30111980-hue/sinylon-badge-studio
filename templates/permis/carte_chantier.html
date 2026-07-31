@@ -1,0 +1,1640 @@
+{% extends "base.html" %}
+
+{% block title %}Plan de Chantier Interactif{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-2">
+    <!-- Header with Stats -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div>
+            <h1 class="h3 mb-1 text-slate-800 fw-bold">🗺️ Plan de Chantier Interactif</h1>
+            <p class="text-muted mb-0 small">Visualisez en temps réel l'occupation des zones et les permis de travail actifs.</p>
+        </div>
+        
+        <div class="d-flex align-items-center gap-3">
+            <!-- Map View Switcher -->
+            <div class="map-view-switcher bg-white shadow-sm border rounded-pill p-1 d-flex align-items-center gap-1">
+                <button type="button" class="btn btn-sm rounded-pill px-3 py-1 fw-bold active" id="btnView2D" data-view="2d" style="font-size: 11px;">
+                    <i class="fas fa-map me-1 text-primary"></i> Plan 2D
+                </button>
+                <button type="button" class="btn btn-sm rounded-pill px-3 py-1 fw-bold" id="btnView3D" data-view="3d" style="font-size: 11px;">
+                    <i class="fas fa-cube me-1 text-success"></i> Vue 3D
+                </button>
+                <button type="button" class="btn btn-sm rounded-pill px-3 py-1 fw-bold" id="btnViewSatellite" data-view="satellite" style="font-size: 11px;">
+                    <i class="fas fa-globe me-1 text-info"></i> Satellite
+                </button>
+            </div>
+            
+            <!-- Global Stats Badges -->
+            <div class="d-flex gap-2">
+                <div class="badge-stat bg-primary bg-opacity-10 text-primary border border-primary border-opacity-20 rounded-3 px-3 py-2 text-center">
+                    <span class="d-block fw-bold h5 mb-0" id="totalWorkers">0</span>
+                    <span class="x-small text-muted">Ouvriers Actifs</span>
+                </div>
+                <div class="badge-stat bg-success bg-opacity-10 text-success border border-success border-opacity-20 rounded-3 px-3 py-2 text-center">
+                    <span class="d-block fw-bold h5 mb-0" id="totalPermits">0</span>
+                    <span class="x-small text-muted">Permis Actifs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid Layout -->
+    <div class="row">
+        <!-- Map Column -->
+        <div class="col-lg-9 mb-4">
+            <!-- Leaflet CSS loaded inside container context -->
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+            
+            <div class="map-perspective-wrapper">
+                <div class="map-card card shadow-lg position-relative overflow-hidden" id="mapCard" style="height: 600px;">
+                    <!-- Map Title Overlay -->
+                    <div class="position-absolute top-0 start-0 m-3 z-3 bg-dark bg-opacity-75 backdrop-blur text-white px-3 py-2 rounded-pill shadow border border-secondary border-opacity-30 d-flex align-items-center gap-2">
+                        <span class="pulse-indicator bg-success"></span>
+                        <span class="fw-semibold small" id="mapTitleOverlayText">Plan Directeur Stellantis - FIAT</span>
+                    </div>
+
+                    <!-- Zoom & View mode Toolbar (2D View only) -->
+                    <div class="zoom-toolbar position-absolute bottom-0 start-0 m-3 z-3 bg-white bg-opacity-75 backdrop-blur px-3 py-1 rounded-pill shadow border border-secondary border-opacity-20 d-flex align-items-center gap-2" id="mapZoomToolbar">
+                        <!-- Mode Toggle (Schématique vs Photo) -->
+                        <div class="btn-group btn-group-sm me-1 bg-light rounded-pill p-0.5 border" role="group" aria-label="Mode de Plan" style="padding: 2px; display: inline-flex;">
+                            <button type="button" class="btn btn-xs rounded-pill px-2 py-0.5 fw-bold btn-primary" id="btnModeSchematic" style="font-size: 10px; line-height: 1.2; box-shadow: none !important;">Schéma</button>
+                            <button type="button" class="btn btn-xs rounded-pill px-2 py-0.5 fw-bold text-slate-700 btn-light" id="btnModePhoto" style="font-size: 10px; line-height: 1.2; box-shadow: none !important;">Photo</button>
+                        </div>
+                        <div class="vr text-secondary opacity-25" style="height: 16px; width: 1px;"></div>
+                        <button type="button" class="btn btn-sm btn-light rounded-circle p-1 border-0" id="zoomOut" title="Zoom Arrière" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; box-shadow: none !important;">
+                            <i class="fas fa-search-minus text-slate-700"></i>
+                        </button>
+                        <span class="x-small fw-bold text-slate-700 text-center" id="zoomLevel" style="min-width: 45px;">100%</span>
+                        <button type="button" class="btn btn-sm btn-light rounded-circle p-1 border-0" id="zoomIn" title="Zoom Avant" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; box-shadow: none !important;">
+                            <i class="fas fa-search-plus text-slate-700"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-light rounded-circle p-1 border-0" id="zoomReset" title="Réinitialiser" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; box-shadow: none !important;">
+                            <i class="fas fa-redo text-slate-700"></i>
+                        </button>
+                    </div>
+
+                    <!-- View 1: 2D Floor Plan (Default) -->
+                    <div class="map-view-container w-100 h-100 active" id="viewContainer2D">
+                        <!-- Map Image and SVG Overlay -->
+                        <div class="map-image-container position-relative overflow-hidden w-100 h-100" id="zoomContainer" style="cursor: default;">
+                            <div class="zoomable-content w-100 h-auto position-relative" id="zoomContent" style="transform-origin: 0 0; transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1); will-change: transform;">
+                                <img src="{{ url_for('static', filename='img/plan_schematic.jpg') }}" class="w-100 h-auto d-block" alt="Plan de Chantier" id="planImage">
+                                
+                                <!-- Overlay SVG -->
+                                <svg class="position-absolute top-0 start-0 w-100 h-100" viewBox="0 0 1000 600" preserveAspectRatio="none" id="mapSvg">
+                                    <defs>
+                                        <filter id="glow-blue" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur stdDeviation="5" result="blur" />
+                                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                        </filter>
+                                    </defs>
+                                    
+                                    <!-- Zone OR 13.1 (Left Hangar) -->
+                                    <polygon points="40,110 220,110 220,510 40,510" class="zone-hotspot" data-zone="OR 13.1"></polygon>
+                                    <text x="130" y="310" class="zone-label">OR 13.1</text>
+                                    
+                                    <!-- Zone OR02.1 (Left-Center Hangar) -->
+                                    <polygon points="230,110 410,110 410,510 230,510" class="zone-hotspot" data-zone="OR02.1"></polygon>
+                                    <text x="320" y="310" class="zone-label">OR02.1</text>
+                                    
+                                    <!-- Zone OR 03 (Center-Top Hangar) -->
+                                    <polygon points="425,70 670,70 670,285 425,285" class="zone-hotspot" data-zone="OR 03"></polygon>
+                                    <text x="547" y="177" class="zone-label">OR 03</text>
+                                    
+                                    <!-- Zone OR 02 (Center-Bottom Hangar) -->
+                                    <polygon points="425,300 670,300 670,530 425,530" class="zone-hotspot" data-zone="OR 02"></polygon>
+                                    <text x="547" y="415" class="zone-label">OR 02</text>
+                                    
+                                    <!-- Zone OR 04 (Right Large Hangar) -->
+                                    <polygon points="685,110 960,110 960,510 685,510" class="zone-hotspot" data-zone="OR 04"></polygon>
+                                    <text x="822" y="310" class="zone-label">OR 04</text>
+                                </svg>
+                                
+                                <!-- Blinking dot overlays will be placed here via absolute coordinates -->
+                                <div id="dotsContainer" class="position-absolute top-0 start-0 w-100 h-100 pointer-events-none"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View 2: 3D WebGL (Three.js) -->
+                    <div class="map-view-container w-100 h-100 position-absolute top-0 start-0" id="viewContainer3D" style="display: none; background: #0b0f19;">
+                        <div id="webgl3dContainer" class="w-100 h-100" style="position: relative;">
+                            <!-- Floating HTML tooltips/labels projected from 3D space -->
+                            <div id="webglLabelsContainer" class="position-absolute top-0 start-0 w-100 h-100 pointer-events-none z-2 overflow-hidden"></div>
+                            <!-- Helper guide overlay -->
+                            <div class="position-absolute bottom-0 end-0 m-3 z-3 bg-dark bg-opacity-75 backdrop-blur text-white-50 px-2 py-1 rounded small pointer-events-none border border-secondary border-opacity-20" style="font-size: 10px;">
+                                <i class="fas fa-mouse me-1"></i> Clic-glisser : Rotation | Molette : Zoom | Clic-droit : Pan
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View 3: Satellite Google Maps (Leaflet) -->
+                    <div class="map-view-container w-100 h-100 position-absolute top-0 start-0" id="viewContainerSatellite" style="display: none;">
+                        <div id="satelliteMapContainer" class="w-100 h-100" style="background: #0f172a;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inline Zone Summary Column (Desktop default before click) -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm h-100 bg-white">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h5 class="fw-bold text-slate-800 mb-0">Régions du Site</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-3" id="zonesListSummary">
+                        <!-- Filled by JS -->
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-3 text-secondary"></i>
+                            <p class="small mb-0">Chargement des données du site...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Glassmorphic Side Drawer (Hidden by default, slides from right) -->
+<div class="side-drawer-overlay" id="drawerOverlay"></div>
+<div class="side-drawer" id="sideDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <!-- Zone Cover Photo Header -->
+    <div class="drawer-cover-photo position-relative w-100 overflow-hidden" id="drawerCoverPhoto" style="height: 160px; background: #0f172a;">
+        <img id="zonePhotoImg" src="" class="w-100 h-100 object-fit-cover" alt="Photo de l'Atelier" style="filter: brightness(0.7); transition: transform 0.5s ease;">
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-to-t from-dark to-transparent opacity-75 pointer-events-none" style="background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0) 100%);"></div>
+        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow-none z-3" id="closeDrawerBtn" aria-label="Fermer" style="background-color: rgba(15, 23, 42, 0.6); padding: 8px; border-radius: 50%;"></button>
+        
+        <!-- Interactive indicator badge overlaid on image -->
+        <div class="position-absolute bottom-0 start-0 m-3 z-2 d-flex align-items-center gap-2">
+            <span class="badge bg-primary bg-opacity-75 backdrop-blur text-white x-small uppercase fw-bold border border-primary border-opacity-30" id="drawerCoverHangarType">Atelier</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="drawer-header border-bottom border-light p-4 d-flex align-items-center justify-content-between bg-dark bg-opacity-10" style="margin-top: 0;">
+        <div class="d-flex align-items-center gap-2">
+            <div class="zone-icon bg-primary bg-opacity-10 text-primary rounded-3 p-2">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div>
+                <h4 class="h5 fw-bold text-slate-800 mb-0" id="drawerTitle">Zone OR 02</h4>
+                <span class="badge bg-success rounded-pill x-small" id="drawerRiskBadge">Risque Faible</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs drawer-tabs px-4 border-bottom border-light" id="drawerTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold text-slate-700 py-3 border-0" id="workers-tab" data-bs-toggle="tab" data-bs-target="#workers-pane" type="button" role="tab" aria-controls="workers-pane" aria-selected="true">
+                👷 Ouvriers (<span id="tabWorkersCount">0</span>)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold text-slate-700 py-3 border-0" id="permits-tab" data-bs-toggle="tab" data-bs-target="#permits-pane" type="button" role="tab" aria-controls="permits-pane" aria-selected="false">
+                📄 Permis (<span id="tabPermitsCount">0</span>)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold text-slate-700 py-3 border-0" id="safety-tab" data-bs-toggle="tab" data-bs-target="#safety-pane" type="button" role="tab" aria-controls="safety-pane" aria-selected="false">
+                🛡️ Sécurité
+            </button>
+        </li>
+    </ul>
+
+    <!-- Body / Content -->
+    <div class="drawer-body p-4 overflow-y-auto">
+        <div class="tab-content" id="drawerTabContent">
+            <!-- Workers Pane -->
+            <div class="tab-pane fade show active" id="workers-pane" role="tabpanel" aria-labelledby="workers-tab">
+                <div class="d-flex flex-column gap-3" id="drawerWorkersList">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Permits Pane -->
+            <div class="tab-pane fade" id="permits-pane" role="tabpanel" aria-labelledby="permits-tab">
+                <div class="d-flex flex-column gap-3" id="drawerPermitsList">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Safety Pane -->
+            <div class="tab-pane fade" id="safety-pane" role="tabpanel" aria-labelledby="safety-tab">
+                <!-- Risk & Protection Panel -->
+                <div class="card bg-warning bg-opacity-10 border border-warning border-opacity-20 rounded-4 mb-4">
+                    <div class="card-body d-flex gap-3 align-items-start">
+                        <i class="fas fa-exclamation-triangle text-warning fa-lg mt-1"></i>
+                        <div>
+                            <h6 class="fw-bold text-slate-800 mb-1">Directives de Sécurité</h6>
+                            <p class="small text-slate-600 mb-0">Le port des Équipements de Protection Individuelle (EPI) est strictement obligatoire dans cette zone.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold text-slate-800 mb-3">EPI Obligatoires :</h6>
+                <div class="row g-3 text-center mb-4">
+                    <div class="col-4">
+                        <div class="border rounded-3 p-3 bg-light">
+                            <i class="fas fa-hard-hat fa-2x text-primary mb-2"></i>
+                            <div class="x-small fw-semibold">Casque</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded-3 p-3 bg-light">
+                            <i class="fas fa-vest fa-2x text-warning mb-2"></i>
+                            <div class="x-small fw-semibold">Gilet fluo</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded-3 p-3 bg-light">
+                            <i class="fas fa-shoe-prints fa-2x text-secondary mb-2"></i>
+                            <div class="x-small fw-semibold">Chaussures</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 border-top pt-3">
+                    <h6 class="fw-bold text-slate-800 small mb-2">Contacts d'urgence zone :</h6>
+                    <div class="d-flex justify-content-between small border-bottom pb-2">
+                        <span class="text-muted">SINYLON FIAT Site :</span>
+                        <span class="fw-bold text-slate-700">+213 555 12 34 56</span>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span class="text-muted">Sécurité Générale :</span>
+                        <span class="fw-bold text-slate-700">Poste 112 (NFC Caisse)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling variables */
+    :root {
+        --drawer-width: 420px;
+    }
+
+    /* Map Layout */
+    .map-perspective-wrapper {
+        perspective: 1200px;
+    }
+    
+    .map-card {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
+        background: #0f172a;
+    }
+
+    #zoomContainer {
+        height: auto;
+        position: relative;
+        touch-action: none;
+        user-select: none;
+    }
+    
+    .zoomable-content {
+        transform-origin: 0 0;
+        transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    
+    .zoom-toolbar {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        border-color: rgba(0, 0, 0, 0.08) !important;
+        background-color: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+    
+    /* Isometric 3D Class */
+    .map-card.isometric-3d {
+        transform: rotateX(55deg) rotateZ(-35deg) scale(0.9) translateY(40px);
+        box-shadow: -20px 30px 50px rgba(0, 0, 0, 0.6), 
+                    -40px 60px 100px rgba(0, 0, 0, 0.4),
+                    inset 0 0 20px rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Interactive Hotspots styling */
+    .zone-hotspot {
+        fill: rgba(59, 130, 246, 0.04);
+        stroke: rgba(59, 130, 246, 0.25);
+        stroke-width: 2px;
+        vector-effect: non-scaling-stroke;
+        cursor: pointer;
+        transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease;
+    }
+    
+    .zone-hotspot:hover, .zone-hotspot.active {
+        fill: rgba(14, 165, 233, 0.18);
+        stroke: #0ea5e9;
+        stroke-width: 3px;
+        filter: drop-shadow(0 0 10px rgba(14, 165, 233, 0.6));
+    }
+    
+    .zone-label {
+        fill: #94a3b8;
+        font-weight: 800;
+        font-size: 14px;
+        text-anchor: middle;
+        pointer-events: none;
+        letter-spacing: 0.5px;
+        transition: fill 0.3s ease, font-size 0.3s ease;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    .zone-hotspot:hover + .zone-label, .zone-hotspot.active + .zone-label {
+        fill: #ffffff;
+        font-size: 16px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Pulsing indicators */
+    .pulse-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        position: relative;
+    }
+    
+    .pulse-indicator::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        animation: pulse-ring 1.6s infinite ease-in-out;
+        background-color: inherit;
+    }
+    
+    @keyframes pulse-ring {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(3.5); opacity: 0; }
+    }
+
+    /* Blinking Dot Overlay */
+    .map-dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        cursor: pointer;
+        z-index: 10;
+        transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+    }
+    
+    .map-dot:hover {
+        transform: translate(-50%, -50%) scale(1.4);
+        z-index: 15;
+    }
+    
+    .map-dot.standard {
+        background-color: #10b981;
+    }
+    
+    .map-dot.standard::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #10b981;
+        animation: pulse-ring 1.8s infinite ease-in-out;
+        top: 0;
+        left: 0;
+    }
+    
+    .map-dot.high-risk {
+        background-color: #ef4444;
+    }
+    
+    .map-dot.high-risk::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #ef4444;
+        animation: pulse-ring 1.2s infinite ease-in-out;
+        top: 0;
+        left: 0;
+    }
+
+    /* Glassmorphic Side Drawer */
+    .side-drawer {
+        position: fixed;
+        top: 0;
+        right: calc(-1 * var(--drawer-width));
+        width: var(--drawer-width);
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+        border-left: 1px solid rgba(0, 0, 0, 0.05);
+        z-index: 1050;
+        transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .side-drawer.open {
+        right: 0;
+    }
+    
+    .side-drawer-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.25);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        opacity: 0;
+        visibility: hidden;
+        z-index: 1040;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .side-drawer-overlay.open {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Custom tabs styling */
+    .drawer-tabs .nav-link {
+        color: #64748b !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        border-bottom: 2px solid transparent !important;
+    }
+    
+    .drawer-tabs .nav-link.active {
+        color: #0ea5e9 !important;
+        border-bottom: 2px solid #0ea5e9 !important;
+    }
+    
+    /* Worker list cards */
+    .worker-card {
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .worker-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        border-color: rgba(14, 165, 233, 0.15);
+    }
+    
+    .worker-img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #f1f5f9;
+        border: 2px solid #f8fafc;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .worker-avatar-fallback {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        color: #64748b;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        border: 2px solid #f8fafc;
+    }
+    
+    /* Permit lists in drawer */
+    .permit-card {
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.04);
+        background: #ffffff;
+        padding: 14px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .permit-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Extra utilities */
+    .x-small {
+        font-size: 0.72rem;
+    }
+    .text-slate-600 {
+        color: #475569;
+    }
+    .text-slate-700 {
+        color: #334155;
+    }
+    .text-slate-800 {
+        color: #1e293b;
+    }
+    
+    /* Summary items */
+    .summary-zone-item {
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        padding: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .summary-zone-item:hover {
+        background-color: #f8fafc;
+        border-color: rgba(14, 165, 233, 0.2);
+        transform: translateX(4px);
+    }
+    .summary-zone-item.active {
+        background-color: #f0f9ff;
+        border-color: #0ea5e9;
+    }
+
+    /* Map Switcher Styles */
+    .map-view-switcher {
+        border-color: rgba(0, 0, 0, 0.08) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        display: flex;
+        gap: 2px;
+    }
+    .map-view-switcher .btn {
+        font-size: 11px !important;
+        border: none !important;
+        padding: 5px 12px !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        color: #64748b !important;
+    }
+    .map-view-switcher .btn:hover {
+        background-color: #f1f5f9 !important;
+        color: #1e293b !important;
+    }
+    .map-view-switcher .btn.active {
+        background-color: #0ea5e9 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3) !important;
+    }
+    .map-view-switcher .btn.active i {
+        color: #ffffff !important;
+    }
+    
+    /* Cover Photo Style */
+    .drawer-cover-photo:hover img {
+        transform: scale(1.05);
+    }
+
+    /* Map containers */
+    .map-view-container {
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+    .map-view-container.active {
+        display: block;
+    }
+
+    /* Leaflet customization */
+    #satelliteMapContainer {
+        border-radius: 0 0 19px 19px;
+    }
+    .leaflet-container {
+        font-family: inherit;
+        border-radius: 0 0 19px 19px;
+    }
+    .leaflet-popup-content-wrapper {
+        background: rgba(15, 23, 42, 0.95) !important;
+        backdrop-filter: blur(8px);
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+    }
+    .leaflet-popup-tip {
+        background: rgba(15, 23, 42, 0.95) !important;
+    }
+    .leaflet-control-zoom {
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+        border-radius: 8px !important;
+        overflow: hidden;
+    }
+    .leaflet-control-zoom-in, .leaflet-control-zoom-out {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(4px) !important;
+        color: #334155 !important;
+        border: none !important;
+    }
+    .leaflet-control-zoom-in:hover, .leaflet-control-zoom-out:hover {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+    }
+
+    /* WebGL floating HTML labels */
+    .three-floating-label {
+        position: absolute;
+        transform: translate(-50%, -100%);
+        pointer-events: none; /* Let clicks pass through label to WebGL canvas */
+        user-select: none;
+        z-index: 100;
+        transition: opacity 0.15s ease;
+    }
+    
+    .three-floating-label .badge {
+        font-size: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .leaflet-tooltip-custom {
+        background: rgba(15, 23, 42, 0.9) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 4px 8px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<!-- Leaflet & Three.js WebGL Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let siteData = {};
+    let selectedZone = null;
+    
+    const mapCard = document.getElementById('mapCard');
+    const mapSvg = document.getElementById('mapSvg');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const zonesListSummary = document.getElementById('zonesListSummary');
+    
+    const sideDrawer = document.getElementById('sideDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+    
+    const totalWorkersEl = document.getElementById('totalWorkers');
+    const totalPermitsEl = document.getElementById('totalPermits');
+    
+    // Zoom & Pan functionality for 2D Plan
+    let scale = 1;
+    let pointX = 0;
+    let pointY = 0;
+    let startX = 0;
+    let startY = 0;
+    let isPanning = false;
+
+    const zoomContainer = document.getElementById('zoomContainer');
+    const zoomContent = document.getElementById('zoomContent');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+    const zoomResetBtn = document.getElementById('zoomReset');
+    const zoomLevelEl = document.getElementById('zoomLevel');
+
+    function updateTransform() {
+        if (scale > 1) {
+            const maxPanX = 0;
+            const maxPanY = 0;
+            const minPanX = zoomContainer.clientWidth - zoomContent.clientWidth * scale;
+            const minPanY = zoomContainer.clientHeight - zoomContent.clientHeight * scale;
+
+            pointX = Math.min(maxPanX, Math.max(minPanX, pointX));
+            pointY = Math.min(maxPanY, Math.max(minPanY, pointY));
+            zoomContainer.style.cursor = 'grab';
+        } else {
+            pointX = 0;
+            pointY = 0;
+            zoomContainer.style.cursor = 'default';
+        }
+
+        zoomContent.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        zoomLevelEl.innerText = Math.round(scale * 100) + '%';
+    }
+
+    function zoom(level) {
+        const newScale = Math.min(4, Math.max(1, level));
+        if (newScale === scale) return;
+
+        const zoomFactor = newScale / scale;
+        const centerX = zoomContainer.clientWidth / 2;
+        const centerY = zoomContainer.clientHeight / 2;
+
+        pointX = centerX - (centerX - pointX) * zoomFactor;
+        pointY = centerY - (centerY - pointY) * zoomFactor;
+        scale = newScale;
+
+        updateTransform();
+    }
+
+    zoomInBtn.addEventListener('click', () => zoom(scale + 0.5));
+    zoomOutBtn.addEventListener('click', () => zoom(scale - 0.5));
+    zoomResetBtn.addEventListener('click', () => {
+        scale = 1;
+        pointX = 0;
+        pointY = 0;
+        updateTransform();
+    });
+
+    // Toggle 2D Plan mode (Schematic blueprint vs Real photo)
+    const btnModeSchematic = document.getElementById('btnModeSchematic');
+    const btnModePhoto = document.getElementById('btnModePhoto');
+    const planImage = document.getElementById('planImage');
+
+    function setPlanMode(mode) {
+        if (mode === 'schematic') {
+            btnModeSchematic.classList.add('btn-primary');
+            btnModeSchematic.classList.remove('btn-light', 'text-slate-700');
+            btnModePhoto.classList.add('btn-light', 'text-slate-700');
+            btnModePhoto.classList.remove('btn-primary');
+            planImage.src = "{{ url_for('static', filename='img/plan_schematic.jpg') }}";
+        } else {
+            btnModePhoto.classList.add('btn-primary');
+            btnModePhoto.classList.remove('btn-light', 'text-slate-700');
+            btnModeSchematic.classList.add('btn-light', 'text-slate-700');
+            btnModeSchematic.classList.remove('btn-primary');
+            planImage.src = "{{ url_for('static', filename='img/plan_chantier.jpg') }}";
+        }
+    }
+
+    if (btnModeSchematic && btnModePhoto) {
+        btnModeSchematic.addEventListener('click', () => setPlanMode('schematic'));
+        btnModePhoto.addEventListener('click', () => setPlanMode('photo'));
+    }
+
+    // Mouse wheel zoom
+    zoomContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.15 : 0.15;
+        zoom(scale + delta);
+    }, { passive: false });
+
+    // Panning mouse events
+    zoomContainer.addEventListener('mousedown', (e) => {
+        if (e.button !== 0 || scale <= 1) return;
+        if (e.target.classList.contains('zone-hotspot') || e.target.classList.contains('map-dot')) return;
+
+        isPanning = true;
+        zoomContent.style.transition = 'none'; // disable transition during drag for 0-latency pan
+        startX = e.clientX - pointX;
+        startY = e.clientY - pointY;
+        zoomContainer.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (isPanning) {
+            isPanning = false;
+            zoomContent.style.transition = 'transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            zoomContainer.style.cursor = scale > 1 ? 'grab' : 'default';
+        }
+    });
+
+    zoomContainer.addEventListener('mousemove', (e) => {
+        if (!isPanning) return;
+        pointX = e.clientX - startX;
+        pointY = e.clientY - startY;
+        updateTransform();
+    });
+
+    // Touch support for panning
+    zoomContainer.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1 || scale <= 1) return;
+        if (e.target.classList.contains('zone-hotspot') || e.target.classList.contains('map-dot')) return;
+
+        isPanning = true;
+        zoomContent.style.transition = 'none';
+        startX = e.touches[0].clientX - pointX;
+        startY = e.touches[0].clientY - pointY;
+    });
+
+    zoomContainer.addEventListener('touchend', () => {
+        if (isPanning) {
+            isPanning = false;
+            zoomContent.style.transition = 'transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        }
+    });
+
+    zoomContainer.addEventListener('touchmove', (e) => {
+        if (!isPanning || e.touches.length !== 1) return;
+        pointX = e.touches[0].clientX - startX;
+        pointY = e.touches[0].clientY - startY;
+        updateTransform();
+    });
+
+    // 2D dots centers mapping
+    const zoneDotCenters = {
+        'OR 13.1': { x: 13, y: 31 }, // in % relative to width/height
+        'OR02.1':  { x: 32, y: 31 },
+        'OR 03':   { x: 55, y: 18 },
+        'OR 02':   { x: 55, y: 41 },
+        'OR 04':   { x: 82, y: 31 }
+    };
+
+    // Unsplash professional industrial images mapping
+    const zonePhotos = {
+        'OR 13.1': 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=600&q=80', // Weld / Bodyshop
+        'OR02.1':  'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80', // Automotive assembly
+        'OR 03':   'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80', // Warehouse logistics
+        'OR 02':   'https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=600&q=80', // Robot Painting
+        'OR 04':   'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=600&q=80'  // Quality control / check
+    };
+    
+    const zoneHangarTypes = {
+        'OR 13.1': 'Atelier Tôlerie & Soudure',
+        'OR02.1':  'Atelier Assemblage Général',
+        'OR 03':   'Centre Logistique Stellantis',
+        'OR 02':   'Cabine de Peinture Robotisée',
+        'OR 04':   'Zone d\'Essai & Contrôle Qualité'
+    };
+
+    // Tabs views switching logic
+    const viewContainers = {
+        '2d': document.getElementById('viewContainer2D'),
+        '3d': document.getElementById('viewContainer3D'),
+        'satellite': document.getElementById('viewContainerSatellite')
+    };
+    const zoomToolbar = document.getElementById('mapZoomToolbar');
+    const mapTitleOverlayText = document.getElementById('mapTitleOverlayText');
+
+    let currentView = '2d';
+
+    document.querySelectorAll('.map-view-switcher button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const view = this.getAttribute('data-view');
+            switchView(view);
+        });
+    });
+
+    function switchView(view) {
+        if (view === currentView) return;
+        
+        // Update switcher buttons UI
+        document.querySelectorAll('.map-view-switcher button').forEach(btn => {
+            if (btn.getAttribute('data-view') === view) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // Hide/Show containers
+        for (const [key, container] of Object.entries(viewContainers)) {
+            if (key === view) {
+                container.style.display = 'block';
+                container.classList.add('active');
+            } else {
+                container.style.display = 'none';
+                container.classList.remove('active');
+            }
+        }
+
+        // Show/Hide 2D zoom controls and update overlay header text
+        if (view === '2d') {
+            zoomToolbar.style.display = 'flex';
+            mapTitleOverlayText.innerText = "Plan Directeur Stellantis - FIAT";
+        } else {
+            zoomToolbar.style.display = 'none';
+            if (view === '3d') {
+                mapTitleOverlayText.innerText = "Maquette Holographique 3D";
+                init3DScene();
+            } else if (view === 'satellite') {
+                mapTitleOverlayText.innerText = "Google Maps - Tafraoui (Oran)";
+                initSatelliteMap();
+            }
+        }
+
+        currentView = view;
+    }
+
+    // Google Maps Satellite / Leaflet Integration
+    let leafletMap = null;
+    const leafletPolygons = {};
+
+    function initSatelliteMap() {
+        if (leafletMap) {
+            setTimeout(() => {
+                leafletMap.invalidateSize();
+            }, 100);
+            return;
+        }
+
+        // Coordinates center: Fiat Tafraoui plant
+        const center = [35.4915, -0.6059];
+        leafletMap = L.map('satelliteMapContainer', {
+            center: center,
+            zoom: 17,
+            minZoom: 15,
+            maxZoom: 19,
+            zoomControl: true
+        });
+
+        // Public Google hybrid satellite tiles layer
+        L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            attribution: '&copy; Google Satellite Maps'
+        }).addTo(leafletMap);
+
+        // Geolocation polygon coordinates for each hangar
+        const zoneCoords = {
+            'OR 13.1': [
+                [35.4920, -0.6069],
+                [35.4920, -0.6065],
+                [35.4910, -0.6065],
+                [35.4910, -0.6069]
+            ],
+            'OR02.1': [
+                [35.4920, -0.6064],
+                [35.4920, -0.6060],
+                [35.4910, -0.6060],
+                [35.4910, -0.6064]
+            ],
+            'OR 03': [
+                [35.4923, -0.6059],
+                [35.4923, -0.6054],
+                [35.4917, -0.6054],
+                [35.4917, -0.6059]
+            ],
+            'OR 02': [
+                [35.4916, -0.6059],
+                [35.4916, -0.6054],
+                [35.4910, -0.6054],
+                [35.4910, -0.6059]
+            ],
+            'OR 04': [
+                [35.4920, -0.6053],
+                [35.4920, -0.6047],
+                [35.4910, -0.6047],
+                [35.4910, -0.6053]
+            ]
+        };
+
+        for (const [zone, coords] of Object.entries(zoneCoords)) {
+            const poly = L.polygon(coords, {
+                color: '#0ea5e9',
+                fillColor: '#0ea5e9',
+                fillOpacity: 0.15,
+                weight: 2
+            }).addTo(leafletMap);
+
+            poly.bindTooltip(`<strong>Zone ${zone}</strong>`, { sticky: true, className: 'leaflet-tooltip-custom' });
+
+            poly.on('click', function() {
+                openZoneDetails(zone);
+            });
+
+            poly.on('mouseover', function() {
+                poly.setStyle({ fillOpacity: 0.35, weight: 3 });
+            });
+
+            poly.on('mouseout', function() {
+                poly.setStyle({ fillOpacity: 0.15, weight: 2 });
+            });
+
+            leafletPolygons[zone] = poly;
+        }
+
+        updateLeafletPolygons();
+    }
+
+    function updateLeafletPolygons() {
+        if (!leafletMap) return;
+        for (const [zone, details] of Object.entries(siteData)) {
+            const poly = leafletPolygons[zone];
+            if (!poly) continue;
+            
+            let color = '#64748b'; // risk nul
+            const highRiskCount = details.permits.filter(p => p.is_high_risk).length;
+            
+            if (details.permits_count === 0) {
+                color = '#64748b';
+            } else if (highRiskCount > 0) {
+                color = '#ef4444'; // high risk
+            } else if (details.permits_count > 2) {
+                color = '#f59e0b'; // moderate risk
+            } else {
+                color = '#10b981'; // low risk
+            }
+            
+            poly.setStyle({
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.25
+            });
+        }
+    }
+
+    // Three.js 3D Holographic Scene
+    let scene = null;
+    let camera = null;
+    let renderer = null;
+    let controls = null;
+    const hangarMeshes = {};
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let hoveredHangar = null;
+    let threeInitialized = false;
+
+    // Hangar dimensions and relative positioning mapped from SVG coords
+    const hangarLayout = {
+        'OR 13.1': { x: -37, z: 1, w: 18, d: 40, h: 6 },
+        'OR02.1':  { x: -18, z: 1, w: 18, d: 40, h: 6 },
+        'OR 03':   { x: 4.75, z: -11.25, w: 24.5, d: 20.5, h: 6 },
+        'OR 02':   { x: 4.75, z: 11.5, w: 24.5, d: 23, h: 6 },
+        'OR 04':   { x: 32.25, z: 1, w: 27.5, d: 40, h: 6 }
+    };
+
+    function init3DScene() {
+        if (threeInitialized) {
+            resize3DCanvas();
+            return;
+        }
+
+        const container = document.getElementById('webgl3dContainer');
+        const width = container.clientWidth || 800;
+        const height = container.clientHeight || 600;
+
+        // Scene configuration
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b0f19);
+        scene.fog = new THREE.FogExp2(0x0b0f19, 0.007);
+
+        // Perspective Camera
+        camera = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+        camera.position.set(0, 75, 95);
+
+        // WebGL Antialiased Renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Orbit controls
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2.1; // Restrict vertical movement below floor
+        controls.minDistance = 20;
+        controls.maxDistance = 250;
+
+        // Ambient & Directional Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight1.position.set(60, 100, 40);
+        scene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0x0ea5e9, 0.3);
+        dirLight2.position.set(-60, 50, -40);
+        scene.add(dirLight2);
+
+        // Ground Metallic helper & neon grid
+        const gridHelper = new THREE.GridHelper(150, 75, 0x334155, 0x1e293b);
+        gridHelper.position.y = 0.01;
+        scene.add(gridHelper);
+
+        const groundGeom = new THREE.PlaneGeometry(160, 120);
+        const groundMat = new THREE.MeshStandardMaterial({ 
+            color: 0x0f172a, 
+            roughness: 0.8, 
+            metalness: 0.2 
+        });
+        const ground = new THREE.Mesh(groundGeom, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        scene.add(ground);
+
+        // Build Hangars 3D shapes
+        for (const [zone, layout] of Object.entries(hangarLayout)) {
+            // Extruded Block Mesh
+            const geom = new THREE.BoxGeometry(layout.w, layout.h, layout.d);
+            const mat = new THREE.MeshStandardMaterial({
+                color: 0x64748b, // base Slate Gray color
+                roughness: 0.1,
+                metalness: 0.8,
+                transparent: true,
+                opacity: 0.65
+            });
+            const hangar = new THREE.Mesh(geom, mat);
+            hangar.position.set(layout.x, layout.h / 2, layout.z);
+            hangar.userData = { zone: zone };
+            scene.add(hangar);
+            hangarMeshes[zone] = hangar;
+
+            // Wireframe Edges
+            const edges = new THREE.EdgesGeometry(geom);
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x0ea5e9, linewidth: 2 });
+            const wireframe = new THREE.LineSegments(edges, lineMat);
+            hangar.add(wireframe);
+            hangar.userData.wireframe = wireframe;
+
+            // Ambient interior neon light
+            const light = new THREE.PointLight(0x0ea5e9, 2.5, 30);
+            light.position.set(0, layout.h / 2 + 1, 0);
+            light.visible = false;
+            hangar.add(light);
+            hangar.userData.light = light;
+
+            // Group for worker glowing spheres
+            const workersGroup = new THREE.Group();
+            hangar.add(workersGroup);
+            hangar.userData.workersGroup = workersGroup;
+
+            // Add HTML overlay map label
+            create3DHTMLMapLabel(zone);
+        }
+
+        // Event Listeners
+        renderer.domElement.addEventListener('mousemove', onWebGLMouseMove);
+        renderer.domElement.addEventListener('click', onWebGLClick);
+
+        window.addEventListener('resize', resize3DCanvas);
+
+        threeInitialized = true;
+        animate3D();
+        updateHangar3DMaterials();
+    }
+
+    function create3DHTMLMapLabel(zone) {
+        const labelsContainer = document.getElementById('webglLabelsContainer');
+        const div = document.createElement('div');
+        div.className = 'three-floating-label';
+        div.id = `3d-label-${zone.replace(/\s+/g, '-')}`;
+        div.innerHTML = `
+            <div class="d-flex flex-column align-items-center gap-1">
+                <div class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-30 rounded-3 px-2 py-1 shadow-sm font-semibold x-small">
+                    Zone ${zone}
+                </div>
+            </div>
+        `;
+        labelsContainer.appendChild(div);
+    }
+
+    function resize3DCanvas() {
+        if (!threeInitialized || !renderer || !camera) return;
+        const container = document.getElementById('webgl3dContainer');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    }
+
+    function onWebGLMouseMove(e) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(Object.values(hangarMeshes));
+
+        if (intersects.length > 0) {
+            const hitHangar = intersects[0].object;
+            if (hoveredHangar !== hitHangar) {
+                if (hoveredHangar) {
+                    hoveredHangar.scale.set(1, 1, 1);
+                    hoveredHangar.userData.wireframe.material.color.setHex(0x0ea5e9);
+                }
+                hoveredHangar = hitHangar;
+                // Scale up on hover, change wireframe to white glowing outline
+                hoveredHangar.scale.set(1.02, 1.05, 1.02);
+                hoveredHangar.userData.wireframe.material.color.setHex(0xffffff);
+                renderer.domElement.style.cursor = 'pointer';
+            }
+        } else {
+            if (hoveredHangar) {
+                hoveredHangar.scale.set(1, 1, 1);
+                hoveredHangar.userData.wireframe.material.color.setHex(0x0ea5e9);
+                hoveredHangar = null;
+            }
+            renderer.domElement.style.cursor = 'default';
+        }
+    }
+
+    function onWebGLClick() {
+        if (hoveredHangar) {
+            const zone = hoveredHangar.userData.zone;
+            openZoneDetails(zone);
+        }
+    }
+
+    function updateFloatingLabels() {
+        if (!threeInitialized) return;
+        const container = document.getElementById('webgl3dContainer');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        for (const [zone, layout] of Object.entries(hangarLayout)) {
+            const labelEl = document.getElementById(`3d-label-${zone.replace(/\s+/g, '-')}`);
+            if (!labelEl) continue;
+
+            const pos = new THREE.Vector3(layout.x, layout.h + 2.5, layout.z);
+            pos.project(camera);
+
+            if (pos.z > 1) {
+                labelEl.style.opacity = 0;
+                continue;
+            }
+
+            const x = (pos.x * .5 + .5) * width;
+            const y = (-(pos.y * .5) + .5) * height;
+
+            labelEl.style.left = `${x}px`;
+            labelEl.style.top = `${y}px`;
+            labelEl.style.opacity = 1;
+        }
+    }
+
+    function animate3D() {
+        if (!threeInitialized) return;
+        requestAnimationFrame(animate3D);
+
+        controls.update();
+
+        const time = Date.now() * 0.003;
+        for (const [zone, details] of Object.entries(siteData)) {
+            const hangar = hangarMeshes[zone];
+            if (!hangar) continue;
+
+            const wGroup = hangar.userData.workersGroup;
+            if (!wGroup) continue;
+
+            const targetCount = details.workers_count;
+            const currentCount = wGroup.children.length;
+
+            if (currentCount < targetCount) {
+                for (let i = currentCount; i < targetCount; i++) {
+                    const sphereGeom = new THREE.SphereGeometry(0.35, 8, 8);
+                    const sphereMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.95 });
+                    const sphere = new THREE.Mesh(sphereGeom, sphereMat);
+                    wGroup.add(sphere);
+                }
+            } else if (currentCount > targetCount) {
+                for (let i = currentCount - 1; i >= targetCount; i--) {
+                    wGroup.remove(wGroup.children[i]);
+                }
+            }
+
+            // Stagger spheres around the center top of the hangar roof
+            wGroup.children.forEach((sphere, idx) => {
+                const layout = hangarLayout[zone];
+                const radius = Math.min(layout.w, layout.d) * 0.35 + idx * 0.5;
+                const angle = time + idx * (Math.PI * 2 / Math.max(1, targetCount));
+                sphere.position.x = Math.cos(angle) * radius;
+                sphere.position.z = Math.sin(angle) * radius;
+                sphere.position.y = layout.h / 2 + 2 + Math.sin(time * 2 + idx) * 0.4;
+            });
+
+            // PointLight pulsing effect
+            const light = hangar.userData.light;
+            if (light && light.visible) {
+                light.intensity = 2.0 + Math.sin(Date.now() * 0.005) * 0.8;
+            }
+        }
+
+        renderer.render(scene, camera);
+        updateFloatingLabels();
+    }
+
+    function updateHangar3DMaterials() {
+        if (!threeInitialized) return;
+        for (const [zone, details] of Object.entries(siteData)) {
+            const hangar = hangarMeshes[zone];
+            if (!hangar) continue;
+
+            let colorHex = 0x64748b; // neutral grey
+            let lightColorHex = 0x64748b;
+            let showLight = false;
+
+            const highRiskCount = details.permits.filter(p => p.is_high_risk).length;
+
+            if (details.permits_count === 0) {
+                colorHex = 0x64748b;
+            } else if (highRiskCount > 0) {
+                colorHex = 0xef4444; // High Risk: Neon Red
+                lightColorHex = 0xef4444;
+                showLight = true;
+            } else if (details.permits_count > 2) {
+                colorHex = 0xf59e0b; // Moderate Risk: Amber Orange
+                lightColorHex = 0xf59e0b;
+                showLight = true;
+            } else {
+                colorHex = 0x10b981; // Low Risk: Emerald Green
+                lightColorHex = 0x10b981;
+                showLight = true;
+            }
+
+            hangar.material.color.setHex(colorHex);
+            
+            const light = hangar.userData.light;
+            if (light) {
+                light.color.setHex(lightColorHex);
+                light.visible = showLight;
+            }
+
+            // Sync indicators count to Floating labels HTML
+            const labelEl = document.getElementById(`3d-label-${zone.replace(/\s+/g, '-')}`);
+            if (labelEl) {
+                labelEl.innerHTML = `
+                    <div class="d-flex flex-column align-items-center gap-1">
+                        <div class="badge bg-dark bg-opacity-75 text-white border border-secondary border-opacity-30 rounded-3 px-2 py-1 shadow-sm font-semibold x-small">
+                            Zone ${zone}
+                        </div>
+                        <div class="d-flex gap-1">
+                            <span class="badge bg-primary bg-opacity-85 rounded-pill" style="font-size: 9px; padding: 2px 6px;">👷 ${details.workers_count}</span>
+                            <span class="badge bg-success bg-opacity-85 rounded-pill" style="font-size: 9px; padding: 2px 6px;">📄 ${details.permits_count}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    // Load API data
+    function fetchSiteData() {
+        fetch('/api/v1/carte/zones')
+            .then(response => response.json())
+            .then(data => {
+                siteData = data;
+                renderSiteState();
+                if (selectedZone && siteData[selectedZone]) {
+                    updateDrawer(selectedZone);
+                }
+
+                if (threeInitialized) {
+                    updateHangar3DMaterials();
+                }
+
+                if (leafletMap) {
+                    updateLeafletPolygons();
+                }
+            })
+            .catch(err => {
+                console.error("Erreur lors de la récupération des données du site :", err);
+            });
+    }
+
+    // SVG hotspots mouse click listener
+    document.querySelectorAll('.zone-hotspot').forEach(hotspot => {
+        hotspot.addEventListener('click', function() {
+            const zone = this.getAttribute('data-zone');
+            openZoneDetails(zone);
+        });
+    });
+
+    // Opening zone details (Summary panel & side drawer)
+    function openZoneDetails(zone) {
+        selectedZone = zone;
+        
+        // Highlight in SVG
+        document.querySelectorAll('.zone-hotspot').forEach(el => {
+            if (el.getAttribute('data-zone') === zone) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        });
+        
+        // Highlight in right sidebar regions list
+        document.querySelectorAll('.summary-zone-item').forEach(el => {
+            if (el.getAttribute('data-zone') === zone) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        });
+
+        // Open Side drawer overlay and container
+        updateDrawer(zone);
+        sideDrawer.classList.add('open');
+        drawerOverlay.classList.add('open');
+    }
+
+    function closeDrawer() {
+        sideDrawer.classList.remove('open');
+        drawerOverlay.classList.remove('open');
+        selectedZone = null;
+        document.querySelectorAll('.zone-hotspot').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.summary-zone-item').forEach(el => el.classList.remove('active'));
+    }
+    
+    closeDrawerBtn.addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeDrawer();
+    });
+
+    // Side Drawer updates
+    function updateDrawer(zone) {
+        const zoneInfo = siteData[zone];
+        if (!zoneInfo) return;
+        
+        document.getElementById('drawerTitle').innerText = "Zone " + zone;
+
+        // Set Cover Hangar Photo & text badge
+        const zonePhotoImg = document.getElementById('zonePhotoImg');
+        const coverHangarType = document.getElementById('drawerCoverHangarType');
+        
+        if (zonePhotoImg) {
+            zonePhotoImg.src = zonePhotos[zone] || '';
+        }
+        if (coverHangarType) {
+            coverHangarType.innerText = zoneHangarTypes[zone] || 'Atelier';
+        }
+        
+        // Compute Risk level badge
+        const riskBadge = document.getElementById('drawerRiskBadge');
+        const highRiskCount = zoneInfo.permits.filter(p => p.is_high_risk).length;
+        
+        if (zoneInfo.permits_count === 0) {
+            riskBadge.innerText = "Risque Nul";
+            riskBadge.className = "badge bg-secondary rounded-pill x-small";
+        } else if (highRiskCount > 0) {
+            riskBadge.innerText = "Risque Élevé ⚠️";
+            riskBadge.className = "badge bg-danger rounded-pill x-small";
+        } else if (zoneInfo.permits_count > 2) {
+            riskBadge.innerText = "Risque Modéré";
+            riskBadge.className = "badge bg-warning text-dark rounded-pill x-small";
+        } else {
+            riskBadge.innerText = "Risque Faible";
+            riskBadge.className = "badge bg-success rounded-pill x-small";
+        }
+        
+        document.getElementById('tabWorkersCount').innerText = zoneInfo.workers_count;
+        document.getElementById('tabPermitsCount').innerText = zoneInfo.permits_count;
+        
+        // Workers list template render
+        const workersContainer = document.getElementById('drawerWorkersList');
+        if (zoneInfo.workers_count === 0) {
+            workersContainer.innerHTML = `
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-user-slash fa-2x mb-2 opacity-50"></i>
+                    <p class="small mb-0">Aucun travailleur actif dans cette zone.</p>
+                </div>
+            `;
+        } else {
+            workersContainer.innerHTML = zoneInfo.workers.map(w => {
+                const avatar = w.photo_url 
+                    ? `<img src="${w.photo_url}" class="worker-img" alt="${w.prenom}">`
+                    : `<div class="worker-avatar-fallback">${w.prenom.charAt(0)}${w.nom.charAt(0)}</div>`;
+                
+                return `
+                    <div class="worker-card">
+                        ${avatar}
+                        <div class="flex-grow-1 min-width-0">
+                            <h6 class="fw-bold text-slate-800 mb-0 text-truncate small">${w.prenom} ${w.nom}</h6>
+                            <div class="text-muted x-small text-truncate">${w.fonction}</div>
+                            <div class="badge bg-light text-slate-600 border rounded-pill mt-1 x-small">${w.societe}</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 rounded-pill x-small" style="font-size: 9px;">${w.reason}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Permits list template render
+        const permitsContainer = document.getElementById('drawerPermitsList');
+        if (zoneInfo.permits_count === 0) {
+            permitsContainer.innerHTML = `
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-file-signature fa-2x mb-2 opacity-50"></i>
+                    <p class="small mb-0">Aucun permis actif enregistré dans cette zone.</p>
+                </div>
+            `;
+        } else {
+            permitsContainer.innerHTML = zoneInfo.permits.map(p => {
+                const hazardBadge = p.is_high_risk 
+                    ? `<span class="badge bg-danger rounded-pill x-small">Haut Risque</span>`
+                    : `<span class="badge bg-success rounded-pill x-small">Standard</span>`;
+                
+                const typeIcon = p.type === 'digital' 
+                    ? '<i class="fas fa-fingerprint text-primary me-1" title="Permis Digital"></i>'
+                    : '<i class="fas fa-file-alt text-warning me-1" title="Permis Papier"></i>';
+
+                const detailUrl = p.type === 'digital'
+                    ? `/permis/verifier/${p.id}`
+                    : `/permis/verifier/${p.id}?papier=1`;
+
+                return `
+                    <div class="permit-card">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="fw-bold text-slate-700 small">${typeIcon} ${p.numero_permis}</span>
+                            ${hazardBadge}
+                        </div>
+                        <h6 class="fw-bold text-slate-800 small mb-1">${p.type_permis}</h6>
+                        <div class="d-flex justify-content-between x-small text-muted mb-2">
+                            <span>Société: <strong>${p.entreprise}</strong></span>
+                            <span>Début: ${p.date_debut}</span>
+                        </div>
+                        <p class="x-small text-slate-600 text-truncate mb-2" title="${p.description}">${p.description || 'Aucune description détaillée.'}</p>
+                        <a href="${detailUrl}" class="btn btn-sm btn-outline-primary bg-transparent text-primary border border-primary w-100 justify-content-center" style="font-size: 10px; padding: 4px;" target="_blank">
+                            <i class="fas fa-eye me-1"></i> Consulter le Permis
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // State render function on 2D map plan
+    function renderSiteState() {
+        let globalWorkers = 0;
+        let globalPermits = 0;
+        
+        dotsContainer.innerHTML = '';
+        let listHtml = '';
+        
+        for (const [zone, details] of Object.entries(siteData)) {
+            globalWorkers += details.workers_count;
+            globalPermits += details.permits_count;
+            
+            // Stagger 2D blinking dots inside the hangar zone relative centers
+            const center = zoneDotCenters[zone];
+            if (center && details.permits_count > 0) {
+                details.permits.forEach((permit, index) => {
+                    const count = details.permits_count;
+                    const offsetPct = (index - (count - 1) / 2) * 2; // offset in percentage points
+                    
+                    const dot = document.createElement('div');
+                    dot.className = `map-dot ${permit.is_high_risk ? 'high-risk' : 'standard'}`;
+                    dot.style.left = `${center.x + offsetPct}%`;
+                    dot.style.top = `${center.y}%`;
+                    dot.title = `Permis: ${permit.numero_permis} (${permit.type_permis})`;
+                    
+                    dot.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openZoneDetails(zone);
+                        const permitsTab = new bootstrap.Tab(document.getElementById('permits-tab'));
+                        permitsTab.show();
+                    });
+                    
+                    dotsContainer.appendChild(dot);
+                });
+            }
+            
+            // List of zones summary on the right column
+            const activePermitsHtml = details.permits_count > 0 
+                ? `<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 rounded-pill x-small">${details.permits_count} Permis</span>`
+                : `<span class="badge bg-light text-muted border rounded-pill x-small">Aucun Permis</span>`;
+                
+            const activeWorkersHtml = details.workers_count > 0 
+                ? `<span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 rounded-pill x-small">${details.workers_count} Ouvriers</span>`
+                : `<span class="badge bg-light text-muted border rounded-pill x-small">Aucun Ouvrier</span>`;
+
+            listHtml += `
+                <div class="summary-zone-item d-flex flex-column gap-2" data-zone="${zone}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-slate-800 small">Zone ${zone}</span>
+                        <i class="fas fa-chevron-right text-muted x-small"></i>
+                    </div>
+                    <div class="d-flex gap-2">
+                        ${activeWorkersHtml}
+                        ${activePermitsHtml}
+                    </div>
+                </div>
+            `;
+        }
+        
+        totalWorkersEl.innerText = globalWorkers;
+        totalPermitsEl.innerText = globalPermits;
+        
+        zonesListSummary.innerHTML = listHtml;
+        
+        // Add click events on sidebar items
+        document.querySelectorAll('.summary-zone-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const zone = this.getAttribute('data-zone');
+                openZoneDetails(zone);
+            });
+        });
+    }
+
+    // Init and periodic sync
+    fetchSiteData();
+    setInterval(fetchSiteData, 8000); // refresh every 8 seconds
+});
+</script>
+{% endblock %}

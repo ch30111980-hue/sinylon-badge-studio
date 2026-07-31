@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Impression Badges - NORO BADGE 5.0 PRO</title>
+    <!-- On charge le bundle complet font-awesome, QR Code et html2pdf -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
+        
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #e0e0e0; font-family: 'Oswald', sans-serif; }
+        
+        /* Contrôles web invisibles à l'impression */
+        .controls { padding: 20px; background: #fff; text-align: center; border-bottom: 2px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .controls button { padding: 12px 24px; font-size: 16px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #fff; font-family: 'Oswald', sans-serif; font-weight: bold; cursor: pointer; border: none; border-radius: 8px; margin: 0 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.2s ease; }
+        .controls button:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .controls button.btn-back { background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); color: #fff; }
+        
+        /* --- CALIBRAGE IMPRESSION A4 --- */
+        @page { size: A4 portrait; margin: 0; }
+        @media print {
+            body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .controls { display: none !important; }
+            .page { box-shadow: none !important; margin: 0 !important; }
+        }
+        
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: #fff;
+            margin: 0 auto 20px auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            page-break-after: always;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        /* Grille des 4 badges B3 (90x120mm). Ajustée pour rentrer parfaitement dans une feuille A4 portrait (210x297mm) */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 90mm 90mm;
+            grid-template-rows: 120mm 120mm;
+            gap: 6mm 8mm;
+            justify-content: center;
+            align-content: center;
+        }
+
+        /* --- DESIGN DU BADGE B3 (90x120mm) --- */
+        .badge-card {
+            width: 90mm;
+            height: 120mm;
+            background: #fff;
+            border: 1px solid #ccc; /* Ligne de coupe */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* En-tête du badge (avec logos préparés et vagues) */
+        .b-header { height: 22mm; display: flex; align-items: center; padding: 0 6mm; justify-content: space-between; color: #fff; background-color: #1f1f21; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 56' fill='none' preserveAspectRatio='none'><path d='M0 0 H200 V40 C140 30, 70 56, 0 42 Z' fill='%231f1f21'/><path d='M0 42 C70 56, 140 30, 200 40' stroke='%23e5e7eb' stroke-width='1.5' fill='none'/><path d='M0 43.5 C70 57.5, 140 31.5, 200 41.5' stroke='%23d1d5db' stroke-width='1' fill='none'/></svg>"); background-size: 100% 100%; background-position: center; position: relative; overflow: hidden; }
+        .b-header::after { display: none !important; }
+        .b-header::before { display: none !important; }
+        .b-header img { height: 15mm; z-index: 2; object-fit: contain; }
+
+        /* Bandeau d'alerte */
+        .b-alert { background: #e0f2fe; height: 7mm; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #bae6fd; }
+        .b-alert-text { color: #ef4444; font-size: 10px; font-weight: bold; letter-spacing: 1px; }
+
+        /* Section Centrale (Photo + QR) */
+        .b-middle { display: flex; padding: 4mm; gap: 6mm; justify-content: center; }
+        .b-photo { width: 28mm; height: 35mm; background: #eee; border: 1px solid #ddd; border-radius: 1.5mm; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .b-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .b-photo span { font-size: 10px; color: #999; }
+        .b-qr { width: 35mm; height: 35mm; background: #fff; border: 1px solid #ddd; padding: 1.5mm; display: flex; align-items: center; justify-content: center; }
+        .b-qr canvas, .b-qr img { width: 100% !important; height: 100% !important; }
+
+        /* Infos texte */
+        .b-info { padding: 0 4mm; line-height: 1.3; margin-top: 1mm; }
+        .b-line { font-size: 11px; color: #666; margin-bottom: 1.2mm; }
+        .b-val { color: #000; font-weight: bold; font-size: 13px; }
+
+        /* STEP Boxes */
+        .b-steps { position: absolute; bottom: 11mm; left: 4mm; display: flex; gap: 3mm; }
+        .step-wrapper { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+        .b-step { width: 6mm; height: 6mm; border: 1px solid #000; font-size: 14px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #1d664f; }
+        .step-label { font-size: 8px; font-weight: bold; color: #5a6080; }
+
+        /* Validité box noire */
+        .b-validity { position: absolute; bottom: 11mm; right: 4mm; background: #475569; color: #fff; padding: 1.5mm 3mm; border-radius: 1.5mm; font-size: 12px; font-weight: bold; }
+
+        /* Footer avec vague svg */
+        .b-footer { position: absolute; bottom: 0; width: 100%; height: 14mm; overflow: hidden; z-index: 5; text-align: center; }
+        .b-footer svg { width: 100%; height: 100%; position: absolute; bottom: 0; left: 0; z-index: 6; }
+        .b-footer-SINYLON FIAT { position: absolute; bottom: 1.5mm; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-size: 10px; padding: 0.8mm 4mm; border-radius: 0.8mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .b-footer-sf { position: absolute; bottom: 6mm; left: 50%; transform: translateX(-50%); color: #dc2626; font-size: 8px; font-weight: bold; z-index: 10; letter-spacing: 0.8px; }
+
+        /* ====== VERSO ====== */
+        .v-content { padding: 6mm; }
+        .v-title { color: #ef4444; font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 4mm; }
+        .v-row { display: flex; align-items: center; gap: 3mm; margin-bottom: 3mm; }
+        .v-dot { width: 3mm; height: 3mm; border-radius: 50%; }
+        .v-lab { font-size: 11px; color: #666; flex: 1; }
+        .v-num { font-size: 13px; color: #1e4ed8; font-weight: bold; }
+        .v-box { background: #475569; border-radius: 1.5mm; padding: 3mm; margin-top: 6mm; }
+        .v-box-title { color: #ef4444; font-size: 13px; font-weight: bold; text-align: center; margin-bottom: 2.5mm; border-bottom: 1px solid #64748b; padding-bottom: 1.5mm; }
+        .v-box-text { color: #fff; font-size: 10px; line-height: 1.5; font-family: sans-serif; }
+        /* ====== BADGE PROVISOIRE (Rouge) ====== */
+        .badge-provisoire {
+            border: 2px solid #dc2626 !important;
+        }
+        .badge-provisoire .b-header {
+            background-color: #991b1b !important;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 56' fill='none' preserveAspectRatio='none'><path d='M0 0 H200 V40 C140 30, 70 56, 0 42 Z' fill='%23991b1b'/><path d='M0 42 C70 56, 140 30, 200 40' stroke='%23fca5a5' stroke-width='1.5' fill='none'/><path d='M0 43.5 C70 57.5, 140 31.5, 200 41.5' stroke='%23f87171' stroke-width='1' fill='none'/></svg>") !important;
+        }
+        .badge-provisoire .b-header::after {
+            display: none !important;
+        }
+        .badge-provisoire .b-alert {
+            background: #fef2f2;
+            border-bottom-color: #fca5a5;
+        }
+        .badge-provisoire .b-alert-text {
+            color: #dc2626;
+            content: '⚠️ BADGE PROVISOIRE · 10 JOURS';
+        }
+        .badge-provisoire .b-photo {
+            width: 28mm;
+            height: 35mm;
+            border: 1.5px solid #dc2626;
+        }
+        .badge-provisoire .b-qr {
+            width: 35mm;
+            height: 35mm;
+            border: 1px solid #dc2626;
+        }
+        .badge-provisoire .b-validity {
+            background: #dc2626 !important;
+        }
+        .badge-provisoire .b-footer-SINYLON FIAT {
+            background: #991b1b !important;
+        }
+        .badge-provisoire .b-footer-sf {
+            color: #ffffff !important;
+        }
+        .prov-tag {
+            position: absolute;
+            top: 24mm;
+            right: 4mm;
+            background: #dc2626;
+            color: #fff;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 0.8mm 2.5mm;
+            border-radius: 1.5mm;
+            letter-spacing: 0.8px;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <h2 style="margin-top:0;">Mode Impression A4 (4 Badges par Page)</h2>
+    <p>Assurez-vous que l'échelle d'impression est réglée sur <strong>100%</strong> ou <strong>Taille réelle</strong> et que les <strong>Graphiques d'arrière-plan</strong> sont cochés.</p>
+    <button class="btn-back" onclick="window.close()">Retour</button>
+    <button onclick="window.print()"><i class="fas fa-print"></i> Lancer l'Impression</button>
+    <button id="btn-pdf" onclick="saveAsPDF()" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);"><i class="fas fa-file-pdf"></i> Enregistrer en PDF</button>
+</div>
+
+<!-- Render pages with Jinja -->
+<div id="print-area">
+{% for chunk in badge_chunks %}
+    <!-- PAGE RECTO -->
+    <div class="page">
+        <div class="grid-4">
+            {% for badge in chunk %}
+                {% if badge %}
+                {% set is_prov = badge.statut in ['provisoire', 'attente_provisoire'] %}
+                <div class="badge-card{% if is_prov %} badge-provisoire{% endif %}">
+                    <!-- Redesigned header with curves and dual logos -->
+                    <div class="b-header">
+                        <img src="/static/img/fiat_logo.png" alt="FIAT">
+                        <img src="/static/img/amce_logo.png" alt="AMCE">
+                    </div>
+                    <div class="b-alert">
+                        <span class="b-alert-text">
+                            {% if is_prov %}⚠️ BADGE PROVISOIRE · 10 JOURS{% else %}SAFETY FIRST{% endif %}
+                        </span>
+                    </div>
+                    {% if is_prov %}<div class="prov-tag">PROVISOIRE</div>{% endif %}
+                    
+                    <div class="b-middle">
+                        <div class="b-photo">
+                            {% if badge.photo_filename %}
+                                <img src="{{ badge.get_photo_url() }}" alt="Photo">
+                            {% else %}
+                                <span>PHOTO</span>
+                            {% endif %}
+                        </div>
+                        <!-- Generates QR code using qrcode.js with optimized data size -->
+                        {% set qr_parts = ["=== NORO SECURITY ==="] %}
+                        {% if badge.numero_badge %}{% set _ = qr_parts.append("Badge: " ~ badge.numero_badge) %}{% endif %}
+                        {% if badge.nom or badge.prenom %}{% set _ = qr_parts.append("Nom: " ~ (badge.nom or '')|upper ~ " " ~ (badge.prenom or '')) %}{% endif %}
+                        {% if badge.societe_affichee %}{% set _ = qr_parts.append("Soc: " ~ badge.societe_affichee) %}{% endif %}
+                        {% if badge.fonction %}{% set _ = qr_parts.append("Job: " ~ badge.fonction) %}{% endif %}
+                        {% if badge.carte_id %}{% set _ = qr_parts.append("ID: " ~ badge.carte_id) %}{% endif %}
+                        {% if badge.cnas %}{% set _ = qr_parts.append("CNAS: " ~ badge.cnas) %}{% endif %}
+                        {% if badge.nfc_uid %}{% set _ = qr_parts.append("NFC: " ~ badge.nfc_uid) %}{% endif %}
+                        {% if badge.groupe_sanguin %}{% set _ = qr_parts.append("GS: " ~ badge.groupe_sanguin) %}{% endif %}
+                        {% if badge.telephone %}{% set _ = qr_parts.append("Tel: " ~ badge.telephone) %}{% endif %}
+                        {% if badge.date_naissance %}{% set _ = qr_parts.append("Naissance: " ~ badge.date_naissance.strftime('%d/%m/%Y')) %}{% endif %}
+                        {% if badge.date_expiration %}{% set _ = qr_parts.append("Expiration: " ~ badge.date_expiration.strftime('%d/%m/%Y')) %}{% endif %}
+                        
+                        {# Zones & Etapes #}
+                        {% if badge.zones_acces %}{% set _ = qr_parts.append("Zones: " ~ badge.zones_acces) %}{% endif %}
+                        {% if badge.step_1_valide %}{% set _ = qr_parts.append("STEP 1: OK") %}{% endif %}
+                        {% if badge.step_2_valide %}{% set _ = qr_parts.append("STEP 2: OK") %}{% endif %}
+                        {% if badge.step_3_valide %}{% set _ = qr_parts.append("STEP 3: OK") %}{% endif %}
+                        
+                        {# Visite Medicale #}
+                        {% if badge.visite_medicale_date or badge.visite_medicale_expiration %}
+                            {% set med_part = "Med: " ~ (badge.visite_medicale_statut or 'VALIDE')|upper %}
+                            {% if badge.visite_medicale_expiration %}
+                                {% set med_part = med_part ~ " (Exp: " ~ badge.visite_medicale_expiration.strftime('%d/%m/%Y') ~ ")" %}
+                            {% endif %}
+                            {% set _ = qr_parts.append(med_part) %}
+                        {% endif %}
+                        
+                        {# Habilitations #}
+                        {% set habs = [] %}
+                        {% if badge.habilitation_hauteur %}{% set _ = habs.append("HAUTEUR" ~ ("(Exp:" ~ badge.habilitation_hauteur_expiration.strftime('%d/%m/%Y') ~ ")" if badge.habilitation_hauteur_expiration else "")) %}{% endif %}
+                        {% if badge.habilitation_soudure %}{% set _ = habs.append("SOUDURE" ~ ("(Exp:" ~ badge.habilitation_soudure_expiration.strftime('%d/%m/%Y') ~ ")" if badge.habilitation_soudure_expiration else "")) %}{% endif %}
+                        {% if badge.habilitation_electricite %}{% set _ = habs.append("ELEC" ~ ("(Exp:" ~ badge.habilitation_electricite_expiration.strftime('%d/%m/%Y') ~ ")" if badge.habilitation_electricite_expiration else "")) %}{% endif %}
+                        {% if badge.habilitation_confine %}{% set _ = habs.append("CONFINE" ~ ("(Exp:" ~ badge.habilitation_confine_expiration.strftime('%d/%m/%Y') ~ ")" if badge.habilitation_confine_expiration else "")) %}{% endif %}
+                        {% if badge.habilitation_engins %}{% set _ = habs.append("ENGINS" ~ ("(Exp:" ~ badge.habilitation_engins_expiration.strftime('%d/%m/%Y') ~ ")" if badge.habilitation_engins_expiration else "")) %}{% endif %}
+                        {% if badge.habilitation_chimique %}{% set _ = habs.append("CHIMIQUE" ~ ("(Exp:" ~ badge.habilitation_chimique_expiration.strftime('%d/%m/%Y') ~ ")" if badge.habilitation_chimique_expiration else "")) %}{% endif %}
+                        {% if badge.habilitation_sst %}{% set _ = habs.append("SST" ~ ("(Exp:" ~ badge.habilitation_sst_expiration.strftime('%d/%m/%Y') ~ ")" if badge.habilitation_sst_expiration else "")) %}{% endif %}
+                        {% if badge.habilitation_safety %}{% set _ = habs.append("SAFETY" ~ ("(Exp:" ~ badge.habilitation_safety_expiration.strftime('%d/%m/%Y') ~ ")" if badge.habilitation_safety_expiration else "")) %}{% endif %}
+                        {% if habs %}
+                            {% set _ = qr_parts.append("Habs: " ~ habs|join(', ')) %}
+                        {% endif %}
+                        <div class="b-qr" id="qr-{{ badge.id }}" data-text="{{ url_for('badge.verifier_public', id=badge.id, _external=True) }}"></div>
+                    </div>
+
+                    <div class="b-info" style="text-align: left;">
+                        <div class="b-line">Nom : <span class="b-val">{{ (badge.nom|default('')) | upper }}</span></div>
+                        <div class="b-line">Prénom : <span class="b-val">{{ badge.prenom }}</span></div>
+                        <div class="b-line">Société : <span class="b-val">{{ badge.societe_affichee }}</span></div>
+                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;">{{ badge.projet|default('SINYLON FIAT Projet FIAT') }}</span></div>
+                        <div class="b-line">ID Badge : <span class="b-val">{{ badge.carte_id or badge.numero_badge }}</span></div>
+                    </div>
+
+                    <div class="b-steps">
+                        <div class="step-wrapper"><div class="b-step">{% if 'STEP 1' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">1</div></div>
+                        <div class="step-wrapper"><div class="b-step">{% if 'STEP 2' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">2</div></div>
+                        <div class="step-wrapper"><div class="b-step">{% if 'STEP 3' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">3</div></div>
+                    </div>
+                    <div class="b-validity">{{ badge.date_expiration.strftime('%d/%m/%Y') if badge.date_expiration else '' }}</div>
+
+                    <div class="b-footer">
+                        <svg viewBox="0 0 200 50" preserveAspectRatio="none">
+                            <path d="M0 50 L0 20 C60 40, 140 40, 200 20 L200 50 Z" fill="#1f1f21"></path>
+                            <path d="M0 20 C60 40, 140 40, 200 20" stroke="#e5e7eb" stroke-width="1.5" fill="none"></path>
+                            <path d="M0 18.5 C60 38.5, 140 38.5, 200 18.5" stroke="#d1d5db" stroke-width="1" fill="none"></path>
+                        </svg>
+                        <div class="b-footer-SINYLON FIAT">SINYLON FIAT</div>
+                        <div class="b-footer-sf">SAFETY FIRST</div>
+                    </div>
+                </div>
+                {% else %}
+                    <div class="badge-card" style="border:1px dashed #eee; background:transparent;"></div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- PAGE VERSO -->
+    <div class="page">
+        <div class="grid-4">
+            <!-- IMPORTANT: Pour que les versos correspondent aux rectos lors du retournement de la feuille
+                 Si le recto est [1][2]
+                                 [3][4]
+                 Le verso doit être [2][1]
+                                    [4][3] -->
+            {% set verso_order = [chunk[1] if chunk|length > 1 else None, 
+                                  chunk[0] if chunk|length > 0 else None, 
+                                  chunk[3] if chunk|length > 3 else None, 
+                                  chunk[2] if chunk|length > 2 else None] %}
+            
+            {% for badge in verso_order %}
+                {% if badge %}
+                <div class="badge-card{% if badge.statut in ['provisoire', 'attente_provisoire'] %} badge-provisoire{% endif %}">
+                    <div class="b-header">
+                        <img src="/static/img/fiat_logo.png" alt="FIAT">
+                        <img src="/static/img/amce_logo.png" alt="AMCE">
+                    </div>
+                    <div class="v-content">
+                        <div class="v-box" style="margin-top: 0 !important;">
+                            <div class="v-box-title">CONSIGNES DE SÉCURITÉ</div>
+                            <div class="v-box-text">
+                                • Port des EPI obligatoire<br>
+                                • Respect des consignes de sécurité<br>
+                                • Badge strictement personnel<br>
+                                • En cas d'accident, prévenir HSE
+                            </div>
+                        </div>
+
+                        <div class="v-title" style="margin-top: 4mm; margin-bottom: 2mm;">NUMÉROS D'URGENCE</div>
+                        <div class="v-row">
+                            <div class="v-dot" style="background:#ef4444;"></div>
+                            <div class="v-lab">URGENCE GÉNÉRALE</div>
+                            <div class="v-num">0770 91 29 78</div>
+                        </div>
+                        <div class="v-row">
+                            <div class="v-dot" style="background:#f59e0b;"></div>
+                            <div class="v-lab">SÉCURITÉ CHANTIER</div>
+                            <div class="v-num">0770 91 29 78</div>
+                        </div>
+                    </div>
+                    
+                    <div class="b-footer">
+                        <svg viewBox="0 0 200 50" preserveAspectRatio="none">
+                            <path d="M0 50 L0 20 C60 40, 140 40, 200 20 L200 50 Z" fill="#1f1f21"></path>
+                            <path d="M0 20 C60 40, 140 40, 200 20" stroke="#e5e7eb" stroke-width="1.5" fill="none"></path>
+                            <path d="M0 18.5 C60 38.5, 140 38.5, 200 18.5" stroke="#d1d5db" stroke-width="1" fill="none"></path>
+                        </svg>
+                        <div class="b-footer-sf">SAFETY FIRST</div>
+                    </div>
+                </div>
+                {% else %}
+                    <div class="badge-card" style="border:1px dashed #eee; background:transparent;"></div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+<script>
+    // Convert string to UTF-8 for qrcode.js compatibility
+    function toUtf8(str) {
+        if (!str) return "";
+        var out, i, len, c;
+        out = "";
+        len = str.length;
+        for(i = 0; i < len; i++) {
+            c = str.charCodeAt(i);
+            if ((c >= 0x0001) && (c <= 0x007F)) {
+                out += str.charAt(i);
+            } else if (c > 0x07FF) {
+                out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
+                out += String.fromCharCode(0x80 | ((c >>  6) & 0x3F));
+                out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));
+            } else {
+                out += String.fromCharCode(0xC0 | ((c >>  6) & 0x1F));
+                out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));
+            }
+        }
+        return out;
+    }
+
+    // Génère les QR Codes avec la lib JavaScript de façon robuste
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.b-qr').forEach(function(el) {
+            const dataText = el.getAttribute('data-text') || "";
+            el.innerHTML = ""; // Assure que l'élément est vide
+            try {
+                new QRCode(el, {
+                    text: toUtf8(dataText),
+                    width: 180,
+                    height: 180,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L
+                });
+            } catch (err) {
+                console.warn("Erreur QRCode complet, tentative avec version courte...", err);
+                try {
+                    // Fallback sur une version réduite à l'essentiel
+                    const lines = dataText.split('\n');
+                    const shortText = lines.slice(0, 6).join('\n'); // Conserve uniquement l'en-tête et les premières lignes
+                    new QRCode(el, {
+                        text: toUtf8(shortText),
+                        width: 180,
+                        height: 180,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.L
+                    });
+                } catch (fallbackErr) {
+                    console.error("Échec définitif de génération du QR Code :", fallbackErr);
+                    el.innerHTML = "<div class='text-danger text-center small' style='font-size:0.6rem;padding-top:70px;'>QR Code Error</div>";
+                }
+            }
+            // Enlève l'attribut title pour ne pas afficher le texte brut au survol
+            el.removeAttribute('title');
+        });
+    });
+
+    // Génère et télécharge le fichier PDF du lot
+    function saveAsPDF() {
+        const printArea = document.getElementById('print-area');
+        const btn = document.getElementById('btn-pdf');
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération...';
+        btn.disabled = true;
+
+        const opt = {
+            margin:       0,
+            filename:     'lot_badges_' + new Date().toISOString().slice(0, 10) + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(printArea).save().then(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(err => {
+            console.error("Erreur génération PDF:", err);
+            alert("Erreur lors de la génération du PDF.");
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+</script>
+
+</body>
+</html>

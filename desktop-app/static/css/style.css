@@ -1,0 +1,28 @@
+/* Style normal pour l'écran */
+.btn-action { background-color: #007bff; color: white; }
+
+/* 🖨️ Style forcé uniquement lors de l'impression physique ou de la sauvegarde PDF */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+    }
+    
+    /* Cacher les menus, le chat, le dashboard, la sidebar et les boutons */
+    nav, .sidebar, .btn, .btn-action, .no-print, #chat-box, .navbar, .footer, .btn-group, .sidebar-wrapper, .modal-footer, .back-to-top {
+        display: none !important;
+    }
+    
+    /* Mettre en valeur la fiche officielle */
+    .printable-document, .card {
+        width: 100% !important;
+        border: 2px solid black !important;
+        padding: 20px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        background: white !important;
+        color: black !important;
+        page-break-inside: avoid;
+    }
+}

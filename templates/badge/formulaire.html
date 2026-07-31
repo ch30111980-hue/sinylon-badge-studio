@@ -1,0 +1,862 @@
+{% extends "base.html" %}
+{% block title %}Nouveau Badge — NORO BADGE 5.0{% endblock %}
+
+{% block content %}
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
+
+    /* === NORO BADGE 5.0 DESIGN SYSTEM === */
+    .nb5-wrapper {
+        background: #0f1117;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #2c3048;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    /* Header bar */
+    .nb5-header {
+        background: #0a0c11;
+        border-bottom: 2px solid #059669;
+        padding: 14px 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .nb5-header .logo {
+        font-family: 'Oswald', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 4px;
+        border: 2px solid #fff;
+        padding: 3px 12px;
+        border-radius: 4px;
+    }
+    .nb5-header .title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 16px;
+        color: #fff;
+        letter-spacing: 3px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .nb5-header .nav-btns {
+        display: flex;
+        gap: 8px;
+    }
+    .nb5-back-btn {
+        background: #1e2130;
+        border: 1px solid #2c3048;
+        color: #e6e8f2;
+        font-family: 'Oswald', sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        text-decoration: none;
+        transition: all .2s;
+    }
+    .nb5-back-btn:hover {
+        background: #2c3048;
+        color: #fff;
+    }
+
+    /* Layout */
+    .nb5-body {
+        display: flex;
+        gap: 0;
+        min-height: 75vh;
+    }
+
+    /* Left panel (form) */
+    .nb5-panel {
+        background: #181b24;
+        border-right: 1px solid #2c3048;
+        padding: 0;
+        width: 460px;
+        flex-shrink: 0;
+    }
+    .nb5-panel-header {
+        background: #0a0c11;
+        padding: 12px 20px;
+        border-bottom: 1px solid #2c3048;
+    }
+    .nb5-panel-header .sec-title {
+        color: #3b82f6;
+        font-family: 'Oswald', sans-serif;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+    .nb5-panel-header .sub {
+        font-size: 11px;
+        color: #5a6080;
+        margin-top: 2px;
+    }
+    .nb5-form-body {
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    /* Sections */
+    .nb5-sec {
+        margin-bottom: 20px;
+    }
+    .nb5-sec-title {
+        font-family: 'Oswald', sans-serif;
+        font-size: 11px;
+        letter-spacing: 3px;
+        color: #10b981;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #2c3048;
+    }
+
+    /* Fields */
+    .nb5-field {
+        margin-bottom: 10px;
+    }
+    .nb5-field label {
+        display: block;
+        font-size: 10px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: #5a6080;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+    .nb5-field input,
+    .nb5-field select,
+    .nb5-field textarea {
+        width: 100%;
+        background: #1e2130;
+        border: 1px solid #2c3048;
+        border-radius: 6px;
+        color: #e6e8f2;
+        font-size: 13px;
+        padding: 8px 10px;
+        outline: none;
+        font-family: inherit;
+        transition: border-color .2s;
+    }
+    .nb5-field input:focus,
+    .nb5-field select:focus {
+        border-color: #10b981;
+    }
+    .nb5-field input[type="file"] {
+        padding: 6px;
+        cursor: pointer;
+    }
+    .nb5-r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .nb5-r3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    /* Checkboxes STEP */
+    .nb5-check-row {
+        display: flex;
+        gap: 10px;
+    }
+    .nb5-check-item {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #1e2130;
+        border: 1px solid #2c3048;
+        border-radius: 6px;
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: 'Oswald', sans-serif;
+        letter-spacing: 1px;
+        color: #aab;
+        transition: all .2s;
+    }
+    .nb5-check-item input[type="checkbox"] {
+        accent-color: #10b981;
+        width: 14px;
+        height: 14px;
+    }
+    .nb5-check-item:has(input:checked) {
+        border-color: #10b981;
+        background: #0d1f18;
+        color: #10b981;
+    }
+
+    /* Submit button */
+    .nb5-submit {
+        display: block;
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+        color: #fff;
+        font-family: 'Oswald', sans-serif;
+        font-size: 14px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-weight: 700;
+        transition: all 0.25s ease;
+        margin-top: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    }
+    .nb5-submit:hover {
+        background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    }
+
+    /* Right content */
+    .nb5-content {
+        flex: 1;
+        padding: 25px;
+        background: #0f1117;
+    }
+
+    .nb5-info-card {
+        background: #1a1d29;
+        border: 1px solid #3b82f6;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .nb5-info-card h5 {
+        font-family: 'Oswald', sans-serif;
+        color: #3b82f6;
+        font-size: 16px;
+        margin: 0 0 14px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .nb5-access-list {
+        background: #0a0c11;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .nb5-access-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+    }
+    .nb5-access-item .icon { font-size: 15px; }
+    .nb5-access-item .text-ok  { color: #ccc; }
+    .nb5-access-item .text-no  { color: #888; }
+
+    .nb5-preview {
+        background: #181b24;
+        border: 1px solid #2c3048;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+    }
+    .nb5-preview-title {
+        font-family: 'Oswald', sans-serif;
+        color: #5a6080;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #2c3048;
+        padding-bottom: 10px;
+    }
+    /* Design exact du badge (CR80) */
+    .badge-card { width:60mm; height:86mm; background:#fff; border:1px solid #ccc; position:relative; overflow:hidden; display:inline-block; text-align:left; font-family:'Oswald', sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,0.3); transform: scale(1.1); transform-origin: top center; margin-bottom: 20px; }
+    .b-header { height:15mm; display:flex; align-items:center; padding:0 4mm; justify-content:space-between; color:#fff; background-color:#1f1f21; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 56' fill='none' preserveAspectRatio='none'><path d='M0 0 H200 V40 C140 30, 70 56, 0 42 Z' fill='%231f1f21'/><path d='M0 42 C70 56, 140 30, 200 40' stroke='%23e5e7eb' stroke-width='1.5' fill='none'/><path d='M0 43.5 C70 57.5, 140 31.5, 200 41.5' stroke='%23d1d5db' stroke-width='1' fill='none'/></svg>"); background-size: 100% 100%; background-position: center; position: relative; overflow: hidden; }
+    /* Hide old circular waves */
+    .b-header::after { display: none !important; }
+    .b-header::before { display: none !important; }
+    .b-header img { height: 10mm; z-index: 2; object-fit: contain; }
+    .b-alert { background:#e0f2fe; height:5mm; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #bae6fd; margin:0;}
+    .b-alert-text { color:#ef4444; font-size:7px; font-weight:bold; letter-spacing:1px; }
+    .b-middle { display:flex; padding:3mm; gap:3mm; }
+    .b-photo { width:18mm; height:22mm; background:#eee; border:1px solid #ddd; border-radius:1mm; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+    .b-photo img { width:100%; height:100%; object-fit:cover; }
+    .b-photo span { font-size:8px; color:#999; }
+    .b-qr { width:22mm; height:22mm; background:#fff; border:1px solid #ddd; padding:1mm; display:flex; align-items:center; justify-content:center; }
+    .b-qr img { width:100%; height:100%; opacity: 0.3; }
+    .b-info { padding:0 3mm; line-height:1.2; margin-top:-1mm; }
+    .b-line { font-size:7px; color:#666; margin-bottom:0.5mm; }
+    .b-val { color:#000; font-weight:bold; }
+    .b-steps { position:absolute; bottom:13mm; left:3mm; display:flex; gap:2mm; }
+    .step-wrapper { display:flex; flex-direction:column; align-items:center; gap:0.5px; }
+    .b-step { width:4mm; height:4mm; border:1px solid #000; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#059669; }
+    .step-label { font-size:5px; font-weight:bold; color:#5a6080; }
+    .b-validity { position:absolute; bottom:13mm; right:3mm; background:#475569; color:#fff; padding:1mm 2mm; border-radius:1mm; font-size:8px; font-weight:bold; }
+    .b-footer { position:absolute; bottom:0; left:0; width:100%; height:11mm; overflow:hidden; z-index:5; text-align: center; }
+    .b-footer svg { width:100%; height:100%; position:absolute; bottom:0; left:0; transition: fill 0.3s; z-index:6; }
+    .b-footer-SINYLON FIAT { position: absolute; bottom: 1.2mm; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-size: 7px; padding: 0.5mm 2.5mm; border-radius: 0.5mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .b-footer-sf { position: absolute; bottom: 4.8mm; left: 50%; transform: translateX(-50%); color: #dc2626; font-size: 5.5px; font-weight: bold; z-index: 10; letter-spacing: 0.5px; }
+    .nb5-signature {
+        text-align: center;
+        margin-top: 30px;
+        color: #3d435c;
+        font-size: 11px;
+    }
+    .nb5-signature span { color: #3b82f6; font-weight: bold; letter-spacing: 1px; }
+
+    /* CSS PROVISOIRE STYLE */
+    .badge-provisoire { border: 2px solid #dc2626 !important; }
+    .badge-provisoire .b-header {
+        background-color: #991b1b !important;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 56' fill='none' preserveAspectRatio='none'><path d='M0 0 H200 V40 C140 30, 70 56, 0 42 Z' fill='%23991b1b'/><path d='M0 42 C70 56, 140 30, 200 40' stroke='%23fca5a5' stroke-width='1.5' fill='none'/><path d='M0 43.5 C70 57.5, 140 31.5, 200 41.5' stroke='%23f87171' stroke-width='1' fill='none'/></svg>") !important;
+    }
+    .badge-provisoire .b-header::after { display: none !important; }
+    .badge-provisoire .b-alert { background: #fef2f2; border-bottom-color: #fca5a5; }
+    .badge-provisoire .b-alert-text { color: #dc2626 !important; }
+    .badge-provisoire .b-photo { width: 20mm; height: 24mm; border: 1.5px solid #dc2626; }
+    .badge-provisoire .b-qr { width: 20mm; height: 20mm; border: 1px solid #dc2626; }
+    .badge-provisoire .b-validity { background: #dc2626 !important; }
+    .badge-provisoire .b-footer-SINYLON FIAT { background: #991b1b !important; }
+    .badge-provisoire .b-footer-sf { color: #ffffff !important; }
+    .prov-tag {
+        position: absolute;
+        top: 16mm;
+        right: 2mm;
+        background: #dc2626;
+        color: #fff;
+        font-size: 5px;
+        font-weight: bold;
+        padding: 0.5mm 1.5mm;
+        border-radius: 1mm;
+        letter-spacing: 0.5px;
+        z-index: 20;
+    }
+</style>
+
+<!-- Nav -->
+<div class="d-flex align-items-center gap-2 mb-3">
+    <a href="{{ url_for('dashboard') }}" class="nb5-back-btn">
+        <i class="fas fa-arrow-left me-1"></i> Tableau de Bord
+    </a>
+    <a href="{{ url_for('badge.liste') }}" class="nb5-back-btn">
+        <i class="fas fa-id-card me-1"></i> Liste des Badges
+    </a>
+</div>
+
+<div class="nb5-wrapper">
+
+    <!-- Header -->
+    <div class="nb5-header">
+        <div class="logo">FIAT</div>
+        <div class="title" style="display: inline-flex; align-items: center; gap: 8px;">
+            <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 24px; width: auto; vertical-align: middle;">
+            <span>NORO BADGE 5.0 — NOUVELLE DEMANDE</span>
+        </div>
+        <div style="font-size:11px; color:#5a6080; font-family:'Oswald',sans-serif; letter-spacing:2px;">
+            {{ current_user.full_name() }}
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="nb5-body">
+
+        <!-- ===== FORMULAIRE (Gauche) ===== -->
+        <div class="nb5-panel">
+            <div class="nb5-panel-header">
+                <div class="sec-title">🏢 Demande de Badge Entreprise</div>
+                <div class="sub">Remplir tous les champs obligatoires (*)</div>
+            </div>
+
+            <div class="nb5-form-body">
+                <form method="POST" enctype="multipart/form-data" id="badgeForm">
+
+                    <!-- Scanner intelligent Noro AI -->
+                    <div class="nb5-sec" style="background: rgba(59, 130, 246, 0.05); border: 2px dashed #3b82f6; border-radius: 10px; padding: 15px; margin-bottom: 20px; cursor: pointer; text-align: center;" id="ai-scan-zone">
+                        <div style="font-family: 'Oswald', sans-serif; font-size: 13px; color: #3b82f6; font-weight: bold; margin-bottom: 5px;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> REMPLIR VIA NORO AI
+                        </div>
+                        <div style="font-size: 11px; color: #8a94a6; line-height: 1.4;">
+                            Déposez la CNI, le Passeport ou la carte CNAS du travailleur ici pour pré-remplir le formulaire.
+                        </div>
+                        <input type="file" id="ai-file-input" accept="image/*,application/pdf" style="display: none;">
+                    </div>
+
+                    <!-- Section Emploi -->
+                    <div class="nb5-sec">
+                        <div class="nb5-sec-title">🏢 Emploi & Société</div>
+                        <div class="nb5-field">
+                            <label>Société (Nom affiché sur le badge) *</label>
+                            <input type="text" name="societe" placeholder="ex: AMCE CONSTRUCTION" required>
+                        </div>
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>Fonction / Poste *</label>
+                                <input type="text" name="poste" placeholder="ex: Chef de Chantier" required>
+                            </div>
+                            <div class="nb5-field">
+                                <label>Département</label>
+                                <input type="text" name="departement" placeholder="ex: Génie Civil">
+                            </div>
+                        </div>
+                        <div class="nb5-field">
+                            <label>Numéro de Badge *</label>
+                            <input type="text" name="numero_badge" placeholder="NORO-XXXX" required>
+                        </div>
+                        <div class="nb5-field">
+                            <label>NFC UID (Carte physique)</label>
+                            <input type="text" name="nfc_uid" placeholder="Ex: 048FA23E">
+                        </div>
+                    </div>
+
+                    <!-- Section Identité -->
+                    <div class="nb5-sec">
+                        <div class="nb5-sec-title">👤 Identité & RH</div>
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>Nom *</label>
+                                <input type="text" name="nom" placeholder="NOM" required>
+                            </div>
+                            <div class="nb5-field">
+                                <label>Prénom *</label>
+                                <input type="text" name="prenom" placeholder="Prénom" required>
+                            </div>
+                        </div>
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>Date de Naissance</label>
+                                <input type="date" name="date_naissance">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Groupe Sanguin</label>
+                                <select name="groupe_sanguin">
+                                    <option value="">--</option>
+                                    <option>O+</option><option>O-</option>
+                                    <option>A+</option><option>A-</option>
+                                    <option>B+</option><option>B-</option>
+                                    <option>AB+</option><option>AB-</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>N° CNAS</label>
+                                <input type="text" name="cnas" placeholder="Numéro CNAS">
+                            </div>
+                            <div class="nb5-field">
+                                <label>ID / Passeport</label>
+                                <input type="text" name="carte_id" placeholder="N° Carte Nationale">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Accès STEP -->
+                    <div class="nb5-sec">
+                        <div class="nb5-sec-title">🔐 Zones d'Accès</div>
+                        <div class="nb5-check-row">
+                            <label class="nb5-check-item">
+                                <input type="checkbox" name="step1" value="1"> STEP 1
+                            </label>
+                            <label class="nb5-check-item">
+                                <input type="checkbox" name="step2" value="1"> STEP 2
+                            </label>
+                            <label class="nb5-check-item">
+                                <input type="checkbox" name="step3" value="1"> STEP 3
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Section Habilitations Spéciales -->
+                    <div class="nb5-sec">
+                        <div class="nb5-sec-title">⚡ Habilitations Spéciales</div>
+                        <div class="nb5-check-row" style="flex-wrap: wrap; gap: 8px;">
+                            <label class="nb5-check-item" style="border-color:#3b82f6;">
+                                <input type="checkbox" name="habilitation_hauteur" id="f_hab_hauteur" value="1"> HAUTEUR
+                            </label>
+                            <label class="nb5-check-item" style="border-color:#f59e0b;">
+                                <input type="checkbox" name="habilitation_soudure" id="f_hab_soudure" value="1"> SOUDURE
+                            </label>
+                            <label class="nb5-check-item" style="border-color:#10b981;">
+                                <input type="checkbox" name="habilitation_electricite" id="f_hab_electricite" value="1"> ÉLECTRIQUE (BT/HT)
+                            </label>
+                            <label class="nb5-check-item" style="border-color:#8b5cf6;">
+                                <input type="checkbox" name="habilitation_confine" id="f_hab_confine" value="1"> CONFINÉ
+                            </label>
+                            <label class="nb5-check-item" style="border-color:#ec4899;">
+                                <input type="checkbox" name="habilitation_engins" id="f_hab_engins" value="1"> ENGINS
+                            </label>
+                            <label class="nb5-check-item" style="border-color:#f43f5e;">
+                                <input type="checkbox" name="habilitation_chimique" id="f_hab_chimique" value="1"> CHIMIQUE
+                            </label>
+                            <label class="nb5-check-item" style="border-color:#06b6d4;">
+                                <input type="checkbox" name="habilitation_sst" id="f_hab_sst" value="1"> SST (Secouriste)
+                            </label>
+                            <label class="nb5-check-item" style="border-color:#ef4444;">
+                                <input type="checkbox" name="habilitation_safety" id="f_hab_safety" value="1"> SAFETY INDICATION
+                            </label>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                            <div class="nb5-field">
+                                <label>Expiration Hauteur</label>
+                                <input type="date" name="habilitation_hauteur_expiration">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Expiration Soudure</label>
+                                <input type="date" name="habilitation_soudure_expiration">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Expiration Électrique</label>
+                                <input type="date" name="habilitation_electricite_expiration">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Expiration Confiné</label>
+                                <input type="date" name="habilitation_confine_expiration">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Expiration Engins</label>
+                                <input type="date" name="habilitation_engins_expiration">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Expiration Chimique</label>
+                                <input type="date" name="habilitation_chimique_expiration">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Expiration SST</label>
+                                <input type="date" name="habilitation_sst_expiration">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Expiration Safety Indication</label>
+                                <input type="date" name="habilitation_safety_expiration">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Visite Médicale -->
+                    <div class="nb5-sec">
+                        <div class="nb5-sec-title">🩺 Visite Médicale</div>
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>Date de la Visite</label>
+                                <input type="date" name="visite_medicale_date">
+                            </div>
+                            <div class="nb5-field">
+                                <label>Date d'Expiration Visite</label>
+                                <input type="date" name="visite_medicale_expiration">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Photo & Validité -->
+                    <div class="nb5-sec">
+                        <div class="nb5-sec-title">🔑 Photo & Validité</div>
+                        <div class="nb5-r2">
+                            <div class="nb5-field">
+                                <label>Date d'Émission *</label>
+                                <input type="date" name="date_emission" required>
+                            </div>
+                            <div class="nb5-field">
+                                <label>Date d'Expiration *</label>
+                                <input type="date" name="date_expiration" value="2026-12-31" required>
+                            </div>
+                        </div>
+                        <div class="nb5-field">
+                            <label>Photo (Obligatoire)</label>
+                            <input type="file" name="photo" accept="image/*">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="nb5-submit">
+                        <i class="fas fa-paper-plane me-2"></i> ENVOYER LE BADGE À L'ADMIN
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== PANNEAU DROIT ===== -->
+        <div class="nb5-content">
+
+            <!-- Règles d'accès -->
+            <div class="nb5-info-card">
+                <h5>🏢 Espace Sous-Traitant</h5>
+                <div class="nb5-access-list">
+                    <div class="nb5-access-item">
+                        <span class="icon">✅</span>
+                        <span class="text-ok">Remplir une nouvelle demande de badge</span>
+                    </div>
+                    <div class="nb5-access-item">
+                        <span class="icon">✅</span>
+                        <span class="text-ok">Corriger / Modifier un badge existant</span>
+                    </div>
+                    <div class="nb5-access-item">
+                        <span class="icon">🚫</span>
+                        <span class="text-no">Impression (réservé à l'Administration)</span>
+                    </div>
+                    <div class="nb5-access-item">
+                        <span class="icon">🚫</span>
+                        <span class="text-no">Export / Sauvegarde (réservé à l'Administration)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aperçu badge -->
+            <div class="nb5-preview">
+                <div class="nb5-preview-title">🪪 Aperçu du Badge</div>
+                
+                <div class="badge-card" id="prev-mockup" style="margin-top:20px;">
+                    <div class="b-header" id="prev-header">
+                        <img src="/static/img/fiat_logo.png" alt="FIAT">
+                        <img src="/static/img/amce_logo.png" alt="AMCE">
+                    </div>
+                    <div class="b-alert"><span class="b-alert-text">SAFETY FIRST</span></div>
+                    <div class="prov-tag" id="prev-prov-tag" style="display: none;">PROVISOIRE</div>
+                    
+                    <div class="b-middle">
+                        <div class="b-photo" id="prev-avatar">
+                            <span>PHOTO</span>
+                        </div>
+                        <div class="b-qr">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Preview" alt="QR" id="prev-qr-img">
+                        </div>
+                    </div>
+
+                    <div class="b-info" style="text-align: left;">
+                        <div class="b-line">Nom : <span class="b-val" id="prev-nom">...</span></div>
+                        <div class="b-line">Prénom : <span class="b-val" id="prev-prenom">...</span></div>
+                        <div class="b-line">Société : <span class="b-val" id="prev-societe">...</span></div>
+                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;" id="prev-projet">SINYLON FIAT Projet FIAT</span></div>
+                        <div class="b-line">ID Badge : <span class="b-val" id="prev-num">...</span></div>
+                    </div>
+
+                    <div class="b-steps">
+                        <div class="step-wrapper"><div class="b-step" id="prev-s1"></div><div class="step-label">1</div></div>
+                        <div class="step-wrapper"><div class="b-step" id="prev-s2"></div><div class="step-label">2</div></div>
+                        <div class="step-wrapper"><div class="b-step" id="prev-s3"></div><div class="step-label">3</div></div>
+                    </div>
+                    
+                    <div style="position:absolute; bottom:18mm; left:3mm; display:flex; gap:1mm; z-index:10;">
+                        <span id="prev-badge-hauteur" style="display:none; background:#3b82f6; color:#fff; font-size:6px; padding:2px 4px; border-radius:3px; font-weight:bold; letter-spacing:0.5px;">HAUTEUR</span>
+                        <span id="prev-badge-soudure" style="display:none; background:#f59e0b; color:#fff; font-size:6px; padding:2px 4px; border-radius:3px; font-weight:bold; letter-spacing:0.5px;">SOUDURE</span>
+                        <span id="prev-badge-safety" style="display:none; background:#ef4444; color:#fff; font-size:6px; padding:2px 4px; border-radius:3px; font-weight:bold; letter-spacing:0.5px;">SAFETY</span>
+                    </div>
+                    <div class="b-validity" id="prev-valid"></div>
+
+                    <div class="b-footer">
+                        <svg viewBox="0 0 200 50" preserveAspectRatio="none">
+                            <path id="prev-wave" d="M0 50 L0 20 C60 40, 140 40, 200 20 L200 50 Z" fill="#1f1f21"></path>
+                            <path d="M0 20 C60 40, 140 40, 200 20" stroke="#e5e7eb" stroke-width="1.5" fill="none"></path>
+                            <path d="M0 18.5 C60 38.5, 140 38.5, 200 18.5" stroke="#d1d5db" stroke-width="1" fill="none"></path>
+                        </svg>
+                        <div class="b-footer-SINYLON FIAT">SINYLON FIAT</div>
+                        <div class="b-footer-sf">SAFETY FIRST</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nb5-signature" style="color: #64748b; font-size: 10px; opacity: 0.85;">
+                <div style="color: #64748b; font-size: 11px; margin-top: 5px;">système de sécurité © 2026</div>
+            </div>
+        </div>
+
+    </div><!-- end nb5-body -->
+</div><!-- end nb5-wrapper -->
+
+<script>
+    function updatePreviewData() {
+        document.getElementById('prev-nom').textContent = document.querySelector('[name="nom"]').value.toUpperCase();
+        document.getElementById('prev-prenom').textContent = document.querySelector('[name="prenom"]').value;
+        document.getElementById('prev-societe').textContent = document.querySelector('[name="societe"]').value;
+        
+        const badgeInput = document.querySelector('[name="numero_badge"]');
+        const badgeNum = (badgeInput ? badgeInput.value : '').toUpperCase();
+        const isProvisional = badgeNum.startsWith("PROV");
+        
+        document.getElementById('prev-num').textContent = "N." + (document.querySelector('[name="carte_id"]').value || badgeNum || '...');
+        
+        const mockup = document.getElementById('prev-mockup');
+        const provTag = document.getElementById('prev-prov-tag');
+        const alertText = mockup.querySelector('.b-alert-text');
+        
+        if (isProvisional) {
+            mockup.classList.add('badge-provisoire');
+            if (provTag) provTag.style.display = 'block';
+            if (alertText) alertText.textContent = '⚠️ BADGE PROVISOIRE · 10 JOURS';
+        } else {
+            mockup.classList.remove('badge-provisoire');
+            if (provTag) provTag.style.display = 'none';
+            if (alertText) alertText.textContent = 'SAFETY FIRST';
+        }
+        
+        const d = document.querySelector('[name="date_expiration"]').value;
+        if(d) {
+            const parts = d.split('-');
+            document.getElementById('prev-valid').textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        
+        document.getElementById('prev-s1').textContent = document.querySelector('[name="step1"]').checked ? '✓' : '';
+        document.getElementById('prev-s2').textContent = document.querySelector('[name="step2"]').checked ? '✓' : '';
+        document.getElementById('prev-s3').textContent = document.querySelector('[name="step3"]').checked ? '✓' : '';
+        
+        document.getElementById('prev-badge-hauteur').style.display = document.getElementById('f_hab_hauteur').checked ? 'inline-block' : 'none';
+        document.getElementById('prev-badge-soudure').style.display = document.getElementById('f_hab_soudure').checked ? 'inline-block' : 'none';
+        document.getElementById('prev-badge-safety').style.display = document.getElementById('f_hab_safety').checked ? 'inline-block' : 'none';
+        
+        // update qr
+        const qrData = `NOM:${document.querySelector('[name="nom"]').value}`;
+        document.getElementById('prev-qr-img').style.opacity = '1';
+        document.getElementById('prev-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
+    }
+
+    ['nom', 'prenom', 'societe', 'carte_id', 'numero_badge', 'date_expiration'].forEach(name => {
+        document.querySelector(`[name="${name}"]`)?.addEventListener('input', updatePreviewData);
+        document.querySelector(`[name="${name}"]`)?.addEventListener('change', updatePreviewData);
+    });
+
+    ['step1', 'step2', 'step3', 'habilitation_hauteur', 'habilitation_soudure', 'habilitation_safety'].forEach(name => {
+        document.querySelector(`[name="${name}"]`)?.addEventListener('change', updatePreviewData);
+    });
+
+    document.querySelector('input[name="photo"]').addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('prev-avatar').innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // Set today's date as default emission
+    document.querySelector('[name="date_emission"]').valueAsDate = new Date();
+
+    // === Noro AI Badge Auto-fill ===
+    const aiScanZone = document.getElementById('ai-scan-zone');
+    const aiFileInput = document.getElementById('ai-file-input');
+
+    if (aiScanZone && aiFileInput) {
+        aiScanZone.addEventListener('click', () => aiFileInput.click());
+
+        aiScanZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            aiScanZone.style.background = 'rgba(59, 130, 246, 0.15)';
+            aiScanZone.style.borderColor = '#2563eb';
+        });
+
+        aiScanZone.addEventListener('dragleave', () => {
+            aiScanZone.style.background = 'rgba(59, 130, 246, 0.05)';
+            aiScanZone.style.borderColor = '#3b82f6';
+        });
+
+        aiScanZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            aiScanZone.style.background = 'rgba(59, 130, 246, 0.05)';
+            aiScanZone.style.borderColor = '#3b82f6';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleAiBadgeAnalysis(files[0]);
+            }
+        });
+
+        aiFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleAiBadgeAnalysis(e.target.files[0]);
+            }
+        });
+    }
+
+    async function handleAiBadgeAnalysis(file) {
+        let key = localStorage.getItem('gemini_api_key') || '';
+        if (!key) {
+            key = prompt("Veuillez saisir votre clé API Gemini pour utiliser le remplissage intelligent Noro AI :");
+            if (!key) return;
+            localStorage.setItem('gemini_api_key', key);
+        }
+
+        const scanTextEl = aiScanZone.querySelector('div:nth-child(2)');
+        const originalText = scanTextEl.textContent;
+        scanTextEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours par Noro AI...';
+        aiScanZone.style.opacity = '0.7';
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const base64Data = reader.result.split(',')[1];
+            const mimeType = file.type || "image/png";
+            
+            const promptText = `Tu es l'agent HSE du système SINYLON FIAT FIAT. Analyse cette image ou document de travailleur (carte d'identité, passeport, CNAS, attestation) et extrais-en les informations correspondantes pour notre formulaire de badge.
+            Retourne un objet JSON valide avec les clés suivantes si tu trouves des informations correspondantes :
+            - "nom" (nom de famille, en majuscules)
+            - "prenom" (prénom)
+            - "societe" (nom de la société intervenante)
+            - "poste" (fonction ou poste de travail)
+            - "cnas" (numéro de sécurité sociale CNAS si présent)
+            - "carte_id" (numéro de pièce d'identité ou passeport)
+            - "telephone" (numéro de téléphone)
+            - "date_naissance" (date de naissance au format YYYY-MM-DD)
+            - "groupe_sanguin" (groupe sanguin sous la forme O+, O-, A+, A-, B+, B-, AB+, AB-)
+            
+            Ne renvoie que le JSON valide sans aucun formatage markdown ou bloc de code (pas de \`\`\`json).`;
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: promptText },
+                                { inlineData: { mimeType: mimeType, data: base64Data } }
+                            ]
+                        }]
+                    })
+                });
+
+                if (!response.ok) throw new Error("Erreur API Gemini : " + response.statusText);
+
+                const resData = await response.json();
+                let resultText = resData.candidates[0].content.parts[0].text;
+                resultText = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const updates = JSON.parse(resultText);
+
+                // Auto-fill form fields
+                for (const [k, v] of Object.entries(updates)) {
+                    const input = document.querySelector(`[name="${k}"]`);
+                    if (input && v) {
+                        input.value = v;
+                        input.style.borderColor = '#10b981';
+                        input.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.2)';
+                        setTimeout(() => {
+                            input.style.borderColor = '';
+                            input.style.boxShadow = '';
+                        }, 3000);
+                    }
+                }
+
+                // If photo is uploaded, also set it as the preview avatar if it's an image
+                if (file.type.startsWith('image/')) {
+                    document.getElementById('prev-avatar').innerHTML = `<img src="${reader.result}" style="width:100%;height:100%;object-fit:cover;">`;
+                    // Copy file to form photo input
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.querySelector('input[name="photo"]').files = dataTransfer.files;
+                }
+
+                updatePreviewData();
+                scanTextEl.innerHTML = '<span style="color: #10b981;"><i class="fas fa-check-circle"></i> Badge pré-rempli avec succès !</span>';
+            } catch (e) {
+                console.error(e);
+                scanTextEl.innerHTML = '<span style="color: #ef4444;"><i class="fas fa-exclamation-circle"></i> Échec du décodage par l\'IA.</span>';
+            } finally {
+                aiScanZone.style.opacity = '1';
+                setTimeout(() => {
+                    scanTextEl.textContent = originalText;
+                }, 4000);
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Initialize preview data on page load
+    updatePreviewData();
+</script>
+
+{% endblock %}

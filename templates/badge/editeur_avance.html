@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noro Badge 3.1 — Système de Badge Professionnel</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0f1117;color:#e6e8f2;min-height:100vh}
+.header{background:#0a0c11;border-bottom:2px solid #059669;padding:14px 30px;display:flex;align-items:center;gap:15px}
+.header .logo{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:4px;border:2px solid #fff;padding:4px 12px;border-radius:4px}
+.header .title{font-family:'Oswald',sans-serif;font-size:14px;color:#5a6080;letter-spacing:3px}
+.header .pill{margin-left:auto;background:linear-gradient(135deg, #059669 0%, #10b981 100%);color:#fff;font-family:'Oswald',sans-serif;font-size:13px;padding:5px 16px;border-radius:20px;font-weight:700}
+.main{display:flex;gap:0;height:calc(100vh - 60px)}
+.panel{background:#181b24;border-right:1px solid #2c3048;padding:20px;width:420px;overflow-y:auto;flex-shrink:0}
+.content{flex:1;padding:25px;overflow-y:auto}
+.sec{margin-bottom:18px}
+.sec-title{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:3px;color:#1d664f;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #2c3048}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;font-weight:bold;letter-spacing:1px;color:#5a6080;margin-bottom:4px;text-transform:uppercase}
+.field input,.field select{width:100%;background:#1e2130;border:1px solid #2c3048;border-radius:6px;color:#e6e8f2;font-size:13px;padding:8px 10px;outline:none}
+.field input:focus,.field select:focus{border-color:#1d664f}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.btn{display:block;width:100%;padding:12px;border:none;border-radius:8px;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;text-transform:uppercase;font-weight:700;transition:all .25s ease;box-shadow: 0 4px 6px rgba(0,0,0,0.15)}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.25); }
+.btn-create{background:linear-gradient(135deg, #059669 0%, #10b981 100%);color:#fff}.btn-create:hover{background:linear-gradient(135deg, #047857 0%, #34d399 100%)}
+.btn-pdf{background:linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);color:#fff;text-decoration:none;text-align:center}.btn-pdf:hover{background:linear-gradient(135deg, #1e40af 0%, #2563eb 100%)}
+.btn-small{padding:6px 12px;font-size:11px}
+.badge-grid{display:block;clear:both;margin-top:20px}
+.badge-card{background:#181b24;border:1px solid #2c3048;border-radius:12px;overflow:hidden;width:280px;float:left;margin:0 15px 15px 0}
+.badge-card-header{padding:10px 14px;display:flex;align-items:center;gap:10px}
+.badge-card-header .dot{width:12px;height:12px;border-radius:50%;}
+.badge-card-header .name{font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;color:#fff}
+.badge-card-images{display:flex;gap:4px;padding:0 10px 10px}
+.badge-card-images img{width:130px;border-radius:6px;border:1px solid #2c3048}
+.badge-card-actions{display:flex;gap:6px;padding:0 10px 12px}
+.badge-card-actions a{flex:1;text-align:center;padding:7px;border-radius:5px;font-size:11px;text-decoration:none;font-weight:bold}
+.act-view{background:#1e2130;color:#10b981;border:1px solid #2c3048;transition: all 0.2s ease;}
+.act-view:hover{background:#13151f;color:#34d399;}
+.act-del{background:#2a1515;color:#f43f5e;border:1px solid #3a2020;transition: all 0.2s ease;}
+.act-del:hover{background:#3a1010;color:#ff4d6d;}
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;background:#181b24;padding:4px;border-radius:10px;border:1px solid #2c3048}
+.tab-btn{flex:1;padding:10px;text-align:center;background:none;border:none;color:#5a6080;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;cursor:pointer;border-radius:8px;transition: all 0.2s ease;}
+.tab-btn:hover{color:#e6e8f2;}
+.tab-btn.active{background:linear-gradient(135deg, #059669 0%, #10b981 100%);color:#fff;font-weight:700}
+.tab-content{display:none}.tab-content.active{display:block}
+.zone-check{display:flex;align-items:center;gap:6px;background:#1e2130;border:1px solid #2c3048;border-radius:6px;padding:8px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <a href="{{ url_for('dashboard') }}" style="text-decoration:none; background:#eab308; color:#000; padding:5px 15px; border-radius:5px; font-weight:bold; font-size:12px; margin-right:15px">⬅ RETOUR</a>
+    <div class="logo">FIAT</div>
+    <div style="width:1px;height:28px;background:#2c3048"></div>
+    <div class="title">NORO BADGE 3.1</div>
+    <div class="pill">{{ badges|length }} BADGE(S)</div>
+</div>
+
+<div class="main">
+    <div class="panel">
+        <form action="/create" method="POST">
+            <div class="sec">
+                <div class="sec-title">🏢 Emploi</div>
+                <div class="field">
+                    <label>Société / Entreprise (Lot)</label>
+                    <select name="entreprise">
+                        {% for e in entreprises %}
+                        <option value="{{ e.id }}">{{ e.nom }} ({{ e.code }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field"><label>Nom de la Société (Affiché)</label><input name="societe" placeholder="ex: AMCE EL DJAZAIR"></div>
+                <div class="r2">
+                    <div class="field"><label>Projet</label><input name="projet" value="SINYLON FIAT"></div>
+                    <div class="field"><label>Année</label><input name="annee" value="2026"></div>
+                </div>
+            </div>
+
+            <div class="sec">
+                <div class="sec-title">👤 Identité & RH</div>
+                <div class="r2">
+                    <div class="field"><label>Nom</label><input name="nom" required></div>
+                    <div class="field"><label>Prénom</label><input name="prenom" required></div>
+                </div>
+                <div class="r2">
+                    <div class="field"><label>Date Naissance</label><input type="date" name="date_naissance"></div>
+                    <div class="field"><label>Gr. Sanguin</label>
+                        <select name="groupe_sanguin">
+                            <option value="">--</option>
+                            <option>O+</option><option>O-</option><option>A+</option><option>A-</option>
+                            <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="r2">
+                    <div class="field"><label>N° CNAS</label><input name="cnas" placeholder="N° Sécu"></div>
+                    <div class="field"><label>ID / Passeport</label><input name="carte_id"></div>
+                </div>
+                <div class="r2">
+                    <div class="field"><label>Fonction</label><input name="fonction" required></div>
+                    <div class="field"><label>Département</label><input name="departement"></div>
+                </div>
+                <div class="r2">
+                    <div class="field"><label>Tél Personnel</label><input name="telephone"></div>
+                    <div class="field"><label>Tél Urgence Perso</label><input name="urgence_tel"></div>
+                </div>
+            </div>
+
+            <div class="sec">
+                <div class="sec-title">🔑 Accès & Validité</div>
+                <div style="display:flex;gap:10px;margin-bottom:10px">
+                    <label class="zone-check"><input type="checkbox" name="zone1" checked><span>STEP 1</span></label>
+                    <label class="zone-check"><input type="checkbox" name="zone2" checked><span>STEP 2</span></label>
+                    <label class="zone-check"><input type="checkbox" name="zone3"><span>STEP 3</span></label>
+                </div>
+                <div class="field"><label>Date de Validité</label><input name="validite" value="31/12/2026"></div>
+                <div class="field">
+                    <label>Photo</label>
+                    <div style="display:flex;gap:5px">
+                        <input type="text" id="photoPathDisplay" placeholder="Aucune photo..." readonly style="flex:1">
+                        <input type="hidden" name="photo_path" id="photoPathInput">
+                        <button type="button" onclick="pickPhoto()" style="white-space:nowrap;padding:8px 14px;background:#2c3048;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:bold">PARCOURIR</button>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-create">＋ CREER LE BADGE</button>
+        </form>
+    </div>
+
+    <div class="content">
+        <div class="tab-bar" style="display:flex;align-items:center;gap:10px">
+            <button class="tab-btn active" onclick="showTab('badges')">🪪 BADGES</button>
+            <button class="tab-btn" onclick="showTab('entreprises')">🏢 ENTREPRISES</button>
+            <button class="tab-btn" onclick="showTab('ai')">🤖 ASSISTANT IA</button>
+            <button class="tab-btn" onclick="showTab('settings')">⚙️ PARAMETRES</button>
+            <input type="text" id="searchInput" placeholder="🔍 Rechercher..." style="flex:1; padding:8px 15px; border-radius:20px; border:1px solid #3d435c; background:#0f1117; color:#fff; font-size:13px; margin-left:10px">
+        </div>
+
+        <div class="tab-content active" id="tab-badges">
+            {% if request.args.get('cleaned') %}
+            <div style="background:#065f46; color:#fff; padding:12px; border-radius:8px; margin-bottom:20px; font-weight:bold; display:flex; align-items:center; gap:10px">
+                <span>✅</span> Stockage nettoyé : {{ request.args.get('cleaned') }} fichiers orphelins supprimés.
+            </div>
+            {% endif %}
+
+            <div style="margin-bottom:20px;background:#181b24;padding:30px;border-radius:12px;border:1px solid #2c3048;text-align:center">
+                <h1 style="font-family: 'Oswald'; font-size: 42px; margin-bottom: 5px; letter-spacing: 2px;">SYSTÈME DE BADGE <span style="color: #1d664f;">PROFESSIONNEL</span></h1>
+                <p style="color: #94a3b8; font-size: 14px; letter-spacing: 1px;">Version 3.1 — <span style="color: #1d664f; font-weight: bold;">Système SINYLON FIAT</span></p>
+            </div>
+
+            <!-- DASHBOARD / TABLEAU DE BORD -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 15px; border-radius: 10px; border: 1px solid #334155; text-align: center;">
+                    <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">📁 TOTAL BADGES</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #1d664f;">{{ stats.total_badges }}</div>
+                </div>
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 15px; border-radius: 10px; border: 1px solid #334155; text-align: center;">
+                    <div style="font-size: 10px; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">🏢 ENTREPRISES</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">{{ stats.total_ents }}</div>
+                </div>
+            </div>
+
+            <!-- CONTROLES D'EXPORT -->
+            <div style="background:#1e293b; padding:15px; border-radius:10px; margin-bottom:20px; border:1px solid #334155">
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px">
+                    <span style="font-size:12px; color:#94a3b8; flex:1">BATCH (TOUS) :</span>
+                    <a href="/export_pdf" class="btn act-view" style="padding:8px 15px; background:#3b82f6; width:150px; text-decoration:none">💾 ENREGISTRER</a>
+                    <a href="/export_pdf" class="btn act-edit" style="padding:8px 15px; background:#eab308; width:150px; text-decoration:none; border-color:#eab308; color:#000">🖨️ IMPRIMER</a>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center">
+                    <span style="font-size:12px; color:#94a3b8; flex:1">FILTRER / LOT :</span>
+                    <select id="filterEnt" onchange="filterBadges()" style="padding:8px; border-radius:5px; background:#0f172a; color:#fff; border:1px solid #475569; width:150px">
+                        <option value="all">TOUTES</option>
+                        {% for e in entreprises %}
+                        <option value="{{ e.id }}">{{ e.nom }}</option>
+                        {% endfor %}
+                    </select>
+                    <button onclick="exportFiltered()" class="btn act-edit" style="padding:8px 15px; background:#1d664f; width:150px; font-weight:bold">📑 LOT PDF</button>
+                </div>
+            </div>
+
+
+            <div class="badge-grid" id="badgeGrid">
+                {% for b in badges %}
+                <div class="badge-card" data-ent="{{ b.entreprise_id }}">
+                    <div class="badge-card-header">
+                        <div class="dot" style="background:{{ b.entreprise_couleur }}"></div>
+                        <div>
+                            <div class="name">{{ b.nom }} {{ b.prenom }}</div>
+                            <div style="font-size:11px;color:#5a6080">{{ b.entreprise_nom }} · N.{{ '%03d'|format(b.id) }}</div>
+                        </div>
+                    </div>
+                    <div class="badge-card-images">
+                        <img src="{{ b.recto_url }}" onerror="this.style.display='none'">
+                        <img src="{{ b.verso_url }}" onerror="this.style.display='none'">
+                    </div>
+                    <div class="badge-card-actions">
+                        <a href="/edit/{{ b.id }}" class="act-view" style="color:#ff8c00;border-color:#ff8c00">MODIFIER</a>
+                        <a href="/badge/{{ b.id }}" class="act-view" target="_blank">SCAN INFO</a>
+                        <a href="/delete/{{ b.id }}" class="act-del" onclick="return confirm('Sûr ?')">SUPPRIMER</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-entreprises">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3>Liste des Entreprises</h3>
+            </div>
+            <div class="badge-grid">
+                {% for e in entreprises %}
+                <div class="badge-card" style="width:100%;max-width:300px;padding:15px">
+                    <div style="display:flex;gap:15px;align-items:center;margin-bottom:15px">
+                        <div style="width:40px;height:40px;border-radius:50%;background:{{e.couleur}};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:18px">{{e.code}}</div>
+                        <div style="font-family:'Oswald';font-size:18px">{{e.nom}}</div>
+                    </div>
+                    <div class="field"><label>Modifier Nom</label><input id="nom_{{e.id}}" value="{{e.nom}}"></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+                        <div class="field">
+                            <label>Accent</label>
+                            <input type="color" id="col_{{e.id}}" value="{{e.couleur}}" oninput="this.style.backgroundColor=this.value" style="padding:0 10px;height:40px;background:{{e.couleur}};color:#000;font-weight:bold">
+                            <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px">
+                                <div onclick="setCol('col_{{e.id}}', '#1d664f')" title="Vert" style="width:18px;height:18px;background:#1d664f;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#3b82f6')" title="Bleu" style="width:18px;height:18px;background:#3b82f6;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#ef4444')" title="Rouge" style="width:18px;height:18px;background:#ef4444;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#f59e0b')" title="Orange" style="width:18px;height:18px;background:#f59e0b;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#8b5cf6')" title="Violet" style="width:18px;height:18px;background:#8b5cf6;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#ec4899')" title="Rose" style="width:18px;height:18px;background:#ec4899;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#06b6d4')" title="Cyan" style="width:18px;height:18px;background:#06b6d4;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#84cc16')" title="Lime" style="width:18px;height:18px;background:#84cc16;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#f97316')" title="Orange foncé" style="width:18px;height:18px;background:#f97316;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#14b8a6')" title="Teal" style="width:18px;height:18px;background:#14b8a6;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#6366f1')" title="Indigo" style="width:18px;height:18px;background:#6366f1;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#d946ef')" title="Fuchsia" style="width:18px;height:18px;background:#d946ef;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#0ea5e9')" title="Bleu ciel" style="width:18px;height:18px;background:#0ea5e9;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#a3e635')" title="Jaune-vert" style="width:18px;height:18px;background:#a3e635;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#fb923c')" title="Pêche" style="width:18px;height:18px;background:#fb923c;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#e11d48')" title="Cramoisi" style="width:18px;height:18px;background:#e11d48;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#7c3aed')" title="Pourpre" style="width:18px;height:18px;background:#7c3aed;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#0284c7')" title="Bleu marine" style="width:18px;height:18px;background:#0284c7;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#16a34a')" title="Vert foncé" style="width:18px;height:18px;background:#16a34a;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('col_{{e.id}}', '#ffffff')" title="Blanc" style="width:18px;height:18px;background:#ffffff;cursor:pointer;border-radius:3px;border:1px solid #ddd"></div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Fond</label>
+                            <input type="color" id="bg_{{e.id}}" value="{{e.couleur_fond or '#111828'}}" oninput="this.style.backgroundColor=this.value" style="padding:0 10px;height:40px;background:{{e.couleur_fond or '#111828'}};color:#fff">
+                            <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px">
+                                <div onclick="setCol('bg_{{e.id}}', '#111828')" title="Bleu nuit" style="width:18px;height:18px;background:#111828;cursor:pointer;border-radius:3px;border:1px solid #fff"></div>
+                                <div onclick="setCol('bg_{{e.id}}', '#1e293b')" title="Ardoise" style="width:18px;height:18px;background:#1e293b;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('bg_{{e.id}}', '#0f172a')" title="Marine foncé" style="width:18px;height:18px;background:#0f172a;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('bg_{{e.id}}', '#000000')" title="Noir" style="width:18px;height:18px;background:#000000;cursor:pointer;border-radius:3px"></div>
+                                <div onclick="setCol('bg_{{e.id}}', '#ffffff')" title="Blanc" style="width:18px;height:18px;background:#ffffff;cursor:pointer;border-radius:3px;border:1px solid #ddd"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="updateEnt({{e.id}})" class="btn act-view">Sauvegarder</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+
+
+        <div class="tab-content" id="tab-ai">
+            <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 30px; border-radius: 12px; border: 1px solid #334155; height: 500px; display: flex; flex-direction: column;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="margin:0; font-family:'Oswald'; color:#1d664f">AGENTE IA — SINYLON FIAT</h2>
+                    <p style="font-size:12px; color:#94a3b8">Scannez, parlez ou écrivez pour remplir les badges automatiquement.</p>
+                </div>
+                
+                <div id="ai-chat" style="flex:1; overflow-y:auto; padding:10px; background:rgba(0,0,0,0.2); border-radius:8px; margin-bottom:20px; border:1px solid #2c3048">
+                    <div style="color:#1d664f; margin-bottom:10px; font-size:13px">🤖 <b>Assistant:</b> Bonjour ! Je suis votre agent SINYLON FIAT. Comment puis-je vous aider ? Vous pouvez me dire "Crée un badge pour..." ou me donner une photo d'un ancien badge à scanner.</div>
+                </div>
+
+                <div style="display:flex; gap:10px">
+                    <button onclick="aiScan()" title="Scanner un badge/document" style="padding:12px; background:#1e293b; border:1px solid #475569; border-radius:8px; color:#fff; cursor:pointer"><span style="font-size:20px">📸</span></button>
+                    <button onclick="aiVoice()" id="aiVoiceBtn" title="Commande Vocale" style="padding:12px; background:#1e293b; border:1px solid #475569; border-radius:8px; color:#fff; cursor:pointer"><span style="font-size:20px">🎤</span></button>
+                    <input type="text" id="aiInput" placeholder="Écrivez ici (ex: Crée un badge pour Ahmed...)" style="flex:1; background:#0f1117; border:1px solid #3d435c; color:#fff; border-radius:8px; padding:0 15px">
+                    <button onclick="aiSend()" style="padding:10px 20px; background:#1d664f; color:#000; border:none; border-radius:8px; font-weight:bold; cursor:pointer">ENVOYER</button>
+                </div>
+            </div>
+            
+            <div style="margin-top:20px; font-size:11px; color:#5a6080; text-align:center">
+                Propulsé par Noro AI Engine & Google Gemini
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-settings">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
+                <form action="/api/config/update" method="POST" style="background:#181b24;padding:25px;border-radius:12px;border:1px solid #2c3048">
+                    <h3 style="margin-bottom:15px;color:#1d664f;font-family:'Oswald'">PARAMÈTRES IA & SYSTÈME</h3>
+                    <div class="field"><label>Urgence Générale</label><input name="urg_generale" value="{{ config.urg_generale }}"></div>
+                    <div class="field"><label>Sécurité Chantier (HSE)</label><input name="urg_hse" value="{{ config.urg_hse }}"></div>
+                    <div class="field">
+                        <label>Clé API Google Gemini (IA)</label>
+                        <input name="gemini_key" type="password" value="{{config.gemini_key}}" placeholder="AIzaSy...">
+                        <small style="color:#5a6080; font-size:10px">Nécessaire pour le Scan Photo et le Vocal.</small>
+                    </div>
+                    <button type="submit" class="btn btn-create">Mettre à jour les paramètres</button>
+                </form>
+
+                <div style="background:#181b24;padding:25px;border-radius:12px;border:1px solid #2c3048;display:flex;flex-direction:column;justify-content:space-between">
+                    <div>
+                        <h3 style="margin-bottom:15px;color:#cc5555;font-family:'Oswald'">MAINTENANCE DU SYSTÈME</h3>
+                        <p style="font-size:13px;color:#94a3b8;margin-bottom:20px">Supprimez les fichiers inutilisés (anciennes photos, versions précédentes des badges) pour libérer de l'espace et optimiser les performances.</p>
+                    </div>
+                    <a href="/cleanup" class="btn" style="background:#2a1515;color:#cc5555;border:1px solid #3a2020;text-decoration:none;text-align:center" onclick="return confirm('Voulez-vous vraiment nettoyer les fichiers orphelins ?')">🧹 NETTOYER LE STOCKAGE</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIGNATURE SINYLON FIAT -->
+        <div style="text-align: center; padding: 15px; background: #0f1117; border-top: 1px solid #1e293b; color: #64748b; font-size: 11px; margin-top: 20px; border-radius: 8px;">
+            <span style="color: #64748b;">Système de badge professionnel v4.1 | © 2026</span>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterBadges() {
+    var val = document.getElementById('filterEnt').value;
+    var cards = document.querySelectorAll('.badge-card-container');
+    cards.forEach(function(card) {
+        if (val === 'all' || card.getAttribute('data-ent') === val) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+function exportFiltered() {
+    var val = document.getElementById('filterEnt').value;
+    if (val === 'all') {
+        window.location.href = '/export_pdf';
+    } else {
+        window.location.href = '/export_pdf?entreprise_id=' + val;
+    }
+}
+function filterBadges() {
+    var val = document.getElementById('filterEnt').value;
+    var cards = document.querySelectorAll('.badge-card');
+    cards.forEach(function(card) {
+        if (!card.hasAttribute('data-ent')) return;
+        if (val === 'all' || card.getAttribute('data-ent') === val) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+function exportFiltered() {
+    var val = document.getElementById('filterEnt').value;
+    if (val === 'all') {
+        window.location.href = '/export_pdf';
+    } else {
+        window.location.href = '/export_pdf?entreprise_id=' + val;
+    }
+}
+function aiSend() {
+    var inp = document.getElementById('aiInput');
+    var msg = inp.value.trim();
+    if (!msg) return;
+    addAiMsg('Vous: ' + msg, '#fff');
+    inp.value = '';
+    
+    fetch('/ai/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'msg=' + encodeURIComponent(msg)
+    }).then(r => r.json()).then(data => {
+        if (data.reply) addAiMsg('Assistant: ' + data.reply, '#1d664f');
+        if (data.form) fillForm(data.form);
+    });
+}
+
+function aiScan() {
+    fetch('/pick_photo').then(r => r.json()).then(res => {
+        if (res.path) {
+            addAiMsg('Assistant: Analyse de la photo en cours...', '#3b82f6');
+            fetch('/ai/scan', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'path=' + encodeURIComponent(res.path)
+            }).then(r => r.json()).then(data => {
+                if (data.reply) addAiMsg('Assistant: ' + data.reply, '#1d664f');
+                if (data.form) fillForm(data.form);
+            });
+        }
+    });
+}
+
+function aiVoice() {
+    alert("Commande vocale : Veuillez parler après le signal... (En attente de configuration API)");
+}
+
+function addAiMsg(txt, col) {
+    var div = document.getElementById('ai-chat');
+    var p = document.createElement('div');
+    p.style.marginBottom = '8px';
+    p.style.fontSize = '13px';
+    p.style.color = col;
+    p.innerHTML = '<b>' + txt.split(':')[0] + ':</b>' + txt.split(':')[1];
+    div.appendChild(p);
+    div.scrollTop = div.scrollHeight;
+}
+
+function fillForm(data) {
+    for (var key in data) {
+        var el = document.getElementsByName(key)[0];
+        if (el) el.value = data[key];
+    }
+    // Handle special cases
+    if (data.entreprise) {
+        var sel = document.getElementsByName('entreprise')[0];
+        for (var i=0; i<sel.options.length; i++) {
+            if (sel.options[i].text.toUpperCase().indexOf(data.entreprise.toUpperCase()) !== -1) {
+                sel.selectedIndex = i; break;
+            }
+        }
+    }
+}
+function pickPhoto() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/pick_photo', false);
+    xhr.send();
+    try {
+        var res = JSON.parse(xhr.responseText);
+        if (res.path && res.path.length > 0) {
+            document.getElementById('photoPathInput').value = res.path;
+            var parts = res.path.replace(/\\/g, '/').split('/');
+            document.getElementById('photoPathDisplay').value = parts[parts.length - 1];
+        }
+    } catch(e) {}
+}
+function showTab(id) {
+    var btns = document.querySelectorAll('.tab-btn');
+    var contents = document.querySelectorAll('.tab-content');
+    for (var i = 0; i < btns.length; i++) btns[i].className = 'tab-btn';
+    for (var i = 0; i < contents.length; i++) contents[i].className = 'tab-content';
+    
+    // Handle event target for older browsers
+    var target = event.currentTarget || event.srcElement || event.target;
+    if (target) target.className = 'tab-btn active';
+    
+    var targetTab = document.getElementById('tab-' + id);
+    if (targetTab) targetTab.className = 'tab-content active';
+}
+
+function updateEnt(id) {
+    var nom = document.getElementById('nom_' + id).value;
+    var col = document.getElementById('col_' + id).value;
+    var bg = document.getElementById('bg_' + id).value;
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/badge/api/entreprise/update', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) window.location.reload();
+    };
+    xhr.send(JSON.stringify({id: id, nom: nom, couleur: col, couleur_fond: bg}));
+}
+
+// Logique de recherche compatible
+document.getElementById('searchInput').onkeyup = function() {
+    var filter = this.value.toLowerCase();
+    var cards = document.getElementById('badgeGrid').getElementsByClassName('badge-card');
+    for (var i = 0; i < cards.length; i++) {
+        var text = cards[i].innerText.toLowerCase();
+        cards[i].style.display = (text.indexOf(filter) > -1) ? '' : 'none';
+    }
+};
+</script>
+</body>
+</html>

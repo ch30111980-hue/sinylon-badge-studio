@@ -1,0 +1,285 @@
+<div class="border-annexe-d" style="border: 2px solid #22c55e; font-family: Arial, sans-serif; font-size: 8px;">
+    <div class="annexe-tag" style="background: #22c55e; color: white;">D</div>
+    
+    <!-- En-tête -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px;">
+        <tr>
+            <td style="width: 15%; border: 2px solid black; padding: 2px; text-align: center; color: #cc0000; font-size: 22px; font-weight: 900; letter-spacing: 1px;">
+                <div style="border: 2px solid #cc0000; padding: 2px; display: inline-block;">SINYLON FIAT</div>
+            </td>
+            <td style="width: 65%; border: 2px solid black; padding: 2px; text-align: center; font-size: 16px; font-weight: bold; color: black; background: #bbf7d0;">
+                PERMIS D'EXCAVATION<br>
+                <span style="font-size: 9px; font-weight: normal; color: black;">( Cochez la case appropriée <span style="border: 1px solid black; display:inline-block; width:24px; height:24px; text-align:center; line-height:24px; font-weight:bold;">X</span> )</span>
+            </td>
+            <td style="width: 20%; border: 2px solid black; padding: 2px; font-size: 9px; text-align: right; vertical-align: top;">
+                Permis No: <span id="val-permit-id-d" contenteditable="true" style="outline:none; min-width: 40px; display:inline-block; border-bottom: 1px dotted black;"></span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- 1 DEMANDE DE PERMIS -->
+    <div style="background: black; color: white; padding: 2px; font-weight: bold; font-size: 9px;">1 DEMANDE DE PERMIS</div>
+    <div style="border: 1px solid black; padding: 2px; margin-bottom: 2px;">
+        <table style="width: 100%; font-size: 8px;">
+            <tr>
+                <td style="width: 60%;">
+                    Zone de réalisation de l'excavation: <span id="val-location-d" contenteditable="true" style="outline:none; min-width: 100px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    Utilité de l'excavation: <span id="val-work-desc-d" contenteditable="true" style="outline:none; min-width: 100px; display:inline-block; border-bottom: 1px dotted black;"></span><br><br>
+                    Schémas joints <span class="check-box-click" id="check-d-schemas" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                </td>
+                <td style="width: 40%; border-left: 1px solid black; padding-left: 5px;">
+                    <table style="width: 100%;">
+                        <tr><td colspan="2" style="text-align: center; font-weight: bold;">Date du début de travail prévue</td></tr>
+                        <tr><td>Date: <span id="val-date-main-d-start" contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td><td>Heure: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span></td></tr>
+                        <tr><td colspan="2" style="text-align: center; font-weight: bold;">Date de la fin de travail prévue</td></tr>
+                        <tr><td>Date: <span id="val-date-main-d-end" contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td><td>Heure: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span></td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <hr style="border: 0; border-top: 1px solid black; margin: 2px 0;">
+        <table style="width: 100%; font-size: 8px;">
+            <tr>
+                <td style="width: 70%;">
+                    Classification de la zone: 
+                    Zone 0 <span class="check-box-click" id="check-d-zone0" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                    Zone 1 <span class="check-box-click" id="check-d-zone1" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                    Zone 2 <span class="check-box-click" id="check-d-zone2" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                    Non classée <span class="check-box-click" id="check-d-nonclas" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    Méthode d'exécution prévue<br>
+                    Manuelle <span class="check-box-click" id="check-d-man" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                    Mécanique <span class="check-box-click" id="check-d-mec" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                    Autre (Préciser): <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    Profondeur de l'excavation: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+                    Largeur de l'excavation: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+                </td>
+                <td style="width: 30%; border-left: 1px solid black; padding-left: 5px; vertical-align: top;">
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 2px;">Équipement utilisé</div>
+                    Outillage manuel <span class="check-box-click" id="check-d-eq1" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right;"></span><br>
+                    Marteau-piqueur <span class="check-box-click" id="check-d-eq2" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right;"></span><br>
+                    Excavatrice <span class="check-box-click" id="check-d-eq3" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right;"></span><br>
+                    Autres (Préciser): <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+                </td>
+            </tr>
+        </table>
+        <hr style="border: 0; border-top: 1px solid black; margin: 2px 0;">
+        <table style="width: 100%; font-size: 8px;">
+            <tr>
+                <td style="width: 50%;">
+                    <div style="text-align: center; font-weight: bold;">Permis demandé par</div>
+                    Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+                </td>
+                <td style="width: 50%; border-left: 1px solid black; padding-left: 5px;">
+                    <div style="text-align: center; font-weight: bold;">Personnel d'exécution</div>
+                    Entreprise Extérieure <span class="check-box-click" id="check-d-ee" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> (Spécifier): <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    Responsable d'Exécution: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 2 PERMIS ET CERTIFICATS ASSOCIES -->
+    <div style="background: #22c55e; color: black; padding: 2px; font-weight: bold; font-size: 9px; border: 1px solid black;">2 PERMIS ET CERTIFICATS ASSOCIES</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px;">
+        <table style="width: 100%; font-size: 8px;">
+            <tr>
+                <td>Permis: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> No: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span></td>
+                <td>Permis: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> No: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span></td>
+                <td>Certificat: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> No: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span></td>
+                <td>Certificat: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> No: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 3 EVALUATION DE RISQUES ET APPROBATION PAR LES SERVICES TECHNIQUES -->
+    <div style="background: #22c55e; color: black; padding: 2px; font-weight: bold; font-size: 9px; border: 1px solid black;">3 ÉVALUATION DE RISQUES ET APPROBATION PAR LES SERVICES TECHNIQUES</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px;">
+        <!-- 3.1 -->
+        <div style="font-weight: bold; background: #d1d5db; border: 1px solid black; padding: 1px; font-size: 8px;">3.1 Identification des dangers / mesures de prévention par Autorité de Zone</div>
+        <table style="width: 100%; font-size: 7.5px;">
+            <tr>
+                <td>Tuyauteries enterrées? Oui <span class="check-box-click" id="check-d-tuy-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-tuy-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span></td>
+                <td>Produit véhiculé: <span contenteditable="true" style="outline:none; min-width: 40px; display:inline-block; border-bottom: 1px dotted black;"></span></td>
+                <td>Pression de service: <span contenteditable="true" style="outline:none; min-width: 40px; display:inline-block; border-bottom: 1px dotted black;"></span></td>
+            </tr>
+        </table>
+        <table style="width: 100%; font-size: 7.5px;">
+            <tr>
+                <td style="width: 70%;">
+                    1) N° d'identification de la tuyauterie: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    2) N° d'identification de la tuyauterie: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    Autres tuyauteries enterrées? Oui <span class="check-box-click" id="check-d-atuy-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-atuy-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Liste d'identification des tuyauteries jointe <span class="check-box-click" id="check-d-atuy-list" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    Autres ouvrages enterrés? Oui <span class="check-box-click" id="check-d-ouv-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-ouv-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Spécifier: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    Référence du plan utilisé: <span contenteditable="true" style="outline:none; min-width: 100px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    <span style="font-size: 6.5px; font-style: italic;">Les travaux d'excavation peuvent être exécutés à condition que les mesures de prévention suivantes soient prises.</span>
+                </td>
+                <td style="width: 30%; text-align: right; padding-right: 10px;">
+                    Isolée? Oui <span class="check-box-click" id="check-d-iso1-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-iso1-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    Isolée? Oui <span class="check-box-click" id="check-d-iso2-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-iso2-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                </td>
+            </tr>
+        </table>
+        <div style="font-size: 7.5px;">Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 40px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></div>
+
+        <!-- 3.2 -->
+        <div style="font-weight: bold; background: #d1d5db; border: 1px solid black; padding: 1px; font-size: 8px; margin-top: 2px;">3.2 Identification des dangers / mesures de prévention et approbation par le Service Électricité ou le Service Technique</div>
+        <table style="width: 100%; font-size: 7.5px;">
+            <tr>
+                <td style="width: 70%;">
+                    Câbles électriques enterrés? Oui <span class="check-box-click" id="check-d-elec-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-elec-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    1) N° d'identification du câble: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Voltage: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> V<br>
+                    2) N° d'identification du câble: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Voltage: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> V<br>
+                    Autres câbles enterrés? Oui <span class="check-box-click" id="check-d-aelec-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-aelec-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Liste d'identification des câbles jointe <span class="check-box-click" id="check-d-aelec-list" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    <span style="font-size: 6.5px; font-style: italic;">Les travaux d'excavation peuvent être exécutés à condition que les mesures de prévention suivantes soient prises.</span>
+                </td>
+                <td style="width: 30%; text-align: right; padding-right: 10px;">
+                    <br>
+                    Isolé? Oui <span class="check-box-click" id="check-d-elec1-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-elec1-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    Isolé? Oui <span class="check-box-click" id="check-d-elec2-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-elec2-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                </td>
+            </tr>
+        </table>
+        <div style="font-size: 7.5px;">Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 40px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></div>
+
+        <!-- 3.3 -->
+        <div style="font-weight: bold; background: #d1d5db; border: 1px solid black; padding: 1px; font-size: 8px; margin-top: 2px;">3.3 Identification des dangers / mesures de prévention et approbation par le Service Contrôle/Instrumentation</div>
+        <table style="width: 100%; font-size: 7.5px;">
+            <tr>
+                <td style="width: 70%;">
+                    Câbles de contrôle/instrumentation enterrés? Oui <span class="check-box-click" id="check-d-inst-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-inst-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    1) N° d'identification du câble: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Voltage: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> V<br>
+                    2) N° d'identification du câble: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Voltage: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> V<br>
+                    Autres câbles enterrés? Oui <span class="check-box-click" id="check-d-ainst-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-ainst-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Liste d'identification des câbles jointe <span class="check-box-click" id="check-d-ainst-list" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    <span style="font-size: 6.5px; font-style: italic;">Les travaux d'excavation peuvent être exécutés à condition que les mesures de prévention suivantes soient prises.</span>
+                </td>
+                <td style="width: 30%; text-align: right; padding-right: 10px;">
+                    <br>
+                    Isolé? Oui <span class="check-box-click" id="check-d-inst1-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-inst1-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    Isolé? Oui <span class="check-box-click" id="check-d-inst2-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-inst2-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                </td>
+            </tr>
+        </table>
+        <div style="font-size: 7.5px;">Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 40px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></div>
+
+        <!-- 3.4 -->
+        <div style="font-weight: bold; background: #d1d5db; border: 1px solid black; padding: 1px; font-size: 8px; margin-top: 2px;">3.4 Identification des dangers / mesures de prévention et approbation par le Service Telecommunications et/ou Informatique</div>
+        <table style="width: 100%; font-size: 7.5px;">
+            <tr>
+                <td>Câbles téléphoniques enterrés? Oui <span class="check-box-click" id="check-d-tel-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-tel-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span></td>
+                <td>Câbles informatiques enterrés? Oui <span class="check-box-click" id="check-d-inf-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-inf-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    1) N° d'identification du câble: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> N° d'identification du câble: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    2) N° d'identification du câble: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span><br>
+                    Autres câbles enterrés? Oui <span class="check-box-click" id="check-d-atel-oui" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Non <span class="check-box-click" id="check-d-atel-non" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span> Liste d'identification des câbles jointe <span class="check-box-click" id="check-d-atel-list" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span><br>
+                    <span style="font-size: 6.5px; font-style: italic;">Les travaux d'excavation peuvent être exécutés à condition que les mesures de prévention suivantes soient prises.</span>
+                </td>
+            </tr>
+        </table>
+        <div style="font-size: 7.5px;">Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 40px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></div>
+
+        <!-- 3.5 -->
+        <div style="font-weight: bold; background: #d1d5db; border: 1px solid black; padding: 1px; font-size: 8px; margin-top: 2px;">3.5 Identification des dangers / mesures de prévention à prendre par le Responsable d'Exécution</div>
+        <table style="width: 100%; font-size: 7.5px;">
+            <tr><th style="width: 30%; text-align: left;">Dangers</th><th style="width: 70%; text-align: center;">Mesures de prévention</th></tr>
+            <tr>
+                <td style="vertical-align: top;">
+                    Terrain meuble / éboulement <span class="check-box-click" id="check-d-dang1" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right; margin-right: 10px;"></span><br>
+                    Chute de personnes <span class="check-box-click" id="check-d-dang2" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right; margin-right: 10px;"></span><br>
+                    Circulation de voiture / engin <span class="check-box-click" id="check-d-dang3" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right; margin-right: 10px;"></span><br>
+                    Autres (Spécifier): <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+                </td>
+                <td style="vertical-align: top;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 50%;">
+                                Barrières de protection <span class="check-box-click" id="check-d-prev1" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right; margin-right: 10px;"></span><br>
+                                Étayage/ Boisage <span class="check-box-click" id="check-d-prev2" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right; margin-right: 10px;"></span><br>
+                                Balisage de nuit <span class="check-box-click" id="check-d-prev3" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right; margin-right: 10px;"></span><br>
+                            </td>
+                            <td style="width: 50%;">
+                                Route fermée partiellement <span class="check-box-click" id="check-d-prev4" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right; margin-right: 10px;"></span><br>
+                                Route fermée totalement <span class="check-box-click" id="check-d-prev5" style="display:inline-block; width:24px; height:24px; border:1px solid black; float: right; margin-right: 10px;"></span><br>
+                                Autres (Spécifier): <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right; padding-right: 10px;">
+                                Évaluation de risques plus approfondie Réf. No: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Endossement par l'Asset Manager <span class="check-box-click" id="check-d-assetman" style="display:inline-block; width:24px; height:24px; border:1px solid black;"></span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 4 APPROBATION DU PERMIS -->
+    <div style="background: black; color: white; padding: 2px; font-weight: bold; font-size: 9px;">4 APPROBATION DU PERMIS</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px; font-size: 7.5px;">
+        Le permis est approuvé pour une période de : <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> (Jours consécutifs) (Période maximale d'approbation possible: 7 jours consécutifs) à compter du Date : <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> sous réserve que toutes les mesures de prévention énumérées dans l'évaluation de risques soient prises et que les conditions du permis restent inchangées.<br>
+        <table style="width: 100%; margin-top: 2px;">
+            <tr><td style="width: 25%;">Autorité de Zone</td><td style="width: 25%;">Nom: <span id="val-FIAT-nom-d" contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td><td style="width: 25%;">Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td><td style="width: 25%;">Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td></tr>
+            <tr><td>Autre Autorité de Zone</td><td>Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td><td>Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td><td>Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td></tr>
+            <tr><td>Structure HSE ou Sécurité</td><td>Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td><td>Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td><td>Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span></td></tr>
+        </table>
+    </div>
+
+    <!-- 5 AUTORISATION DU DEBUT DES TRAVAUX D'EXCAVATION -->
+    <div style="background: black; color: white; padding: 2px; font-weight: bold; font-size: 9px;">5 AUTORISATION DU DÉBUT DES TRAVAUX D'EXCAVATION</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px; font-size: 7.5px;">
+        Je, Représentant de l'Autorité de Zone , déclare avoir personnellement contrôlé le site de travail ainsi que les précautions, et autorise le début des travaux d'excavation.<br>
+        Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Période de validité du permis (1 Quart/Poste maximum) Du Date: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 20px; display:inline-block; border-bottom: 1px dotted black;"></span> Au Date: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 20px; display:inline-block; border-bottom: 1px dotted black;"></span>
+    </div>
+
+    <!-- 6 ACCEPTATION DU PERMIS PAR LE RESPONSABLE D'EXÉCUTION -->
+    <div style="background: #22c55e; color: black; padding: 2px; font-weight: bold; font-size: 9px; border: 1px solid black;">6 ACCEPTATION DU PERMIS PAR LE RESPONSABLE D'EXÉCUTION</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px; font-size: 7.5px;">
+        Je, Responsable d'Exécution , déclare avoir lu et compris les précautions Je m'engage à les respecter et à les faire respecter par l'ensemble de mon personnel.<br>
+        Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 20px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+    </div>
+
+    <!-- 7 REVALIDATION DU PERMIS -->
+    <div style="background: #22c55e; color: black; padding: 2px; font-weight: bold; font-size: 9px; border: 1px solid black;">7 REVALIDATION DU PERMIS</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px; font-size: 7.5px; text-align: center;">
+        Toutes les autorisations de continuation/reprise de travaux d'excavation doivent être enregistrées au verso du permis
+    </div>
+
+    <!-- 8 DÉCLARATION DE SUSPENSION DES TRAVAUX D'EXCAVATION ET ANNULATION DU PERMIS -->
+    <div style="background: black; color: white; padding: 2px; font-weight: bold; font-size: 9px;">8 DÉCLARATION DE SUSPENSION DES TRAVAUX D'EXCAVATION ET ANNULATION DU PERMIS</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px; font-size: 7.5px;">
+        Les travaux d'excavation sont suspendus pour les raisons suivantes: <span contenteditable="true" style="outline:none; min-width: 100px; display:inline-block; border-bottom: 1px dotted black;"></span> Le permis doit être annulé (Aller à la section 11 du permis)<br>
+        Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 20px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+    </div>
+
+    <!-- 9 DÉCLARATION DE LA FIN DES TRAVAUX D'EXCAVATION PAR LE RESPONSABLE D'EXÉCUTION -->
+    <div style="background: black; color: white; padding: 2px; font-weight: bold; font-size: 9px;">9 DÉCLARATION DE LA FIN DES TRAVAUX D'EXCAVATION PAR LE RESPONSABLE D'EXÉCUTION</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px; font-size: 7.5px;">
+        Les travaux d'excavation sont terminés.<br>
+        Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 20px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+    </div>
+
+    <!-- 10 VÉRIFICATION ET APPROBATION DE LA FIN DES TRAVAUX D'EXCAVATION PAR LE REPRÉSENTANT DE L'AUTORITÉ DE ZONE -->
+    <div style="background: #22c55e; color: black; padding: 2px; font-weight: bold; font-size: 9px; border: 1px solid black;">10 VÉRIFICATION ET APPROBATION DE LA FIN DES TRAVAUX D'EXCAVATION PAR LE REPRÉSENTANT DE L'AUTORITÉ DE ZONE</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; margin-bottom: 2px; font-size: 7.5px;">
+        Les travaux d'excavation sont terminés.<br>
+        Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 20px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+    </div>
+
+    <!-- 11 ENREGISTREMENT DE LA FIN DES TRAVAUX D'EXCAVATION ET ANNULATION DU PERMIS -->
+    <div style="background: black; color: white; padding: 2px; font-weight: bold; font-size: 9px;">11 ENREGISTREMENT DE LA FIN DES TRAVAUX D'EXCAVATION ET ANNULATION DU PERMIS</div>
+    <div style="border: 1px solid black; border-top: none; padding: 2px; font-size: 7.5px;">
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 50%;">Les travaux d'excavation sont terminés</td>
+                <td style="width: 50%;">Les travaux d'excavation ne sont pas terminés, un nouveau permis est nécessaire pour terminer ces travaux</td>
+            </tr>
+        </table>
+        Toutes les copies du permis ont été rassemblées, ce permis est annulé.<br>
+        Nom: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Fonction: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span> Date: <span contenteditable="true" style="outline:none; min-width: 30px; display:inline-block; border-bottom: 1px dotted black;"></span> Heure: <span contenteditable="true" style="outline:none; min-width: 20px; display:inline-block; border-bottom: 1px dotted black;"></span> Signature: <span contenteditable="true" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dotted black;"></span>
+    </div>
+    
+    <div style="text-align: center; font-size: 6px; font-weight: bold; margin-top: 2px;">DISTRIBUTION Original: SINYLON FIAT 1ere Copie: Autorité de Zone 2eme Copie: FIAT</div>
+</div>

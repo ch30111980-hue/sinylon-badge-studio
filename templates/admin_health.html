@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Health Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0"><i class="fas fa-heartbeat text-danger me-2"></i>Health Dashboard</h1>
+    <span class="badge bg-secondary" id="refreshBadge">Auto-refresh : 30s</span>
+  </div>
+
+  <!-- Status cards row -->
+  <div class="row g-3 mb-4" id="statusCards">
+    <!-- Filled by JS -->
+  </div>
+
+  <!-- Stats row -->
+  <div class="row g-3 mb-4" id="statsRow">
+    <!-- Filled by JS -->
+  </div>
+
+  <!-- Recent sync failures -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-0 fw-semibold">
+      <i class="fas fa-exclamation-triangle text-warning me-2"></i>Échecs de sync récents
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>Action</th><th>Détails</th><th>Date</th></tr>
+          </thead>
+          <tbody id="syncFailures">
+            <tr><td colspan="3" class="text-center text-muted py-3">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent exports -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 fw-semibold">
+      <i class="fas fa-file-export text-primary me-2"></i>Exports récents
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>ID</th><th>Type</th><th>Statut</th><th>Date</th></tr>
+          </thead>
+          <tbody id="recentExports">
+            <tr><td colspan="4" class="text-center text-muted py-3">Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const STATUS_ICONS = {
+    ok: '<i class="fas fa-check-circle text-success"></i>',
+    up: '<i class="fas fa-check-circle text-success"></i>',
+    degraded: '<i class="fas fa-minus-circle text-warning"></i>',
+    error: '<i class="fas fa-times-circle text-danger"></i>',
+    not_configured: '<i class="fas fa-minus-circle text-secondary"></i>',
+  };
+
+  function statusIcon(s) { return STATUS_ICONS[s] || STATUS_ICONS.error; }
+
+  function card(title, icon, status, extra) {
+    return `
+      <div class="col-md-3 col-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center py-3">
+            <div class="fs-4 mb-1"><i class="fas fa-${icon} text-primary"></i></div>
+            <h6 class="text-muted mb-1">${title}</h6>
+            <div class="fw-bold">${statusIcon(status)} ${status}</div>
+            ${extra ? `<small class="text-muted">${extra}</small>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function statCard(label, value, icon, color) {
+    return `
+      <div class="col-md-3 col-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center py-3">
+            <div class="fs-2 fw-bold text-${color}">${value}</div>
+            <small class="text-muted"><i class="fas fa-${icon} me-1"></i>${label}</small>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }
+
+  function statusBadge(s) {
+    const map = {completed:'success', failed:'danger', running:'warning', queued:'secondary'};
+    return `<span class="badge bg-${map[s]||'secondary'}">${s}</span>`;
+  }
+
+  function refresh() {
+    fetch('/admin/health/api')
+      .then(r => r.json())
+      .then(data => {
+        // Status cards
+        const db = data.database || {};
+        const fb = data.firebase || {};
+        const rd = data.redis || {};
+        const sq = data.sync_queue || {};
+
+        document.getElementById('statusCards').innerHTML =
+          card('Base de données', 'database', db.status || 'error', db.latency || '') +
+          card('Firebase', 'fire', fb.status || 'error', '') +
+          card('Redis', 'server', rd.status || 'error', rd.latency || '') +
+          card('Sync Queue', 'sync', sq.pending === 0 ? 'ok' : 'up', sq.pending + ' en attente');
+
+        // Stats
+        if (db.status === 'ok') {
+          document.getElementById('statsRow').innerHTML =
+            statCard('Utilisateurs', db.users, 'users', 'primary') +
+            statCard('Badges', db.badges, 'id-badge', 'success') +
+            statCard('Permis', db.permis, 'file-alt', 'info') +
+            statCard('Version', data.app_version || '?', 'code-branch', 'dark');
+        }
+
+        // Sync failures
+        const failTbody = document.getElementById('syncFailures');
+        if (data.sync_failures && data.sync_failures.length) {
+          failTbody.innerHTML = data.sync_failures.map(f =>
+            `<tr>
+              <td><code>${f.action}</code></td>
+              <td class="text-truncate" style="max-width:300px">${f.details||'—'}</td>
+              <td>${formatDate(f.timestamp)}</td>
+            </tr>`
+          ).join('');
+        } else {
+          failTbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">Aucun échec récent ✅</td></tr>';
+        }
+
+        // Recent exports
+        const expTbody = document.getElementById('recentExports');
+        if (data.recent_exports && data.recent_exports.length) {
+          expTbody.innerHTML = data.recent_exports.map(e =>
+            `<tr>
+              <td><code>${(e.id||'').substring(0,8)}…</code></td>
+              <td>${e.export_type||'—'}</td>
+              <td>${statusBadge(e.status)}</td>
+              <td>${formatDate(e.created_at)}</td>
+            </tr>`
+          ).join('');
+        } else {
+          expTbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Aucun export récent</td></tr>';
+        }
+      })
+      .catch(err => {
+        console.error('Health API error:', err);
+      });
+  }
+
+  // Initial load + auto-refresh every 30s
+  refresh();
+  setInterval(refresh, 30000);
+})();
+</script>
+{% endblock %}

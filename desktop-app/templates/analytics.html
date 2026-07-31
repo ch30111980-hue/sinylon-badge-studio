@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}Analytics & Métriques HSE | SINYLON FIAT{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <!-- Header Glassmorphism -->
+    <div class="card border-0 shadow-lg text-white p-4 mb-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px;">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-center rounded-4 bg-info text-white shadow" style="width: 56px; height: 56px;">
+                    <i class="fas fa-chart-line fs-3"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h2 class="h3 fw-bold mb-0 text-white">Tableau de Bord Analytics & Métriques HSE</h2>
+                        <span class="badge bg-warning text-dark text-uppercase px-2.5 py-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Supervision Admin Nouri</span>
+                    </div>
+                    <p class="text-white-50 small mb-0 mt-1">Analyse en temps réel de la conformité, des permis de travail, des intervenants badgés et des incidents HSE du Chantier FIAT Tafraoui.</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button onclick="window.print()" class="btn btn-outline-light btn-sm fw-bold px-3 py-2" style="border-radius: 10px;">
+                    <i class="fas fa-print me-1"></i> Imprimer Rapport HSE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards KPI Clés -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; background: #ffffff;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase">Total Permis Émis</span>
+                        <h2 class="fw-bold mb-0 text-dark mt-1">{{ total_permis }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-primary-subtle text-primary p-3">
+                        <i class="fas fa-file-contract fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; background: #ffffff;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase">Permis Actifs En Cours</span>
+                        <h2 class="fw-bold mb-0 text-success mt-1">{{ permis_actifs }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-success-subtle text-success p-3">
+                        <i class="fas fa-check-circle fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; background: #ffffff;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase">En Attente Validation</span>
+                        <h2 class="fw-bold mb-0 text-warning mt-1">{{ permis_suspendus }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-warning-subtle text-warning p-3">
+                        <i class="fas fa-clock fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; background: #ffffff;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-bold text-uppercase">Total Incidents HSE</span>
+                        <h2 class="fw-bold mb-0 text-danger mt-1">{{ total_incidents }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-danger-subtle text-danger p-3">
+                        <i class="fas fa-exclamation-triangle fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques Interactifs Chart.js -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 16px; background: #ffffff;">
+                <h5 class="fw-bold text-dark mb-3"><i class="fas fa-chart-pie text-success me-2"></i> Statut & Répartition des Permis</h5>
+                <div style="max-height: 280px; position: relative;">
+                    <canvas id="permisDonutChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 16px; background: #ffffff;">
+                <h5 class="fw-bold text-dark mb-3"><i class="fas fa-chart-bar text-primary me-2"></i> Activité par Entreprise Intervenante</h5>
+                <div style="max-height: 280px; position: relative;">
+                    <canvas id="entrepriseBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Tableaux Répartition -->
+    <div class="row g-4 mb-4">
+        <!-- Répartition par Entreprise -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 16px; background: #ffffff;">
+                <h5 class="fw-bold text-dark mb-3"><i class="fas fa-building text-primary me-2"></i> Détail par Entreprise</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Entreprise</th>
+                                <th>Badges Enregistrés</th>
+                                <th>Permis Émis</th>
+                                <th>Proportion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in stats_entreprises %}
+                            <tr>
+                                <td class="fw-bold">{{ e.nom }}</td>
+                                <td><span class="badge bg-secondary-subtle text-secondary">{{ e.badges }}</span></td>
+                                <td><span class="badge bg-primary-subtle text-primary fw-bold">{{ e.permis }}</span></td>
+                                <td style="width: 35%;">
+                                    <div class="progress" style="height: 8px; border-radius: 4px;">
+                                        <div class="progress-bar" style="width: {{ (e.permis * 10) if (e.permis * 10) <= 100 else 100 }}%; background-color: {{ e.couleur }};"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Répartition par Zone du Chantier FIAT -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 16px; background: #ffffff;">
+                <h5 class="fw-bold text-dark mb-3"><i class="fas fa-map-marked-alt text-info me-2"></i> Répartition des Permis par Zone</h5>
+                <div class="row g-2">
+                    {% for z in stats_zones %}
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 d-flex align-items-center justify-content-between" style="background: #f8fafc;">
+                            <span class="fw-semibold text-dark small">{{ z.zone }}</span>
+                            <span class="badge bg-info text-dark fw-bold px-2.5 py-1.5" style="font-size: 0.85rem;">{{ z.count }} Permis</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Chart 1: Donut Permis Statuts
+        const ctxDonut = document.getElementById('permisDonutChart');
+        if (ctxDonut) {
+            new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Permis Actifs 🟢', 'En Attente Validation 🟠', 'Refusés / Expirés 🔴'],
+                    datasets: [{
+                        data: [{{ permis_actifs }}, {{ permis_suspendus }}, {{ permis_expires }}],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // Chart 2: Bar Chart Entreprises
+        const ctxBar = document.getElementById('entrepriseBarChart');
+        if (ctxBar) {
+            const labels = [{% for e in stats_entreprises %}'{{ e.nom }}',{% endfor %}];
+            const dataPermis = [{% for e in stats_entreprises %}{{ e.permis }},{% endfor %}];
+            const dataBadges = [{% for e in stats_entreprises %}{{ e.badges }},{% endfor %}];
+
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Permis Émis',
+                            data: dataPermis,
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Badges Intervenants',
+                            data: dataBadges,
+                            backgroundColor: '#0ea5e9',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

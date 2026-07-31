@@ -1,0 +1,1109 @@
+{% extends "base.html" %}
+{% block title %}Permis d'Excavation (VERT F) - Recto{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<script src="{{ url_for("static", filename="js/signature_pad.umd.min.js") }}"></script>
+
+<style>
+    body {
+        font-family: 'Outfit', sans-serif;
+    }
+    @media print {
+        .btn, .navbar, .alert, .no-print { display: none !important; }
+        body { background-color: white !important; color: black !important; }
+        .card { border: none !important; }
+        .card-body { padding: 0 !important; }
+        .border-success-dark { border-color: #1b5e20 !important; }
+    }
+    .x-small { font-size: 0.68rem; }
+    .title-banner {
+        background-color: #e8f5e9 !important;
+        border: 2px solid #2e7d32 !important;
+    }
+    .text-success-dark {
+        color: #1b5e20 !important;
+    }
+    .border-success-dark {
+        border-color: #2e7d32 !important;
+    }
+    .sig-canvas {
+        background-color: #fafafa;
+        border: 1px dashed #ccc;
+    }
+    .form-control-sm, .form-select-sm {
+        font-size: 0.72rem;
+        padding: 0.2rem 0.4rem;
+    }
+    .permis-section-title {
+        background-color: #2e7d32 !important;
+        color: white !important;
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 0.3rem 0.75rem;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Tableau de Bord
+        </a>
+        <div class="dropdown">
+            <button class="btn btn-outline-success shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-plus-circle me-2"></i> Nouvelle Demande de Permis
+            </button>
+            <ul class="dropdown-menu shadow border-0">
+                <li><a class="dropdown-item" href="{{ url_for('permis.nouveau') }}">
+                    <i class="fas fa-file-signature me-2 text-primary"></i> <strong>DEMANDE DE PERMIS (SINYLON FIAT)</strong> — En ligne
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header small text-uppercase fw-bold">Choisir le type de permis</h6></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='securite_generale') }}">
+                    <i class="fas fa-file-contract me-2 text-dark"></i> <strong>RECTO (P1)</strong> — Sécurité Générale
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='revalidation', theme='fouille') }}">
+                    <i class="fas fa-sync me-2 text-secondary"></i> <strong>VERSO (P2)</strong> — Revalidation
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='hauteur') }}">
+                    <i class="fas fa-hard-hat me-2 text-primary"></i> <strong>BLEUE (A)</strong> — Travail en Hauteur
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='chaud') }}">
+                    <i class="fas fa-fire me-2 text-danger"></i> <strong>ROUGE (B)</strong> — Travail à Chaud
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='levage') }}">
+                    <i class="fas fa-dolly me-2 text-warning"></i> <strong>JAUNE (C)</strong> — Permis de Levage
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='vehicule') }}">
+                    <i class="fas fa-car me-2 text-info"></i> <strong>VIOLETTE (D)</strong> — Inspection Engins
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='espace_confine') }}">
+                    <i class="fas fa-door-closed me-2 text-success"></i> <strong>CYAN (E)</strong> — Espace Confiné
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='fouille') }}">
+                    <i class="fas fa-shovel me-2 text-success"></i> <strong>PERMIS D'EXCAVATION (F)</strong>
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='electrique') }}">
+                    <i class="fas fa-bolt me-2 text-warning"></i> <strong>ORANGE (G)</strong> — Travail Électrique
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    {% if permis %}
+    <button onclick="window.print()" class="btn btn-3d btn-chic-gold shadow-sm">
+        <i class="fas fa-print me-2"></i> Imprimer / Enregistrer en PDF
+    </button>
+    {% else %}
+    <button onclick="submitForPrint()" class="btn btn-3d btn-chic-gold shadow-sm">
+        <i class="fas fa-print me-2"></i> Enregistrer & Imprimer
+    </button>
+    {% endif %}
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+        <div class="card shadow-sm border-0 mb-5">
+            <div class="card-body p-4 bg-white border border-dark border-success-dark" style="border-left: 15px solid #2e7d32 !important; border-right: 15px solid #2e7d32 !important;">
+                
+                <!-- HEADER -->
+                <div class="d-flex align-items-stretch mb-3 flex-wrap gap-2">
+                    <div class="text-white fw-bold px-3 d-flex align-items-center justify-content-center text-center" style="font-size: 1.5rem; background-color: #d32f2f !important; font-family: 'Arial Black', sans-serif; letter-spacing: 1px; min-width: 140px; border: 2px solid #d32f2f;">
+                        SINYLON FIAT<br><span style="font-size: 1rem; color: #ffeb3b;">STELLANTIS</span>
+                    </div>
+                    <div class="flex-grow-1 text-center py-2 d-flex flex-column align-items-center justify-content-center title-banner">
+                        <h3 class="fw-bold mb-0 text-uppercase text-success-dark" style="letter-spacing: 1.5px; font-size: 1.6rem;">PERMIS D'EXCAVATION</h3>
+                        <div class="x-small fw-bold text-muted mt-1 text-success-dark">SÉCURITÉ &amp; CONTRÔLE DES TRAVAUX SOUTERRAINS</div>
+                    </div>
+                    {% if qr_code %}
+                    <div class="ms-2 p-1 bg-white border border-dark text-center d-flex flex-column align-items-center justify-content-center" style="width: 80px; flex-shrink: 0;">
+                        <img src="data:image/png;base64,{{ qr_code }}" alt="QR Verification" style="height: 60px; width: 60px;">
+                        <div class="text-dark fw-bold" style="font-size: 8px; margin-top: 1px;">VERIFY</div>
+                    </div>
+                    {% endif %}
+                    <div class="ms-2 border border-dark p-1 text-center d-flex flex-column align-items-center justify-content-center" style="min-width: 150px; flex-shrink: 0; background-color: #fafafa;">
+                        <div class="x-small fw-bold border-bottom border-dark text-uppercase w-100 pb-1">N° DE PERMIS</div>
+                        <div class="fw-bold fs-5 mt-1">{% if form_id %}{{ form_id }}{% elif form %}{{ form.id }}{% else %}AUTO{% endif %}</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-success border border-success-dark py-2 px-3 mb-3 small" style="background:#f1f8e9; font-size: 0.75rem; color: #2e7d32;">
+                    <ul class="mb-0 ps-3">
+                        <li>Ce formulaire doit obligatoirement accompagner le permis de travail de sécurité générale pour tous les travaux d'excavation, de terrassement ou de tranchée de plus de 0.3 m de profondeur.</li>
+                        <li>Aucun terrassement mécanique n'est autorisé dans la zone d'influence de réseaux souterrains identifiés (Gaz, électricité, eau, télécoms) sans repérage manuel préalable.</li>
+                    </ul>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" id="excavationForm">
+                    <input type="hidden" name="type_formulaire" value="fouille">
+                    <input type="hidden" name="pre_allocated_id" value="{{ form_id }}">
+
+                    <!-- SECTION 1: DEPISTAGE (DEMANDE DE PERMIS) -->
+                    <div class="border border-success-dark mb-3" style="border: 2px solid #2e7d32 !important;">
+                        <div class="permis-section-title">
+                            1. DÉPISTAGE (DEMANDE DE PERMIS)
+                        </div>
+                        <div class="p-3 bg-white">
+                            <div class="row g-3">
+                                <!-- Gauche -->
+                                <div class="col-md-6 border-end border-light">
+                                    <div class="mb-2">
+                                        <label class="x-small fw-bold text-uppercase text-dark">Zone de réalisation de l'excavation :</label>
+                                        <input type="text" name="zone_travail" class="form-control form-control-sm border-dark rounded-0" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="x-small fw-bold text-uppercase text-dark">Utilité de l'excavation :</label>
+                                        <input type="text" name="utilite_excavation" class="form-control form-control-sm border-dark rounded-0" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="x-small fw-bold text-uppercase text-dark">Bâtiment / Area :</label>
+                                        <input type="text" name="batiment_area" class="form-control form-control-sm border-dark rounded-0">
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="x-small fw-bold text-uppercase d-block mb-1 text-success-dark">Classification de la zone :</span>
+                                        <div class="d-flex flex-wrap gap-2 text-dark">
+                                            <label class="x-small"><input type="checkbox" name="class_zone_0" value="Y"> Zone 0</label>
+                                            <label class="x-small"><input type="checkbox" name="class_zone_1" value="Y"> Zone 1</label>
+                                            <label class="x-small"><input type="checkbox" name="class_zone_2" value="Y"> Zone 2</label>
+                                            <label class="x-small"><input type="checkbox" name="class_zone_nc" value="Y" checked> Non classée</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="x-small fw-bold text-uppercase d-block mb-1 text-success-dark">Méthode d'exécution :</span>
+                                        <div class="d-flex flex-wrap gap-2 text-dark">
+                                            <label class="x-small"><input type="checkbox" name="methode_manuelle" value="Y"> Manuelle</label>
+                                            <label class="x-small"><input type="checkbox" name="methode_mecanique" value="Y"> Mécanique</label>
+                                            <label class="x-small"><input type="checkbox" name="methode_sans_tranchee" value="Y"> Sans Tranchée</label>
+                                        </div>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-4">
+                                            <label class="x-small text-dark fw-bold">Profondeur (m) :</label>
+                                            <input type="text" name="exc_profondeur" class="form-control form-control-sm border-dark rounded-0" placeholder="Ex: 1.5">
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="x-small text-dark fw-bold">Largeur (m) :</label>
+                                            <input type="text" name="exc_largeur" class="form-control form-control-sm border-dark rounded-0" placeholder="Ex: 2.0">
+                                        </div>
+                                        <div class="col-4">
+                                            <label class="x-small text-dark fw-bold">Longueur (m) :</label>
+                                            <input type="text" name="exc_longueur" class="form-control form-control-sm border-dark rounded-0" placeholder="Ex: 5.0">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Droite -->
+                                <div class="col-md-6 ps-md-4">
+                                    <div class="mb-3">
+                                        <label class="x-small fw-bold text-uppercase text-dark">Date &amp; Heure de début prévue :</label>
+                                        <div class="d-flex gap-1">
+                                            <input type="date" name="date_debut" class="form-control form-control-sm border-dark rounded-0" required>
+                                            <input type="time" name="heure_debut" class="form-control form-control-sm border-dark rounded-0">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="x-small fw-bold text-uppercase text-dark">Date &amp; Heure de fin prévue :</label>
+                                        <div class="d-flex gap-1">
+                                            <input type="date" name="date_fin" class="form-control form-control-sm border-dark rounded-0" required>
+                                            <input type="time" name="heure_fin" class="form-control form-control-sm border-dark rounded-0">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="x-small fw-bold text-uppercase d-block mb-1 text-success-dark">Équipements routiers / Réseaux :</span>
+                                        <div class="d-flex flex-column gap-1 text-dark">
+                                            <label class="x-small"><input type="checkbox" name="eq_cottage" value="Y"> Cottage routier</label>
+                                            <label class="x-small"><input type="checkbox" name="eq_vapeur" value="Y"> Réseau vapeur</label>
+                                            <label class="x-small"><input type="checkbox" name="eq_egouts" value="Y"> Égouts / Canalisations</label>
+                                            <div class="d-flex align-items-center gap-1 mt-1">
+                                                <label class="x-small mb-0"><input type="checkbox" name="eq_autres_check" value="Y"> Autres :</label>
+                                                <input type="text" name="eq_autres" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.7rem; height: 18px;" placeholder="Spécifier">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- DEMANDEUR BLOCK -->
+                            <div class="border border-dark mt-3 p-2 bg-light">
+                                <div class="fw-bold x-small text-uppercase text-success-dark mb-2">Permis demandé par (Demandeur) :</div>
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <label class="x-small text-dark">Nom du demandeur :</label>
+                                        <input type="text" name="entreprise_demandeur_nom" class="form-control form-control-sm border-dark rounded-0" placeholder="Saisir nom" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="x-small text-dark">Fonction / Titre :</label>
+                                        <input type="text" name="entreprise_demandeur_fonction" class="form-control form-control-sm border-dark rounded-0" placeholder="Saisir fonction">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="x-small text-dark">Entreprise / Division :</label>
+                                        <input type="text" name="entreprise" class="form-control form-control-sm border-dark rounded-0" value="{{ current_user.entreprise }}" required readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Département :</label>
+                                        <input type="text" name="departement_demandeur" class="form-control form-control-sm border-dark rounded-0" placeholder="Département">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Date :</label>
+                                        <input type="date" name="date_demandeur" class="form-control form-control-sm border-dark rounded-0">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Heure :</label>
+                                        <input type="time" name="heure_demandeur" class="form-control form-control-sm border-dark rounded-0">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-dark bg-white" style="position: relative;">
+                                            <div class="text-center fw-bold x-small py-0 border-bottom border-dark bg-light d-flex justify-content-between align-items-center px-2">
+                                                <span class="text-dark">Signature</span>
+                                                <div class="d-flex gap-1">
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.5rem;" onclick="loadSignature('demandeur')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.5rem;" onclick="saveSignature('demandeur')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                                </div>
+                                            </div>
+                                            <input type="text" name="nom_signature_demandeur" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                            <div style="height: 60px; position: relative;">
+                                                <canvas id="sig_fouille_demandeur" class="w-100 h-100 sig-canvas"></canvas>
+                                                <input type="hidden" name="sig_fouille_demandeur_data" id="sig_fouille_demandeur_data">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: PERMIS ET CERTIFICATS ASSOCIES -->
+                    <div class="border border-success-dark mb-3" style="border: 2px solid #2e7d32 !important;">
+                        <div class="permis-section-title">
+                            2. PERMIS ET CERTIFICATS ASSOCIÉS
+                        </div>
+                        <div class="p-3 bg-white">
+                            <div class="row g-2">
+                                {% for cert_label, cert_name in [
+                                    ('Permis de travail à chaud (Rouge)', 'cert_chaud'),
+                                    ('Permis de travail en hauteur (Bleu)', 'cert_hauteur'),
+                                    ('Certificat d\'entrée en espace confiné (Cyan)', 'cert_espace_confine'),
+                                    ('Permis de travail électrique (Orange)', 'cert_electrique')
+                                ] %}
+                                <div class="col-md-3 border-end border-light">
+                                    <span class="x-small fw-bold text-uppercase d-block text-dark">{{ cert_label }} :</span>
+                                    <div class="d-flex align-items-center gap-2 mt-1 text-dark">
+                                        <label class="x-small"><input type="radio" name="{{ cert_name }}" value="Non" checked> Non</label>
+                                        <label class="x-small"><input type="radio" name="{{ cert_name }}" value="Oui"> Oui</label>
+                                        <label class="x-small"><input type="radio" name="{{ cert_name }}" value="Co-Permis"> Co-Permis</label>
+                                    </div>
+                                    <input type="text" name="{{ cert_name }}_num" class="form-control form-control-sm border-dark rounded-0 mt-1 py-0" style="font-size:0.65rem;" placeholder="N° Co-Permis">
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="row g-2 mt-2 pt-2 border-top border-light">
+                                <div class="col-md-12">
+                                    <span class="x-small fw-bold text-uppercase d-block text-dark">Autre certificat / permis associé :</span>
+                                    <div class="row g-2 align-items-center mt-1 text-dark">
+                                        <div class="col-md-3">
+                                            <label class="x-small"><input type="radio" name="cert_autre" value="Non" checked> Aucun</label>
+                                            <label class="x-small ms-2"><input type="radio" name="cert_autre" value="Oui"> Oui</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <input type="text" name="cert_autre_desc" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem;" placeholder="Description de l'autre permis">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" name="cert_autre_num" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem;" placeholder="N° Co-Permis">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: SERVICES TECHNIQUES (EVALUATION DE RISQUES) -->
+                    <div class="border border-success-dark mb-3" style="border: 2px solid #2e7d32 !important;">
+                        <div class="permis-section-title">
+                            3. SERVICES TECHNIQUES (ÉVALUATION DE RISQUES)
+                        </div>
+                        <div class="p-3 bg-white">
+                            
+                            <!-- 3.1 Autorité de Zone -->
+                            <div class="border border-dark p-2 mb-3 bg-light bg-opacity-50">
+                                <div class="fw-bold x-small text-uppercase text-success-dark border-bottom border-dark pb-1 mb-2">3.1 AUTORITÉ DE ZONE</div>
+                                <div class="row g-2 align-items-center mb-2 text-dark">
+                                    <div class="col-md-3 border-end border-light">
+                                        <span class="x-small fw-bold">Câbles électriques enterrés ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="az_cables_elec" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="az_cables_elec" value="Non" checked> N</label>
+                                        </div>
+                                        <input type="text" name="az_cables_elec_volt" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem; height:20px;" placeholder="Tension (V)">
+                                    </div>
+                                    <div class="col-md-3 border-end border-light">
+                                        <span class="x-small fw-bold">Ligne d'eau / gaz ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="az_eau_gaz" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="az_eau_gaz" value="Non" checked> N</label>
+                                        </div>
+                                        <input type="text" name="az_eau_gaz_tuyaux" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem; height:20px;" placeholder="Tuyaux / Diamètre">
+                                    </div>
+                                    <div class="col-md-3 border-end border-light">
+                                        <span class="x-small fw-bold">Ligne identifiée sur plan ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="az_sur_plan" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="az_sur_plan" value="Non" checked> N</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span class="x-small fw-bold">Terrassement mécanique autorisé ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="az_terrasse_mecanique" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="az_terrasse_mecanique" value="Non" checked> N</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-2 align-items-end text-dark">
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Nom de l'inspecteur :</label>
+                                        <input type="text" name="nom_az_tech" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Fonction :</label>
+                                        <input type="text" name="fonction_az_tech" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Date / Heure :</label>
+                                        <input type="text" name="date_heure_az_tech" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;" placeholder="Ex: 14:00 - 02/06">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-dark bg-white" style="position: relative;">
+                                            <div class="text-center fw-bold px-2 py-0 border-bottom border-dark bg-light d-flex justify-content-between align-items-center" style="font-size:0.55rem;">
+                                                <span class="text-dark">Signature AZ TECH</span>
+                                                <div class="d-flex gap-1">
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.4rem;" onclick="loadSignature('az_tech')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.4rem;" onclick="saveSignature('az_tech')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                                </div>
+                                            </div>
+                                            <input type="text" name="nom_signature_az_tech" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                            <div style="height: 60px; position: relative;">
+                                                <canvas id="sig_fouille_az_tech" class="w-100 h-100 sig-canvas"></canvas>
+                                                <input type="hidden" name="sig_fouille_az_tech_data" id="sig_fouille_az_tech_data">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3.2 Service Electricité -->
+                            <div class="border border-dark p-2 mb-3 bg-light bg-opacity-50">
+                                <div class="fw-bold x-small text-uppercase text-success-dark border-bottom border-dark pb-1 mb-2">3.2 SERVICE ÉLECTRICITÉ</div>
+                                <div class="row g-2 align-items-center mb-2 text-dark">
+                                    <div class="col-md-3 border-end border-light">
+                                        <span class="x-small fw-bold">Câbles enterrés ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="elec_cables_enterrres" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="elec_cables_enterrres" value="Non" checked> N</label>
+                                        </div>
+                                        <input type="text" name="elec_cables_enterrres_volt" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem; height:20px;" placeholder="Tension (V)">
+                                    </div>
+                                    <div class="col-md-3 border-end border-light">
+                                        <span class="x-small fw-bold">Câbles aériens ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="elec_cables_aeriens" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="elec_cables_aeriens" value="Non" checked> N</label>
+                                        </div>
+                                        <input type="text" name="elec_cables_aeriens_volt" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem; height:20px;" placeholder="Tension (V)">
+                                    </div>
+                                    <div class="col-md-3 border-end border-light">
+                                        <span class="x-small fw-bold">Autres câbles ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="elec_autres_cables" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="elec_autres_cables" value="Non" checked> N</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <span class="x-small fw-bold">Ligne identifiée sur plan ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="elec_identification_plan" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="elec_identification_plan" value="Non" checked> N</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-2 mb-2 text-dark">
+                                    <div class="col-12">
+                                        <input type="text" name="elec_mesures" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem;" placeholder="Conditions de sécurité / Mesures requises">
+                                    </div>
+                                </div>
+                                <div class="row g-2 align-items-end text-dark">
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Nom de l'inspecteur :</label>
+                                        <input type="text" name="nom_elec" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Fonction :</label>
+                                        <input type="text" name="fonction_elec" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Date / Heure :</label>
+                                        <input type="text" name="date_heure_elec" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;" placeholder="Ex: 14:00 - 02/06">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-dark bg-white" style="position: relative;">
+                                            <div class="text-center fw-bold px-2 py-0 border-bottom border-dark bg-light d-flex justify-content-between align-items-center" style="font-size:0.55rem;">
+                                                <span class="text-dark">Signature ELEC</span>
+                                                <div class="d-flex gap-1">
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.4rem;" onclick="loadSignature('elec')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.4rem;" onclick="saveSignature('elec')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                                </div>
+                                            </div>
+                                            <input type="text" name="nom_signature_elec" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                            <div style="height: 60px; position: relative;">
+                                                <canvas id="sig_fouille_elec" class="w-100 h-100 sig-canvas"></canvas>
+                                                <input type="hidden" name="sig_fouille_elec_data" id="sig_fouille_elec_data">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3.3 Service Canalisation/Canaux -->
+                            <div class="border border-dark p-2 mb-3 bg-light bg-opacity-50">
+                                <div class="fw-bold x-small text-uppercase text-success-dark border-bottom border-dark pb-1 mb-2">3.3 SERVICE CANALISATION / CANAUX</div>
+                                <div class="row g-2 align-items-center mb-2 text-dark">
+                                    <div class="col-md-4 border-end border-light">
+                                        <span class="x-small fw-bold">Câbles enterrés ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="canal_cables_enterrres" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="canal_cables_enterrres" value="Non" checked> N</label>
+                                        </div>
+                                        <input type="text" name="canal_cables_enterrres_type" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem; height:20px;" placeholder="Type / PVC / etc">
+                                    </div>
+                                    <div class="col-md-4 border-end border-light">
+                                        <span class="x-small fw-bold">Ligne eau / gaz ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="canal_eau_gaz" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="canal_eau_gaz" value="Non" checked> N</label>
+                                        </div>
+                                        <input type="text" name="canal_eau_gaz_tuyaux" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem; height:20px;" placeholder="Tuyaux / Dimensions">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span class="x-small fw-bold">Ligne identifiée sur plan ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="canal_sur_plan" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="canal_sur_plan" value="Non" checked> N</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-2 mb-2 text-dark">
+                                    <div class="col-12">
+                                        <input type="text" name="canal_mesures" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem;" placeholder="Conditions de sécurité / Mesures requises">
+                                    </div>
+                                </div>
+                                <div class="row g-2 align-items-end text-dark">
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Nom de l'inspecteur :</label>
+                                        <input type="text" name="nom_canal" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Fonction :</label>
+                                        <input type="text" name="fonction_canal" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Date / Heure :</label>
+                                        <input type="text" name="date_heure_canal" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;" placeholder="Ex: 14:00 - 02/06">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-dark bg-white" style="position: relative;">
+                                            <div class="text-center fw-bold px-2 py-0 border-bottom border-dark bg-light d-flex justify-content-between align-items-center" style="font-size:0.55rem;">
+                                                <span class="text-dark">Signature CANAL</span>
+                                                <div class="d-flex gap-1">
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.4rem;" onclick="loadSignature('canal')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.4rem;" onclick="saveSignature('canal')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                                </div>
+                                            </div>
+                                            <input type="text" name="nom_signature_canal" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                            <div style="height: 60px; position: relative;">
+                                                <canvas id="sig_fouille_canal" class="w-100 h-100 sig-canvas"></canvas>
+                                                <input type="hidden" name="sig_fouille_canal_data" id="sig_fouille_canal_data">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3.4 Service Télécommunication/Voix/Informatique -->
+                            <div class="border border-dark p-2 mb-3 bg-light bg-opacity-50">
+                                <div class="fw-bold x-small text-uppercase text-success-dark border-bottom border-dark pb-1 mb-2">3.4 SERVICE TÉLÉCOMMUNICATION / VOIX / INFORMATIQUE</div>
+                                <div class="row g-2 align-items-center mb-2 text-dark">
+                                    <div class="col-md-6 border-end border-light">
+                                        <span class="x-small fw-bold">Câbles enterrés ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="telecom_cables_enterrres" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="telecom_cables_enterrres" value="Non" checked> N</label>
+                                        </div>
+                                        <input type="text" name="telecom_cables_enterrres_type" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem; height:20px;" placeholder="Type / Fibre / etc">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span class="x-small fw-bold">Ligne identifiée sur plan ?</span>
+                                        <div class="d-flex gap-2">
+                                            <label class="x-small"><input type="radio" name="telecom_identification_plan" value="Oui"> O</label>
+                                            <label class="x-small"><input type="radio" name="telecom_identification_plan" value="Non" checked> N</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-2 mb-2 text-dark">
+                                    <div class="col-12">
+                                        <input type="text" name="telecom_mesures" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.65rem;" placeholder="Conditions de sécurité / Mesures requises">
+                                    </div>
+                                </div>
+                                <div class="row g-2 align-items-end text-dark">
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Nom de l'inspecteur :</label>
+                                        <input type="text" name="nom_telecom" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Fonction :</label>
+                                        <input type="text" name="fonction_telecom" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Date / Heure :</label>
+                                        <input type="text" name="date_heure_telecom" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;" placeholder="Ex: 14:00 - 02/06">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-dark bg-white" style="position: relative;">
+                                            <div class="text-center fw-bold px-2 py-0 border-bottom border-dark bg-light d-flex justify-content-between align-items-center" style="font-size:0.55rem;">
+                                                <span class="text-dark">Signature TELECOM</span>
+                                                <div class="d-flex gap-1">
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.4rem;" onclick="loadSignature('telecom')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.4rem;" onclick="saveSignature('telecom')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                                </div>
+                                            </div>
+                                            <input type="text" name="nom_signature_telecom" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                            <div style="height: 60px; position: relative;">
+                                                <canvas id="sig_fouille_telecom" class="w-100 h-100 sig-canvas"></canvas>
+                                                <input type="hidden" name="sig_fouille_telecom_data" id="sig_fouille_telecom_data">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3.5 Responsable d'Exécution -->
+                            <div class="border border-dark p-2 bg-light">
+                                <div class="fw-bold x-small text-uppercase text-success-dark border-bottom border-dark pb-1 mb-2">3.5 IDENTIFICATION DES DANGERS / MESURES À PRENDRE PAR LE RESPONSABLE D'EXÉCUTION</div>
+                                <div class="row g-2 text-dark mb-2">
+                                    <div class="col-md-6 border-end border-light">
+                                        <span class="x-small fw-bold text-uppercase d-block mb-1 text-warning">Dangers identifiés :</span>
+                                        
+                                        {% for label, name in [
+                                            ('Terrain instable / risque d\'éboulement de parois', 'danger_terrain_instable'),
+                                            ('Chute de personnes / glissement', 'danger_chute'),
+                                            ('Risque d\'inondation / accumulation d\'eau', 'danger_inondation')
+                                        ] %}
+                                        <div class="d-flex justify-content-between align-items-center mb-1 border-bottom border-light">
+                                            <span class="x-small" style="font-size: 0.65rem;">{{ label }}</span>
+                                            <div class="border px-2 bg-white" style="font-size:0.6rem;"><label class="me-1"><input type="radio" name="{{ name }}" value="Y"> Y</label> <label><input type="radio" name="{{ name }}" value="N" checked> N</label></div>
+                                        </div>
+                                        {% endfor %}
+                                        <div class="d-flex justify-content-between align-items-center mb-1 border-bottom border-light">
+                                            <span class="x-small" style="font-size: 0.65rem;">Autres dangers :</span>
+                                            <div class="d-flex gap-1 align-items-center">
+                                                <input type="text" name="danger_autres_desc" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.6rem; height:18px; width:120px;" placeholder="Spécifier">
+                                                <div class="border px-2 bg-white" style="font-size:0.6rem;"><label class="me-1"><input type="radio" name="danger_autres" value="Y"> Y</label> <label><input type="radio" name="danger_autres" value="N" checked> N</label></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span class="x-small fw-bold text-uppercase d-block mb-1 text-primary">Mesures de prévention requises :</span>
+                                        
+                                        {% for label, name in [
+                                            ('Blindage / Étaiement mis en place (fouille > 1.3 m)', 'ex_blindage'),
+                                            ('Pente de talutage respectée', 'ex_talutage'),
+                                            ('Balisage physique (Barrières / Ruban)', 'ex_balisage_physique'),
+                                            ('Moyen d\'accès installé (Échelle tous les 7.5m)', 'ex_echelles'),
+                                            ('Passerelles de franchissement piétons installées', 'ex_passerelles'),
+                                            ('Déblais stockés à plus de 1 m du bord', 'ex_stockage_deblais'),
+                                            ('Pompage d\'eau / absence d\'infiltration d\'eau', 'ex_absence_eau'),
+                                            ('Port d\'EPI spécifique requis', 'ex_epi_specifique')
+                                        ] %}
+                                        <div class="d-flex justify-content-between align-items-center mb-1 border-bottom border-light">
+                                            <span class="x-small" style="font-size: 0.65rem;">{{ label }}</span>
+                                            <div class="border px-2 bg-white" style="font-size:0.6rem;"><label class="me-1"><input type="radio" name="{{ name }}" value="Y"> Y</label> <label><input type="radio" name="{{ name }}" value="N" checked> N</label></div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row g-2 align-items-end text-dark">
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark fw-bold">Nom du Responsable :</label>
+                                        <input type="text" name="nom_re_tech" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Fonction :</label>
+                                        <input type="text" name="fonction_re_tech" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="x-small text-dark">Date / Heure :</label>
+                                        <input type="text" name="date_heure_re_tech" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.65rem;" placeholder="Ex: 14:00 - 02/06">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="border border-dark bg-white" style="position: relative;">
+                                            <div class="text-center fw-bold px-2 py-0 border-bottom border-dark bg-light d-flex justify-content-between align-items-center" style="font-size:0.55rem;">
+                                                <span class="text-dark">Signature RE TECH</span>
+                                                <div class="d-flex gap-1">
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.4rem;" onclick="loadSignature('re_tech')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.4rem;" onclick="saveSignature('re_tech')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                                </div>
+                                            </div>
+                                            <input type="text" name="nom_signature_re_tech" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                            <div style="height: 60px; position: relative;">
+                                                <canvas id="sig_fouille_re_tech" class="w-100 h-100 sig-canvas"></canvas>
+                                                <input type="hidden" name="sig_fouille_re_tech_data" id="sig_fouille_re_tech_data">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: APPROBATION DU PERMIS -->
+                    <div class="border border-success-dark mb-3" style="border: 2px solid #2e7d32 !important;">
+                        <div class="permis-section-title">
+                            4. APPROBATION DU PERMIS
+                        </div>
+                        <div class="p-3 bg-white">
+                            <p class="x-small mb-2 text-muted">L'approbation de ce permis est accordée pour une durée de <strong>______ jours consécutifs</strong> (dans la limite de 10 jours maximum) sous réserve que les conditions de sécurité restent inchangées.</p>
+                            <div class="row g-3">
+                                <!-- Box 1 -->
+                                <div class="col-md-4">
+                                    <div class="border border-dark bg-white" style="position: relative;">
+                                        <div class="text-center fw-bold x-small py-1 border-bottom border-dark bg-light d-flex justify-content-between align-items-center px-2">
+                                            <span class="text-dark">AUTORITÉ DE ZONE (AZ)</span>
+                                            <div class="d-flex gap-1">
+                                                <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.5rem;" onclick="loadSignature('approb_az')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.5rem;" onclick="saveSignature('approb_az')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="p-2 text-dark">
+                                            <div class="mb-1">
+                                                <label class="x-small">Nom :</label>
+                                                <input type="text" name="nom_approb_az" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;">
+                                            </div>
+                                            <div class="mb-1">
+                                                <label class="x-small">Fonction :</label>
+                                                <input type="text" name="fonction_approb_az" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;" placeholder="Ex: Chef de Zone">
+                                            </div>
+                                            <div class="mb-1">
+                                                <label class="x-small">Date &amp; Heure :</label>
+                                                <input type="text" name="date_heure_approb_az" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;">
+                                            </div>
+                                        </div>
+                                        <input type="text" name="nom_signature_approb_az" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                        <div style="height: 60px; position: relative;">
+                                            <canvas id="sig_fouille_approb_az" class="w-100 h-100 sig-canvas"></canvas>
+                                            <input type="hidden" name="sig_fouille_approb_az_data" id="sig_fouille_approb_az_data">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Box 2 -->
+                                <div class="col-md-4">
+                                    <div class="border border-dark bg-white" style="position: relative;">
+                                        <div class="text-center fw-bold x-small py-1 border-bottom border-dark bg-light d-flex justify-content-between align-items-center px-2">
+                                            <span class="text-dark">RESPONSABLE HSE</span>
+                                            <div class="d-flex gap-1">
+                                                <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.5rem;" onclick="loadSignature('approb_hse')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.5rem;" onclick="saveSignature('approb_hse')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="p-2 text-dark">
+                                            <div class="mb-1">
+                                                <label class="x-small">Nom :</label>
+                                                <input type="text" name="nom_approb_hse" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;">
+                                            </div>
+                                            <div class="mb-1">
+                                                <label class="x-small">Fonction :</label>
+                                                <input type="text" name="fonction_approb_hse" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;" placeholder="Ex: Inspecteur HSE">
+                                            </div>
+                                            <div class="mb-1">
+                                                <label class="x-small">Date &amp; Heure :</label>
+                                                <input type="text" name="date_heure_approb_hse" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;">
+                                            </div>
+                                        </div>
+                                        <input type="text" name="nom_signature_approb_hse" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                        <div style="height: 60px; position: relative;">
+                                            <canvas id="sig_fouille_approb_hse" class="w-100 h-100 sig-canvas"></canvas>
+                                            <input type="hidden" name="sig_fouille_approb_hse_data" id="sig_fouille_approb_hse_data">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Box 3 -->
+                                <div class="col-md-4">
+                                    <div class="border border-dark bg-white" style="position: relative;">
+                                        <div class="text-center fw-bold x-small py-1 border-bottom border-dark bg-light d-flex justify-content-between align-items-center px-2">
+                                            <span class="text-dark">DIRECTEUR HSE / SÉCURITÉ</span>
+                                            <div class="d-flex gap-1">
+                                                <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.5rem;" onclick="loadSignature('approb_dir')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                                <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.5rem;" onclick="saveSignature('approb_dir')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="p-2 text-dark">
+                                            <div class="mb-1">
+                                                <label class="x-small">Nom :</label>
+                                                <input type="text" name="nom_approb_dir" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;">
+                                            </div>
+                                            <div class="mb-1">
+                                                <label class="x-small">Fonction :</label>
+                                                <input type="text" name="fonction_approb_dir" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;" placeholder="Ex: Directeur HSE">
+                                            </div>
+                                            <div class="mb-1">
+                                                <label class="x-small">Date &amp; Heure :</label>
+                                                <input type="text" name="date_heure_approb_dir" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size: 0.7rem;">
+                                            </div>
+                                        </div>
+                                        <input type="text" name="nom_signature_approb_dir" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                        <div style="height: 60px; position: relative;">
+                                            <canvas id="sig_fouille_approb_dir" class="w-100 h-100 sig-canvas"></canvas>
+                                            <input type="hidden" name="sig_fouille_approb_dir_data" id="sig_fouille_approb_dir_data">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 5: AUTORISATION DE DEBUT DES TRAVAUX -->
+                    <div class="border border-success-dark mb-3" style="border: 2px solid #2e7d32 !important;">
+                        <div class="permis-section-title">
+                            5. AUTORISATION DE DÉBUT DES TRAVAUX
+                        </div>
+                        <div class="p-3 bg-white">
+                            <p class="x-small text-muted mb-2">Je, Représentant de l'Autorité de Zone, autorise le début des travaux après vérification des mesures de sécurité.</p>
+                            
+                            <!-- Période de validité -->
+                            <div class="border border-dark p-2 mb-3 bg-light text-dark">
+                                <span class="x-small fw-bold text-uppercase d-block mb-1 text-success-dark">Période de validité de l'autorisation de début :</span>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <label class="x-small fw-bold mb-0">Du :</label>
+                                            <input type="date" name="auto_val_date_debut" class="form-control form-control-sm border-dark rounded-0" style="width: auto;">
+                                            <input type="time" name="auto_val_heure_debut" class="form-control form-control-sm border-dark rounded-0" style="width: auto;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <label class="x-small fw-bold mb-0">Au :</label>
+                                            <input type="date" name="auto_val_date_fin" class="form-control form-control-sm border-dark rounded-0" style="width: auto;">
+                                            <input type="time" name="auto_val_heure_fin" class="form-control form-control-sm border-dark rounded-0" style="width: auto;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border border-dark bg-white text-dark" style="position: relative;">
+                                <div class="text-center fw-bold x-small py-1 border-bottom border-dark bg-light d-flex justify-content-between align-items-center px-2">
+                                    <span>AUTORITÉ DE ZONE</span>
+                                    <div class="d-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.5rem;" onclick="loadSignature('auto_debut')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.5rem;" onclick="saveSignature('auto_debut')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                    </div>
+                                </div>
+                                <div class="p-2">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <label class="x-small">Nom :</label>
+                                            <input type="text" name="nom_auto_debut" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.7rem;" placeholder="Nom">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="x-small">Fonction :</label>
+                                            <input type="text" name="fonction_auto_debut" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.7rem;" placeholder="Fonction">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="x-small">Date &amp; Heure :</label>
+                                            <input type="text" name="auto_debut_date_time" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.7rem;" placeholder="Ex: 14:00 - 02/06/2026">
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="text" name="nom_signature_auto_debut" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                <div style="height: 60px; position: relative;">
+                                    <canvas id="sig_fouille_auto_debut" class="w-100 h-100 sig-canvas"></canvas>
+                                    <input type="hidden" name="sig_fouille_auto_debut_data" id="sig_fouille_auto_debut_data">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 6: ACCEPTATION PAR LE RESPONSABLE D'EXECUTION -->
+                    <div class="border border-success-dark mb-3" style="border: 2px solid #2e7d32 !important;">
+                        <div class="permis-section-title">
+                            6. ACCEPTATION PAR LE RESPONSABLE D'EXÉCUTION
+                        </div>
+                        <div class="p-3 bg-white">
+                            <p class="x-small text-muted mb-2">Je, Responsable d'Exécution, déclare avoir pris connaissance des risques et m'engage à faire respecter toutes les consignes de sécurité.</p>
+                            <div class="border border-dark bg-white text-dark" style="position: relative;">
+                                <div class="text-center fw-bold x-small py-1 border-bottom border-dark bg-light d-flex justify-content-between align-items-center px-2">
+                                    <span>RESPONSABLE D'EXÉCUTION</span>
+                                    <div class="d-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-primary" style="font-size:0.5rem;" onclick="loadSignature('accept_resp')" title="Charger signature"><i class="fas fa-magic"></i></button>
+                                        <button type="button" class="btn btn-sm btn-light border py-0 px-1 text-success" style="font-size:0.5rem;" onclick="saveSignature('accept_resp')" title="Enregistrer signature"><i class="fas fa-save"></i></button>
+                                    </div>
+                                </div>
+                                <div class="p-2">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <label class="x-small">Nom :</label>
+                                            <input type="text" name="nom_accept_resp" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.7rem;" placeholder="Nom" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="x-small">Fonction :</label>
+                                            <input type="text" name="fonction_accept_resp" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.7rem;" placeholder="Fonction">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="x-small">Date &amp; Heure :</label>
+                                            <input type="text" name="accept_resp_date_time" class="form-control form-control-sm border-dark rounded-0 py-0" style="font-size:0.7rem;" placeholder="Ex: 14:15 - 02/06/2026">
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="text" name="nom_signature_accept_resp" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 px-1 py-0" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                <div style="height: 60px; position: relative;">
+                                    <canvas id="sig_fouille_accept_resp" class="w-100 h-100 sig-canvas"></canvas>
+                                    <input type="hidden" name="sig_fouille_accept_resp_data" id="sig_fouille_accept_resp_data">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REDIRECTION VERS VERSO (PAGE 2) -->
+                    <div class="alert alert-info border border-info d-flex justify-content-between align-items-center py-2 px-3 mb-3 small no-print" style="background:#e3f2fd; color:#0d47a1; font-size:0.75rem;">
+                        <span><i class="fas fa-info-circle me-2"></i><strong>Page 2 (Verso - Revalidation journalière)</strong> : Pour accéder aux 10 lignes de revalidation journalière, de changement de Responsable d'Exécution et d'enregistrement des contrôles HSE.</span>
+                        <a href="{{ url_for('permis.formulaire_papier', type_form='revalidation', theme='fouille') }}" class="btn btn-sm btn-primary fw-bold rounded-pill shadow-sm" target="_blank"><i class="fas fa-sync me-1"></i> Ouvrir Page 2 (Verso)</a>
+                    </div>
+
+                    <!-- SCAN OU PHOTO (PIÈCE JOINTE) -->
+                    <div class="border border-dark p-2 mb-3 mt-3 bg-light no-print">
+                        <div class="fw-bold x-small text-uppercase mb-1 text-dark"><i class="fas fa-paperclip me-1"></i> Pièce Jointe / Scan du Formulaire Physique (Optionnel)</div>
+                        <input type="file" name="fichier_joint" class="form-control form-control-sm border-dark rounded-0" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between align-items-center opacity-75 no-print" style="font-size: 0.6rem; border-top: 1px solid #ccc; pt-2; color: #2e7d32;">
+                        <div style="text-transform: lowercase;">système de sécurité © 2026</div>
+                        <div class="fw-bold">Formulaire F - Permis d'Excavation (SINYLON FIAT) - Page 1</div>
+                    </div>
+
+                    <div class="mt-4 text-center no-print">
+                        <button type="button" onclick="submitExcavationForm()" class="btn btn-success px-5 fw-bold text-white shadow-sm" style="background-color: #2e7d32 !important; border: none; font-size: 1.1rem; border-radius: 4px; padding: 10px 30px;">ENREGISTRER PERMIS D'EXCAVATION (F)</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ids = ['demandeur', 'az_tech', 'elec', 'canal', 'telecom', 're_tech', 'approb_az', 'approb_hse', 'approb_dir', 'auto_debut', 'accept_resp'];
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        ids.forEach(id => {
+            const canvas = document.getElementById('sig_fouille_' + id);
+            if(canvas) {
+                const currentWidth = canvas.offsetWidth * ratio;
+                const currentHeight = canvas.offsetHeight * ratio;
+                if (currentWidth > 0 && currentHeight > 0) {
+                    canvas.width = currentWidth;
+                    canvas.height = currentHeight;
+                    canvas.getContext("2d").scale(ratio, ratio);
+                }
+                
+                let inputName = '';
+                if (id === 'demandeur') inputName = 'entreprise_demandeur_nom';
+                else if (id === 'az_tech') inputName = 'nom_az_tech';
+                else if (id === 'elec') inputName = 'nom_elec';
+                else if (id === 'canal') inputName = 'nom_canal';
+                else if (id === 'telecom') inputName = 'nom_telecom';
+                else if (id === 're_tech') inputName = 'nom_re_tech';
+                else if (id === 'approb_az') inputName = 'nom_approb_az';
+                else if (id === 'approb_hse') inputName = 'nom_approb_hse';
+                else if (id === 'approb_dir') inputName = 'nom_approb_dir';
+                else if (id === 'auto_debut') inputName = 'nom_auto_debut';
+                else if (id === 'accept_resp') inputName = 'nom_accept_resp';
+
+                // Draw initial state
+                drawSignatureText(id, getSignatureText(id, inputName));
+                
+                if (window.isPermisReadOnly) {
+                    {% if permis and permis.signatures %}
+                        const savedSigs = {{ permis.signatures|tojson }};
+                        const base64Data = savedSigs['sig_fouille_' + id];
+                        if (base64Data) {
+                            const img = new Image();
+                            img.onload = function() {
+                                const ctx = canvas.getContext('2d');
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                ctx.drawImage(img, 0, 0, canvas.width / ratio, canvas.height / ratio);
+                            };
+                            img.src = base64Data;
+                        }
+                    {% endif %}
+                    return;
+                }
+                
+                // Bind input listeners
+                const inputNameEl = document.querySelector('input[name="' + inputName + '"]');
+                const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+                
+                function updateSig() {
+                    drawSignatureText(id, getSignatureText(id, inputName));
+                }
+                
+                if(inputNameEl) inputNameEl.addEventListener('input', updateSig);
+                if(inputSig) inputSig.addEventListener('input', updateSig);
+                
+                // Draw initial state
+                updateSig();
+            }
+        });
+
+        if (window.isPermisReadOnly) return;
+
+        // Force redraw when font is loaded to ensure it displays correctly
+        document.fonts.load("22px 'Dancing Script'").then(function() {
+            ids.forEach(id => {
+                let inputName = '';
+                if (id === 'demandeur') inputName = 'entreprise_demandeur_nom';
+                else if (id === 'az_tech') inputName = 'nom_az_tech';
+                else if (id === 'elec') inputName = 'nom_elec';
+                else if (id === 'canal') inputName = 'nom_canal';
+                else if (id === 'telecom') inputName = 'nom_telecom';
+                else if (id === 're_tech') inputName = 'nom_re_tech';
+                else if (id === 'approb_az') inputName = 'nom_approb_az';
+                else if (id === 'approb_hse') inputName = 'nom_approb_hse';
+                else if (id === 'approb_dir') inputName = 'nom_approb_dir';
+                else if (id === 'auto_debut') inputName = 'nom_auto_debut';
+                else if (id === 'accept_resp') inputName = 'nom_accept_resp';
+
+                drawSignatureText(id, getSignatureText(id, inputName));
+            });
+        });
+    });
+
+    function getSignatureText(id, inputName) {
+        const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+        const inputNameEl = document.querySelector('input[name="' + inputName + '"]');
+        return (inputSig && inputSig.value) ? inputSig.value : (inputNameEl ? inputNameEl.value : '');
+    }
+
+    function drawSignatureText(id, text) {
+        const canvas = document.getElementById('sig_fouille_' + id);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        // Dynamic resize if dimensions are not set or changed
+        const currentWidth = canvas.offsetWidth * ratio;
+        const currentHeight = canvas.offsetHeight * ratio;
+        if (currentWidth > 0 && currentHeight > 0 && (canvas.width !== currentWidth || canvas.height !== currentHeight)) {
+            canvas.width = currentWidth;
+            canvas.height = currentHeight;
+            ctx.scale(ratio, ratio);
+        }
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if(!text) return;
+        
+        ctx.save();
+        ctx.font = "italic 22px 'Dancing Script', 'Brush Script MT', cursive";
+        ctx.fillStyle = "blue";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, canvas.width / (2 * ratio), canvas.height / (2 * ratio));
+        ctx.restore();
+    }
+
+    function saveSignature(id) {
+        let inputName = '';
+        if (id === 'demandeur') inputName = 'entreprise_demandeur_nom';
+        else if (id === 'az_tech') inputName = 'nom_az_tech';
+        else if (id === 'elec') inputName = 'nom_elec';
+        else if (id === 'canal') inputName = 'nom_canal';
+        else if (id === 'telecom') inputName = 'nom_telecom';
+        else if (id === 're_tech') inputName = 'nom_re_tech';
+        else if (id === 'approb_az') inputName = 'nom_approb_az';
+        else if (id === 'approb_hse') inputName = 'nom_approb_hse';
+        else if (id === 'approb_dir') inputName = 'nom_approb_dir';
+        else if (id === 'auto_debut') inputName = 'nom_auto_debut';
+        else if (id === 'accept_resp') inputName = 'nom_accept_resp';
+
+        const inputNameEl = document.querySelector('input[name="' + inputName + '"]');
+        const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+        
+        const nameVal = inputNameEl ? inputNameEl.value.trim() : '';
+        const sigVal = inputSig ? inputSig.value.trim() : '';
+        
+        if (nameVal || sigVal) {
+            localStorage.setItem('noro_saved_sig_name_' + id, nameVal);
+            localStorage.setItem('noro_saved_sig_text_' + id, sigVal);
+            alert("✅ Votre signature numérique a été enregistrée !");
+        } else {
+            alert("⚠️ Veuillez saisir votre nom ou votre texte de signature avant d'enregistrer.");
+        }
+    }
+
+    function loadSignature(id) {
+        let inputName = '';
+        if (id === 'demandeur') inputName = 'entreprise_demandeur_nom';
+        else if (id === 'az_tech') inputName = 'nom_az_tech';
+        else if (id === 'elec') inputName = 'nom_elec';
+        else if (id === 'canal') inputName = 'nom_canal';
+        else if (id === 'telecom') inputName = 'nom_telecom';
+        else if (id === 're_tech') inputName = 'nom_re_tech';
+        else if (id === 'approb_az') inputName = 'nom_approb_az';
+        else if (id === 'approb_hse') inputName = 'nom_approb_hse';
+        else if (id === 'approb_dir') inputName = 'nom_approb_dir';
+        else if (id === 'auto_debut') inputName = 'nom_auto_debut';
+        else if (id === 'accept_resp') inputName = 'nom_accept_resp';
+
+        const savedName = localStorage.getItem('noro_saved_sig_name_' + id);
+        const savedSig = localStorage.getItem('noro_saved_sig_text_' + id);
+        
+        if (savedName || savedSig) {
+            const inputNameEl = document.querySelector('input[name="' + inputName + '"]');
+            const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+            
+            if (inputNameEl && savedName !== null) inputNameEl.value = savedName;
+            if (inputSig && savedSig !== null) inputSig.value = savedSig;
+            
+            drawSignatureText(id, getSignatureText(id, inputName));
+        } else {
+            alert("⚠️ Aucune signature enregistrée pour cet acteur.");
+        }
+    }
+
+    function submitExcavationForm() {
+        const ids = ['demandeur', 'az_tech', 'elec', 'canal', 'telecom', 're_tech', 'approb_az', 'approb_hse', 'approb_dir', 'auto_debut', 'accept_resp'];
+        ids.forEach(id => {
+            const canvas = document.getElementById('sig_fouille_' + id);
+            if(canvas) {
+                let inputName = '';
+                if (id === 'demandeur') inputName = 'entreprise_demandeur_nom';
+                else if (id === 'az_tech') inputName = 'nom_az_tech';
+                else if (id === 'elec') inputName = 'nom_elec';
+                else if (id === 'canal') inputName = 'nom_canal';
+                else if (id === 'telecom') inputName = 'nom_telecom';
+                else if (id === 're_tech') inputName = 'nom_re_tech';
+                else if (id === 'approb_az') inputName = 'nom_approb_az';
+                else if (id === 'approb_hse') inputName = 'nom_approb_hse';
+                else if (id === 'approb_dir') inputName = 'nom_approb_dir';
+                else if (id === 'auto_debut') inputName = 'nom_auto_debut';
+                else if (id === 'accept_resp') inputName = 'nom_accept_resp';
+
+                const inputNameEl = document.querySelector('input[name="' + inputName + '"]');
+                const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+                if ((inputNameEl && inputNameEl.value) || (inputSig && inputSig.value)) {
+                    document.getElementById('sig_fouille_' + id + '_data').value = canvas.toDataURL();
+                }
+            }
+        });
+        document.getElementById('excavationForm').submit();
+    }
+</script>
+{% endblock %}

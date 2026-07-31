@@ -1,0 +1,758 @@
+{% extends "base.html" %}
+{% block title %}Contrôle d'Accès - Caisse NFC{% endblock %}
+
+{% block content %}
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+    /* Radar Animation */
+    .radar-container {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .radar-circle {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: rgba(14, 165, 233, 0.05);
+        border: 2px solid rgba(14, 165, 233, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .radar-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid rgba(14, 165, 233, 0.4);
+        animation: radar-pulse 2s linear infinite;
+        opacity: 0;
+    }
+    .radar-ring:nth-child(2) {
+        animation-delay: 0.6s;
+    }
+    .radar-ring:nth-child(3) {
+        animation-delay: 1.2s;
+    }
+    
+    @keyframes radar-pulse {
+        0% {
+            transform: scale(0.6);
+            opacity: 0.8;
+        }
+        100% {
+            transform: scale(1.4);
+            opacity: 0;
+        }
+    }
+
+    .nfc-icon-btn {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        border: none;
+        color: white;
+        font-size: 2.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4);
+        cursor: pointer;
+        z-index: 5;
+        transition: all 0.3s ease;
+    }
+    .nfc-icon-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 30px rgba(14, 165, 233, 0.5);
+    }
+    .nfc-icon-btn.scanning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        box-shadow: 0 10px 25px rgba(245, 158, 11 0.4);
+        animation: pulse-orange 1.5s infinite alternate;
+    }
+
+    @keyframes pulse-orange {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.08); }
+    }
+
+    /* Result Card Styles */
+    .status-banner {
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .status-authorized {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #15803d;
+        border: 1px solid #86efac;
+    }
+    .status-blocked {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #b91c1c;
+        border: 1px solid #fca5a5;
+    }
+    .status-expired {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        color: #d97706;
+        border: 1px solid #fcd34d;
+    }
+
+    .hab-badge-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        margin: 3px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .hab-active {
+        background-color: #dcfce7;
+        color: #16a34a;
+        border: 1px solid #86efac;
+    }
+    .hab-inactive {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        border: 1px solid #cbd5e1;
+        opacity: 0.5;
+    }
+
+    /* Countdown Bar */
+    .progress-bar-countdown {
+        height: 4px;
+        background-color: #e2e8f0;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        border-radius: 2px;
+    }
+    .progress-bar-inner {
+        height: 100%;
+        background-color: #0ea5e9;
+        width: 100%;
+        transition: width 5s linear;
+    }
+
+    /* Glassmorphism Caisse Card */
+    .caisse-card {
+        border-radius: 24px !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.8) !important;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.1) !important;
+    }
+</style>
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-6 col-md-8">
+        <div class="card caisse-card shadow-lg mb-4 text-dark">
+            <div class="card-header text-center border-bottom border-light pb-3 pt-4">
+                <h3 class="fw-bold mb-1"><i class="fas fa-microchip me-2 text-primary"></i>Contrôle d'Accès NFC</h3>
+                <p class="text-muted small mb-0">Scanner les cartes d'accès des travailleurs en temps réel</p>
+            </div>
+            
+            <div class="card-body p-4">
+                <!-- RADAR SECTION -->
+                <div id="radar-view" class="text-center py-4">
+                    <div class="radar-container mb-4">
+                        <div class="radar-ring"></div>
+                        <div class="radar-ring"></div>
+                        <div class="radar-ring"></div>
+                        <div class="radar-circle">
+                            <button id="nfc-scan-btn" class="nfc-icon-btn" onclick="startNfcScan()">
+                                <i class="fas fa-rss"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h5 class="fw-bold text-dark" id="scan-status-text">Approchez un badge NFC...</h5>
+                    <p class="text-muted small px-4" id="scan-sub-text">
+                        Posez la carte physique sur votre lecteur USB ou au dos de votre smartphone NFC.
+                    </p>
+                    
+                    <!-- Webcam QR Code scanner area -->
+                    <div id="qr-reader-container" class="mt-3 d-none border rounded overflow-hidden shadow-inner mx-auto" style="max-width: 320px; background: #000;">
+                        <div id="qr-reader" style="width: 100%;"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-center flex-wrap gap-2 mt-4">
+                        <button class="btn btn-outline-primary btn-sm" id="toggle-webcam-btn" onclick="toggleWebcamScanner()">
+                            <i class="fas fa-camera"></i> Scanner Caméra (QR)
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="triggerManualPrompt()">
+                            <i class="fas fa-keyboard"></i> Saisie manuelle UID
+                        </button>
+                    </div>
+
+                    <div class="alert alert-danger bg-danger-subtle border-danger text-start p-3 rounded-3 mt-4 mb-0" style="border-left: 5px solid #dc2626;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-phone-volume text-danger fs-4 me-3"></i>
+                                <div>
+                                    <div class="fw-bold text-danger-emphasis small">CONTACT URGENCE HSE CHANTIER</div>
+                                    <div class="fw-bold text-dark fs-6">Nouri : <a href="tel:0563765157" class="text-danger text-decoration-none fw-extrabold">0563765157</a></div>
+                                </div>
+                            </div>
+                            <span class="badge bg-danger text-white rounded-pill px-3 py-2">SÉCURITÉ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LOADING SPINNER (HIDDEN) -->
+                <div id="loading-view" class="text-center py-5 d-none">
+                    <div class="spinner-border text-primary mb-3" style="width: 3.5rem; height: 3.5rem;" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <h5 class="fw-bold">Interrogation de la base de données...</h5>
+                    <p class="text-muted small">Vérification de la validité du badge</p>
+                </div>
+
+                <!-- RESULT SECTION (HIDDEN) -->
+                <div id="result-view" class="d-none">
+                    <!-- Countdown Bar -->
+                    <div class="progress-bar-countdown mb-3">
+                        <div id="countdown-bar-inner" class="progress-bar-inner"></div>
+                    </div>
+
+                    <!-- Access Status Banner -->
+                    <div id="result-status-banner" class="status-banner mb-4">
+                        ACCÈS AUTORISÉ
+                    </div>
+
+                    <!-- Worker Identity Grid -->
+                    <div class="row align-items-center mb-4">
+                        <div class="col-4 text-center">
+                            <div class="border border-dark rounded overflow-hidden shadow-sm mx-auto" style="width: 100px; height: 120px; background-color: #f1f5f9;">
+                                <img id="res-photo" src="" alt="Photo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/static/img/default_avatar.png'">
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <h4 id="res-name" class="fw-bold mb-1">JEAN DUPONT</h4>
+                            <div class="badge bg-secondary mb-2" id="res-societe">ARTRLIA</div>
+                            <div class="text-dark small mb-1"><strong class="text-muted">Poste:</strong> <span id="res-poste" class="fw-semibold">Conducteur d'Engins</span></div>
+                            <div class="text-dark small mb-1"><strong class="text-muted">N° Badge:</strong> <span id="res-num" class="font-monospace text-primary fw-bold">ART-B-0001</span></div>
+                            <div class="text-dark small"><strong class="text-muted">Expiration:</strong> <span id="res-exp" class="fw-semibold">31/12/2026</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Zones & Habilitations -->
+                    <div class="border-top border-light pt-3">
+                        <div class="row">
+                            <div class="col-6 border-end border-light">
+                                <h6 class="fw-bold text-muted small text-uppercase mb-2"><i class="fas fa-lock-open me-1"></i>Zones autorisées</h6>
+                                <div id="res-zones" class="d-flex flex-wrap gap-1">
+                                    <span class="badge bg-dark">STEP 3</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="fw-bold text-muted small text-uppercase mb-2"><i class="fas fa-shield-alt me-1"></i>Habilitations</h6>
+                                <div id="res-habs">
+                                    <span class="hab-badge-icon hab-active" title="Hauteur">H</span>
+                                    <span class="hab-badge-icon hab-inactive" title="Soudure">S</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reason Block (Flashing if Blocked) -->
+                    <div id="res-reason-block" class="alert alert-danger mt-3 d-none">
+                        <i class="fas fa-exclamation-triangle me-2"></i><strong>Motif du blocage :</strong> <span id="res-reason-text">Infraction de sécurité</span>
+                    </div>
+
+                    <div class="text-center mt-4 pt-2 border-top border-light">
+                        <button class="btn btn-primary btn-chic-gold px-4" onclick="resetToScan()">
+                            <i class="fas fa-sync"></i> Re-scanner
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HIDDEN AUTOFOCUS INPUT FOR KEYBOARD WEDGE READERS -->
+<input type="text" id="wedge-input" style="position: absolute; left: -9999px; opacity: 0;" autocomplete="off">
+
+<script>
+    let ndefReader = null;
+    let nfcReadingActive = false;
+    let countdownTimer = null;
+    let audioCtx = null;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Setup hidden keyboard wedge input autofocus
+        const wedge = document.getElementById('wedge-input');
+        if (wedge) {
+            // Keep input focused
+            document.body.addEventListener('click', function() {
+                if (document.getElementById('radar-view').classList.contains('d-none') === false) {
+                    wedge.focus();
+                }
+            });
+            wedge.focus();
+
+            // Detect Enter key from reader
+            wedge.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const uid = wedge.value.trim().toUpperCase();
+                    if (uid) {
+                        console.log("Scanned via keyboard wedge:", uid);
+                        verifyUID(uid);
+                    }
+                    wedge.value = '';
+                }
+            });
+        }
+
+        // Try to unlock audio context on first click
+        document.body.addEventListener('click', function() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
+
+        // Proactively test WebNFC support on load
+        if ('NDEFReader' in window) {
+            console.log("WebNFC is supported natively.");
+            // Auto start scanning if supported
+            startNfcScan();
+        } else {
+            console.log("WebNFC is not supported natively.");
+            document.getElementById('scan-sub-text').innerHTML += "<br><span class='text-warning fw-bold'><i class='fas fa-info-circle me-1'></i>Note: WebNFC natif non supporté par ce navigateur. Utilisez un lecteur USB clavier (ACR122U en émulation clavier) ou tapez l'UID manuellement.</span>";
+        }
+    });
+
+    // Sound alert generator
+    function playBeep(type) {
+        if (!audioCtx) return;
+        try {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const now = audioCtx.currentTime;
+            
+            if (type === 'success') {
+                // Happy double tone
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'error') {
+                // Sad alarm buzz
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.setValueAtTime(120, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            } else if (type === 'warning') {
+                // Double alert
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(440, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.45);
+            }
+        } catch(e) {
+            console.warn("Could not play scan sound:", e);
+        }
+    }
+
+    async function startNfcScan() {
+        if (!('NDEFReader' in window)) {
+            // Not supported, focus keyboard wedge input
+            document.getElementById('wedge-input').focus();
+            return;
+        }
+
+        const btn = document.getElementById('nfc-scan-btn');
+        const statusText = document.getElementById('scan-status-text');
+
+        try {
+            if (nfcReadingActive) {
+                return; // Already scanning
+            }
+
+            ndefReader = new NDEFReader();
+            await ndefReader.scan();
+            
+            nfcReadingActive = true;
+            btn.classList.add('scanning');
+            statusText.textContent = "Scanner actif. Approchez la carte...";
+            statusText.classList.add('text-warning');
+
+            ndefReader.addEventListener("readingerror", () => {
+                console.warn("Error reading NFC tag.");
+                playBeep('error');
+            });
+
+            ndefReader.addEventListener("reading", ({ message, serialNumber }) => {
+                // serialNumber has colon separators like 04:8f:a2:3e...
+                const uid = serialNumber.replace(/:/g, "").toUpperCase();
+                console.log("NFC Tag read, UID:", uid);
+                verifyUID(uid);
+            });
+
+        } catch (error) {
+            console.error("NFC Scan failed:", error);
+            statusText.textContent = "Lecteur indisponible (autorisez le NFC)";
+            statusText.classList.remove('text-warning');
+            btn.classList.remove('scanning');
+            nfcReadingActive = false;
+        }
+    }
+
+    function verifyUID(uid) {
+        // Show loading view
+        document.getElementById('radar-view').classList.add('d-none');
+        document.getElementById('loading-view').classList.remove('d-none');
+        document.getElementById('result-view').classList.add('d-none');
+
+        // Cancel previous countdown
+        if (countdownTimer) {
+            clearTimeout(countdownTimer);
+        }
+
+        fetch(`/badge/api/check_nfc/${uid}`)
+            .then(res => {
+                if (res.status === 404) {
+                    return res.json().then(data => { throw { status: 404, message: data.message }; });
+                }
+                if (!res.ok) {
+                    throw { status: res.status, message: "Erreur serveur" };
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success && data.badge) {
+                    displayResult(data.badge);
+                } else {
+                    displayUnknown(uid);
+                }
+            })
+            .catch(err => {
+                console.error("Error verifying UID:", err);
+                if (err.status === 404) {
+                    displayUnknown(uid);
+                } else {
+                    displayError(err.message || "Erreur de connexion");
+                }
+            });
+    }
+
+    function displayResult(badge) {
+        document.getElementById('loading-view').classList.add('d-none');
+        document.getElementById('result-view').classList.remove('d-none');
+
+        // Prepopulate text
+        document.getElementById('res-name').textContent = `${badge.prenom} ${badge.nom}`.toUpperCase();
+        document.getElementById('res-societe').textContent = badge.societe;
+        document.getElementById('res-poste').textContent = badge.fonction;
+        document.getElementById('res-num').textContent = badge.numero_badge;
+        document.getElementById('res-exp').textContent = badge.date_expiration;
+        
+        // Photo URL
+        const photoEl = document.getElementById('res-photo');
+        if (badge.photo_url) {
+            photoEl.src = badge.photo_url;
+        } else {
+            photoEl.src = '/static/img/default_avatar.png';
+        }
+
+        // Access zones
+        const zonesEl = document.getElementById('res-zones');
+        zonesEl.innerHTML = '';
+        if (badge.zones_acces) {
+            badge.zones_acces.split(',').forEach(z => {
+                const span = document.createElement('span');
+                span.className = 'badge bg-dark text-white px-2.5 py-1.5';
+                span.textContent = z.trim();
+                zonesEl.appendChild(span);
+            });
+        } else {
+            zonesEl.innerHTML = '<span class="text-muted small">—</span>';
+        }
+
+        // Habilitations list
+        const habsEl = document.getElementById('res-habs');
+        habsEl.innerHTML = '';
+        const habMap = [
+            { key: 'hauteur', label: 'H', desc: 'Habilitation Hauteur' },
+            { key: 'soudure', label: 'S', desc: 'Habilitation Soudure/Chaud' },
+            { key: 'electricite', label: 'E', desc: 'Habilitation Électricité' },
+            { key: 'confine', label: 'C', desc: 'Espace Confiné' },
+            { key: 'engins', label: 'V', desc: 'Opérateur Engins' },
+            { key: 'sst', label: 'SST', desc: 'Sauveteur Secouriste' }
+        ];
+
+        habMap.forEach(h => {
+            const hasHab = badge.habilitations[h.key];
+            const span = document.createElement('span');
+            span.className = `hab-badge-icon ${hasHab ? 'hab-active' : 'hab-inactive'}`;
+            span.textContent = h.label;
+            span.title = `${h.desc}: ${hasHab ? 'Valide' : 'Non'}`;
+            habsEl.appendChild(span);
+        });
+
+        // Banner and Alerts based on Status
+        const banner = document.getElementById('result-status-banner');
+        const reasonBlock = document.getElementById('res-reason-block');
+        const reasonText = document.getElementById('res-reason-text');
+        
+        reasonBlock.classList.add('d-none');
+
+        if (badge.is_blocked) {
+            banner.textContent = "ACCÈS REFUSÉ / BLOQUÉ";
+            banner.className = "status-banner status-blocked";
+            reasonText.textContent = badge.motif_blocage || "Bloqué par la sécurité SINYLON FIAT.";
+            reasonBlock.classList.remove('d-none');
+            playBeep('error');
+        } else if (badge.statut === 'expire') {
+            banner.textContent = "BADGE EXPIRÉ";
+            banner.className = "status-banner status-expired";
+            reasonText.textContent = `Ce badge a expiré le ${badge.date_expiration}. Accès refusé.`;
+            reasonBlock.classList.remove('d-none');
+            playBeep('error');
+        } else {
+            banner.textContent = "ACCÈS AUTORISÉ";
+            banner.className = "status-banner status-authorized";
+            playBeep('success');
+        }
+
+        // Start 5-second countdown to auto-reset
+        triggerCountdownReset();
+    }
+
+    function displayUnknown(uid) {
+        document.getElementById('loading-view').classList.add('d-none');
+        document.getElementById('result-view').classList.remove('d-none');
+
+        document.getElementById('res-name').textContent = "BADGE INCONNU";
+        document.getElementById('res-societe').textContent = "NON ENREGISTRÉ";
+        document.getElementById('res-poste').textContent = "N/A";
+        document.getElementById('res-num').textContent = uid;
+        document.getElementById('res-exp').textContent = "N/A";
+        document.getElementById('res-photo').src = '/static/img/default_avatar.png';
+        document.getElementById('res-zones').innerHTML = '<span class="text-muted">—</span>';
+        document.getElementById('res-habs').innerHTML = '<span class="text-muted">—</span>';
+
+        const banner = document.getElementById('result-status-banner');
+        banner.textContent = "CARTE NON ENREGISTRÉE";
+        banner.className = "status-banner status-blocked";
+
+        const reasonBlock = document.getElementById('res-reason-block');
+        const reasonText = document.getElementById('res-reason-text');
+        reasonText.textContent = `L'UID NFC (${uid}) ne correspond à aucun badge actif ou provisoire enregistré dans le système.`;
+        reasonBlock.classList.remove('d-none');
+
+        playBeep('warning');
+        triggerCountdownReset();
+    }
+
+    function displayError(msg) {
+        document.getElementById('loading-view').classList.add('d-none');
+        document.getElementById('result-view').classList.remove('d-none');
+
+        document.getElementById('res-name').textContent = "ERREUR";
+        document.getElementById('res-societe').textContent = "COMMUNICATION";
+        document.getElementById('res-photo').src = '/static/img/default_avatar.png';
+
+        const banner = document.getElementById('result-status-banner');
+        banner.textContent = "ERREUR TECHNIQUE";
+        banner.className = "status-banner status-blocked";
+
+        const reasonBlock = document.getElementById('res-reason-block');
+        const reasonText = document.getElementById('res-reason-text');
+        reasonText.textContent = msg;
+        reasonBlock.classList.remove('d-none');
+
+        playBeep('error');
+        triggerCountdownReset();
+    }
+
+    function triggerCountdownReset() {
+        const barInner = document.getElementById('countdown-bar-inner');
+        barInner.style.transition = 'none';
+        barInner.style.width = '100%';
+        
+        // Force reflow
+        barInner.offsetHeight;
+
+        barInner.style.transition = 'width 5s linear';
+        barInner.style.width = '0%';
+
+        countdownTimer = setTimeout(() => {
+            resetToScan();
+        }, 5000);
+    }
+
+    function resetToScan() {
+        if (countdownTimer) {
+            clearTimeout(countdownTimer);
+        }
+        
+        // Stop webcam scanner if active
+        if (isWebcamScanning) {
+            stopWebcamScanner();
+        }
+        
+        // Hide result view, show radar view
+        document.getElementById('result-view').classList.add('d-none');
+        document.getElementById('loading-view').classList.add('d-none');
+        document.getElementById('radar-view').classList.remove('d-none');
+
+        // Refocus hidden wedge input
+        const wedge = document.getElementById('wedge-input');
+        if (wedge) {
+            wedge.focus();
+        }
+
+        // Keep scanner active
+        if (nfcReadingActive) {
+            document.getElementById('scan-status-text').textContent = "Scanner actif. Approchez la carte...";
+            document.getElementById('scan-status-text').classList.add('text-warning');
+        }
+    }
+
+    function triggerManualPrompt() {
+        const uid = prompt("Veuillez saisir l'UID NFC de la carte (ex: 048FA23E) :");
+        if (uid && uid.trim()) {
+            verifyUID(uid.trim().toUpperCase());
+        }
+    }
+
+    // === WEBCAM QR SCANNER INTEGRATION ===
+    let html5QrScanner = null;
+    let isWebcamScanning = false;
+
+    function toggleWebcamScanner() {
+        const container = document.getElementById('qr-reader-container');
+        const btn = document.getElementById('toggle-webcam-btn');
+        
+        if (isWebcamScanning) {
+            stopWebcamScanner();
+        } else {
+            container.classList.remove('d-none');
+            btn.innerHTML = '<i class="fas fa-stop"></i> Arrêter Caméra';
+            btn.className = 'btn btn-outline-danger btn-sm';
+            isWebcamScanning = true;
+            
+            html5QrScanner = new Html5Qrcode("qr-reader");
+            html5QrScanner.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                (decodedText, decodedResult) => {
+                    console.log("QR Code Scanned:", decodedText);
+                    // Stop scanner first
+                    stopWebcamScanner();
+                    verifyQR(decodedText);
+                },
+                (errorMessage) => {
+                    // Verbose scan failures, ignore
+                }
+            ).catch(err => {
+                console.error("Unable to start webcam scanner:", err);
+                alert("Erreur d'accès à la caméra. Vérifiez les permissions.");
+                stopWebcamScanner();
+            });
+        }
+    }
+
+    function stopWebcamScanner() {
+        const container = document.getElementById('qr-reader-container');
+        const btn = document.getElementById('toggle-webcam-btn');
+        
+        if (html5QrScanner) {
+            html5QrScanner.stop().then(() => {
+                html5QrScanner.clear();
+                html5QrScanner = null;
+            }).catch(err => console.warn(err));
+        }
+        
+        container.classList.add('d-none');
+        btn.innerHTML = '<i class="fas fa-camera"></i> Scanner Caméra (QR)';
+        btn.className = 'btn btn-outline-primary btn-sm';
+        isWebcamScanning = false;
+    }
+
+    function verifyQR(text) {
+        // Show loading view
+        document.getElementById('radar-view').classList.add('d-none');
+        document.getElementById('loading-view').classList.remove('d-none');
+        document.getElementById('result-view').classList.add('d-none');
+
+        if (countdownTimer) {
+            clearTimeout(countdownTimer);
+        }
+
+        fetch('/badge/api/check_qr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        })
+        .then(res => {
+            if (res.status === 404) {
+                return res.json().then(data => { throw { status: 404, message: data.message }; });
+            }
+            if (!res.ok) {
+                throw { status: res.status, message: "Erreur serveur" };
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (data.success && data.badge) {
+                displayResult(data.badge);
+            } else {
+                displayUnknown("QR CODE");
+            }
+        })
+        .catch(err => {
+            console.error("Error verifying QR:", err);
+            if (err.status === 404) {
+                displayUnknown("QR CODE");
+            } else {
+                displayError(err.message || "Erreur de connexion");
+            }
+        });
+    }
+</script>
+{% endblock %}

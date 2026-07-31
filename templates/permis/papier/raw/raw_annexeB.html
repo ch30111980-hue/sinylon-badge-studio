@@ -1,0 +1,156 @@
+<div class="border-annexe-b">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+        <div style="font-weight: bold; font-size: 14px; color: var(--SINYLON FIAT-red); text-transform: uppercase;">
+            Travail chaud
+        </div>
+        <div style="border: 2px solid var(--SINYLON FIAT-red); padding: 5px; font-size: 12px; font-weight: bold;">
+            Permit Identifier GC- <span contenteditable="true" id="val-gc-id-b" style="outline:none; min-width: 50px; display:inline-block; border-bottom: 1px dashed black;"></span>
+        </div>
+    </div>
+
+    <div style="font-size: 11px; margin-bottom: 10px; font-style: italic;">
+        Cette question est pour vous aider avec votre evaluation des risques.
+    </div>
+
+    <div style="font-size: 11px; margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #ccc; padding-bottom: 2px;">
+            <span>Tous les produits inflammable ou combustible seront dég. 10m de l'operation du travail à chaud (incluant le dessus)</span>
+            <span style="flex-shrink: 0;">
+                <span class="check-box-click" id="check-b1-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b1-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #ccc; padding-bottom: 2px;">
+            <span>Si le déplacement n'est pas possible, ils seront couverts de baches resistantes au feu</span>
+            <span style="flex-shrink: 0;">
+                <span class="check-box-click" id="check-b2-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b2-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #ccc; padding-bottom: 2px;">
+            <span>Tous debris, saleté ou huiles seront enlevés</span>
+            <span style="flex-shrink: 0;">
+                <span class="check-box-click" id="check-b3-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b3-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #ccc; padding-bottom: 2px;">
+            <span>Présence dans un étage/autre structure combustible qui seront humidifiés / couverts d'une protection résitante au feu ou asablés</span>
+            <span style="flex-shrink: 0;">
+                <span class="check-box-click" id="check-b4-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b4-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #ccc; padding-bottom: 2px;">
+            <span>Y'a t-il des combustibles ou produit infammables ou matières pouvant être transmit au sol</span>
+            <span style="flex-shrink: 0;">
+                <span class="check-box-click" id="check-b5-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b5-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; border-bottom: 1px dashed #ccc; padding-bottom: 2px;">
+            <span>L'atmosphere est -t-il surveillé ou testé pour detecter un gas inflammable ou toxique</span>
+            <span style="flex-shrink: 0;">
+                <span class="check-box-click" id="check-b6-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b6-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+        </div>
+    </div>
+
+    <div style="font-size: 11px; margin-bottom: 10px; border: 1px solid black; padding: 5px;">
+        <div style="font-weight: bold; text-decoration: underline; margin-bottom: 5px;">Equipement de lutte anti feu fourni</div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                    <span style="width: 100px;">Extincteur de feu:</span>
+                    Water <span class="check-box-click" id="check-bf1-w" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; margin: 0 4px;"> </span>
+                    Poudre <span class="check-box-click" id="check-bf1-p" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; margin: 0 4px;"> </span>
+                    CO2 <span class="check-box-click" id="check-bf1-c" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; margin: 0 4px;"> </span>
+                </div>
+                
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                    <span style="width: 120px;">Couvertures anti-feu</span>
+                    <span class="check-box-click" id="check-bf2" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span>
+                </div>
+                
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                    <span style="width: 120px;">surveillent d'incendie</span>
+                    <span class="check-box-click" id="check-bf3" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span>
+                </div>
+
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                    <span style="width: 120px;">Instruction par site</span>
+                    <span class="check-box-click" id="check-bf4" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span>
+                </div>
+            </div>
+            <div style="border: 1px solid black; padding: 2px;">
+                <div style="background: #eef2f5; font-size: 9px; text-align: center; border-bottom: 1px solid black; font-weight: bold;">HSE ENTREPRISE</div>
+                <div contenteditable="true" id="val-b-hse-top" style="text-align:center; font-weight:bold; font-size: 11px; margin-top:5px; outline:none; min-height:20px;"></div>
+            </div>
+        </div>
+
+        <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                Inspection du site de travail 
+                1 <span class="check-box-click" id="check-bf5-1" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; margin: 0 2px;"> </span>
+                2 <span class="check-box-click" id="check-bf5-2" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; margin: 0 2px;"> </span>
+                3 <span class="check-box-click" id="check-bf5-3" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer; margin: 0 2px;"> </span> h.
+            </div>
+            <div>
+                Durée de la dernière inspection <strong style="border-bottom: 1px solid black;">30 MIN.</strong>
+            </div>
+        </div>
+    </div>
+
+    <div style="font-size: 11px; margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>L'alarme d'incendie la plus proche/appel d'urgence verifié</span>
+            <span>
+                <span class="check-box-click" id="check-b7-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b7-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>Mise hors service de l'instrument de detection</span>
+            <span>
+                <span class="check-box-click" id="check-b8-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b8-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-start; margin-bottom: 4px; margin-left: 20px;">
+            <span style="margin-right: 20px;">si oui: Notification requise Dept incendie</span>
+            <span style="margin-right: 20px;">
+                <span class="check-box-click" id="check-b9-y" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> Y 
+                <span class="check-box-click" id="check-b9-n" style="display:inline-block; width:24px; height:24px; border:1px solid #000; text-align:center; line-height:24px; cursor:pointer;"> </span> N
+            </span>
+            <span>numero de téléphone <span contenteditable="true" id="val-tel-incendie" style="outline:none; display:inline-block; border-bottom: 1px dashed black; min-width: 60px;"></span></span>
+        </div>
+    </div>
+
+    <div style="margin-top: 5px; margin-bottom: 15px; font-size: 11px;">
+        Mesures additionnel: <span contenteditable="true" id="val-mesures-chaud" style="outline:none; display:inline-block; border-bottom: 1px solid black; min-width: 70%;"></span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+        <div style="border: 1px solid black; min-height: 50px; position: relative;">
+            <div style="background: #eef2f5; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 2px; font-weight: bold;">CHEF DE PROJET</div>
+            <div contenteditable="true" id="val-b-chef" style="text-align:center; font-weight:bold; font-size: 12px; margin-top:10px; outline:none; min-height:22px;"></div>
+        </div>
+        <div style="border: 1px solid black; min-height: 50px; position: relative;">
+            <div style="background: #eef2f5; border-bottom: 1px solid black; text-align: center; font-size: 9px; padding: 2px; font-weight: bold;">HSE ENTREPRISE</div>
+            <div contenteditable="true" id="val-b-hse-bot" style="text-align:center; font-weight:bold; font-size: 12px; margin-top:10px; outline:none; min-height:22px;"></div>
+        </div>
+        <div style="font-size: 11px; display:flex; flex-direction:column; justify-content:center; padding-left: 10px;">
+            <div style="margin-bottom: 5px;">Date: <strong contenteditable="true" style="outline:none; border-bottom: 1px solid black; display:inline-block; width: 80px;"></strong></div>
+            <div>Heure: <strong contenteditable="true" style="outline:none; border-bottom: 1px solid black; display:inline-block; width: 80px;"></strong></div>
+        </div>
+    </div>
+</div>

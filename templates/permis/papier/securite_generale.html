@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+{% block title %}Page 1/2 - Sécurité Générale{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        .btn, .navbar, .alert, .nav-item, .no-print { display: none !important; }
+        body { background-color: white !important; margin: 0; padding: 0; }
+        .card { border: none !important; box-shadow: none !important; }
+        .container { width: 100% !important; max-width: 100% !important; }
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Tableau de Bord
+        </a>
+        <div class="dropdown">
+            <button class="btn btn-outline-success shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-plus-circle me-2"></i> Nouvelle Demande de Permis
+            </button>
+            <ul class="dropdown-menu shadow border-0">
+                <li><a class="dropdown-item" href="{{ url_for('permis.nouveau') }}">
+                    <i class="fas fa-file-signature me-2 text-primary"></i> <strong>DEMANDE DE PERMIS (SINYLON FIAT)</strong> — En ligne
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header small text-uppercase fw-bold">Choisir le type de permis</h6></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='securite_generale') }}">
+                    <i class="fas fa-file-contract me-2 text-dark"></i> <strong>RECTO (P1)</strong> — Sécurité Générale
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='revalidation', theme='securite_generale') }}">
+                    <i class="fas fa-sync me-2 text-secondary"></i> <strong>VERSO (P2)</strong> — Revalidation
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='hauteur') }}">
+                    <i class="fas fa-hard-hat me-2 text-primary"></i> <strong>BLEUE (A)</strong> — Travail en Hauteur
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='chaud') }}">
+                    <i class="fas fa-fire me-2 text-danger"></i> <strong>ROUGE (B)</strong> — Travail à Chaud
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='levage') }}">
+                    <i class="fas fa-dolly me-2 text-warning"></i> <strong>JAUNE (C)</strong> — Permis de Levage
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='vehicule') }}">
+                    <i class="fas fa-car me-2 text-info"></i> <strong>VIOLETTE (D)</strong> — Inspection Engins
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='espace_confine') }}">
+                    <i class="fas fa-door-closed me-2 text-success"></i> <strong>CYAN (E)</strong> — Espace Confiné
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='fouille') }}">
+                    <i class="fas fa-shovel me-2" style="color: #2e7d32;"></i> <strong>PERMIS D'EXCAVATION (F)</strong>
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='electrique') }}">
+                    <i class="fas fa-bolt me-2" style="color: #ff9500;"></i> <strong>ORANGE (G)</strong> — Travail Électrique
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    {% if permis %}
+    <button onclick="window.print()" class="btn btn-3d btn-chic-gold shadow-sm">
+        <i class="fas fa-print me-2"></i> Imprimer / Enregistrer en PDF
+    </button>
+    {% else %}
+    <button onclick="submitForPrint()" class="btn btn-3d btn-chic-gold shadow-sm">
+        <i class="fas fa-print me-2"></i> Enregistrer & Imprimer
+    </button>
+    {% endif %}
+</div>
+<script src="{{ url_for("static", filename="js/signature_pad.umd.min.js") }}"></script>
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+        <div class="card shadow-sm border-0 mb-5">
+            <div class="card-body p-4 bg-white border border-dark">
+                
+                <!-- HEADER -->
+                <div class="d-flex align-items-center mb-2 flex-wrap gap-2">
+                    <div class="text-center flex-grow-1">
+                        <h4 class="fw-bold mb-0">Permis de Travail de Sécurité Générale</h4>
+                        <div class="small">(à afficher sur le site de travail)</div>
+                    </div>
+                    <div style="font-weight: 900; font-size: 1.8rem;">SINYLON FIAT <span style="color: #ea580c;">STELLANTIS</span></div>
+                    {% if qr_code %}
+                    <div class="ms-2 p-1 bg-white border border-dark text-center" style="width: 80px;">
+                        <img src="data:image/png;base64,{{ qr_code }}" alt="QR Verification" style="height: 70px; width: 70px;">
+                        <div class="text-dark fw-bold" style="font-size: 8px; margin-top: 1px;">VERIFY</div>
+                    </div>
+                    {% endif %}
+                    <div class="ms-3 border border-dark p-1 text-center" style="min-width: 150px;">
+                        <div class="x-small fw-bold border-bottom border-dark">Identifiant du permis</div>
+                        <div class="fw-bold">{% if form_id %}{{ form_id }}{% elif form %}{{ form.id }}{% else %}AUTO{% endif %}</div>
+                    </div>
+                </div>
+
+                <form method="POST" id="mainForm" enctype="multipart/form-data">
+                    <input type="hidden" name="type_formulaire" value="securite_generale">
+                    <input type="hidden" name="pre_allocated_id" value="{{ form_id }}">
+
+                    <div class="fw-bold p-1 text-center x-small" style="background-color: #ffeb3b; border: 1px solid #000;">Brève description du travail</div>
+                    <textarea name="travail_desc" class="form-control border-dark rounded-0 mb-3" rows="1"></textarea>
+
+                    <div class="row g-0 mb-3">
+                        <div class="col-md-6">
+                            <div class="fw-bold p-1 text-center x-small" style="background-color: #ffeb3b; border: 1px solid #000; border-right: 0;">Endroit de travail:</div>
+                            <input type="text" name="endroit_travail" class="form-control border-dark rounded-0 border-right-0">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-bold p-1 text-center x-small" style="background-color: #ffeb3b; border: 1px solid #000;">Equipment/Machinerie / Zone sur lequel s'effectue le travail</div>
+                            <input type="text" name="equipement_zone" class="form-control border-dark rounded-0">
+                        </div>
+                    </div>
+
+                    <div class="border border-dark p-2 mb-3 small">
+                        <div class="fw-bold">Entreprise Intervenante :</div>
+                        <input type="text" name="entreprise" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 mb-2">
+                        <div class="row">
+                            <div class="col-md-6">Avant de commencer le travail, veuillez contacter: <span class="fw-bold">Nom: SINYLON FIAT</span></div>
+                            <div class="col-md-6 d-flex align-items-center">
+                                <span class="me-2">Plan d'urgence du site attaché</span>
+                                <div class="border border-dark px-2 py-1"><label class="me-1"><input type="radio" name="plan_urgence" value="Y"> Y</label> <label><input type="radio" name="plan_urgence" value="N"> N</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CHECKLIST DANGERS -->
+                    <div class="row g-0 mb-3 small">
+                        <div class="col-md-6 pe-md-2">
+                            <div class="x-small mb-1">si oui, la liste de verification des grands danger suivante doit être attachée de</div>
+                            {% for label, code, name in [
+                                ('Travail en hauteur', 'A', 'chk_a'),
+                                ('Travail dans un espace confiné', 'B', 'chk_b_conf'),
+                                ('Travail sur un système électrique', 'C', 'chk_c'),
+                                ('Ouvrir un système/une ligne de rupture', 'D', 'chk_d_rup'),
+                                ('Autre travaux dangereux:', 'E', 'chk_e_dang')
+                            ] %}
+                            <div class="d-flex justify-content-between align-items-center mb-1 border-bottom border-secondary border-opacity-25 pb-1">
+                                <span>{{ label }}</span>
+                                <div class="d-flex gap-2">
+                                    <div class="border border-dark px-1"><label><input type="radio" name="{{ name }}" value="Y"> Y</label></div>
+                                    <div class="border border-dark px-1"><label><input type="radio" name="{{ name }}" value="N" checked> N</label></div>
+                                    <div class="border border-dark px-1 fw-bold">{{ code }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 ps-md-2">
+                            <div class="x-small mb-1 text-end">de</div>
+                            {% for label, code, name in [
+                                ('Travail à chaud', 'B', 'chk_b_chaud'),
+                                ('Excavation', 'D', 'chk_d_exc'),
+                                ('Travail sur équipement sous tension', 'E', 'chk_e_tens'),
+                                ('Exposition/Cond. Atmosphérique', 'F', 'chk_f')
+                            ] %}
+                            <div class="d-flex justify-content-between align-items-center mb-1 border-bottom border-secondary border-opacity-25 pb-1">
+                                <span>{{ label }}</span>
+                                <div class="d-flex gap-2">
+                                    <div class="border border-dark px-1"><label><input type="radio" name="{{ name }}" value="Y"> Y</label></div>
+                                    <div class="border border-dark px-1"><label><input type="radio" name="{{ name }}" value="N" checked> N</label></div>
+                                    <div class="border border-dark px-1 fw-bold">{{ code }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-0 mb-3 small">
+                        <div class="col-md-6 border border-dark p-2">
+                            <span>Est ce travail, une modification couverte par MOC?</span>
+                            <div class="float-end border border-dark px-2"><label class="me-1"><input type="radio" name="moc_active" value="Y"> Y</label> <label><input type="radio" name="moc_active" value="N" checked> N</label></div>
+                        </div>
+                        <div class="col-md-6 border border-dark p-2 border-start-0">
+                            <span>MOC Ref. Nr. / Id.</span>
+                            <input type="text" name="moc_ref" class="form-control form-control-sm border-0 border-bottom border-dark d-inline-block w-50 p-0 rounded-0 ms-2">
+                        </div>
+                    </div>
+
+                    <div class="fw-bold p-1 x-small border border-dark" style="background-color: #ffeb3b;">validité du permis et signatures</div>
+                    <div class="border border-top-0 border-dark p-2 mb-1 small">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">Date du permis <input type="date" name="date_permis" class="form-control form-control-sm d-inline-block w-auto border-dark"></div>
+                            <div class="col-md-4">heure de début <input type="time" name="heure_debut" class="form-control form-control-sm d-inline-block w-auto border-dark"></div>
+                            <div class="col-md-4">heure de fin <input type="time" name="heure_fin" class="form-control form-control-sm d-inline-block w-auto border-dark"></div>
+                        </div>
+                        <div class="x-small mt-2 italic" style="line-height: 1.1;">
+                            Ce permis de travail de sécurité générale et sa liste de verification des grands danger suivant doit etre toujours accompagné par le permis de travail de sécurité générale. 
+                            Ce permis de travail de sécurité générale et sa liste de verification des grands danger identifiant du permis sont uniquement valide pour la date et la période spécifiée ci-dessus. 
+                            Toutes les signatures doivent etre obtenues avant l'entame du travail. Permis affiché sur le lieu de travail. 
+                            Copies: Emetteur du permis, receveur du permis et si applicable: Coordinateur, chef de quart et/ou salle de controle.
+                        </div>
+                    </div>
+
+                    <!-- 5 SIGNATURE BOXES -->
+                    <div class="row g-2 mb-4">
+                        {% for role, id in [
+                            ('Chef de Projet Entreprise', 'chef'),
+                            ('Validation FIAT - Ingénieur / Responsable', 'FIAT'),
+                            ('Coordinateur SINYLON FIAT', 'SINYLON FIAT'),
+                            ('HSE Entreprise', 'hse'),
+                            ('Receveur du permis', 'receveur')
+                        ] %}
+                        <div class="{% if loop.index <= 2 %}col-md-6{% else %}col-md-4{% endif %}">
+                            <div class="border border-dark">
+                                <div class="text-center fw-bold x-small py-1 border-bottom border-dark" style="background-color: #bbdefb;">{{ role }}</div>
+                                <div class="p-1 x-small text-muted d-flex justify-content-between align-items-center">
+                                    <span>Nom et signature:</span>
+                                    <div class="no-print">
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-primary" style="font-size: 0.55rem; padding: 1px 4px;" onclick="loadSignature('{{ id }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i> Utiliser</button>
+                                        <button type="button" class="btn btn-sm btn-light border shadow-sm text-success" style="font-size: 0.55rem; padding: 1px 4px;" onclick="saveSignature('{{ id }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i> Enregistrer</button>
+                                    </div>
+                                </div>
+                                <div class="d-flex g-0 border-bottom border-dark">
+                                    <input type="text" name="nom_{{ id }}" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; border-right: 1px solid #333 !important;" placeholder="Nom (Majuscule)">
+                                    <input type="text" name="nom_signature_{{ id }}" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                </div>
+                                <div style="height: 60px; position: relative;">
+                                    <canvas id="sig_{{ id }}" class="w-100 h-100"></canvas>
+                                    <input type="hidden" name="sig_{{ id }}_data" id="sig_{{ id }}_data">
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- HAND BACK SECTION -->
+                    <div class="border border-dark p-2 mb-3">
+                        <div class="fw-bold x-small text-uppercase">Permit Hand-Back <span class="text-lowercase fw-normal">(renvoyer à l'emetteur du permis après signature)</span></div>
+                        <div class="row mt-2 small">
+                            <div class="col-md-6">
+                                <div class="mb-1">Etat de travail</div>
+                                <div class="d-flex justify-content-between border border-dark p-1 mb-1"><span>Achevé</span> <input type="checkbox" name="handback_acheve"></div>
+                                <div class="d-flex justify-content-between border border-dark p-1"><span>Inachevé <small>(veuillez spécifier ci-dessous)</small></span> <input type="checkbox" name="handback_inacheve"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-1">Etat de la surface/installation/équipmer</div>
+                                <div class="d-flex justify-content-between border border-dark p-1 mb-1"><span>pret pour l'operation normale</span> <input type="checkbox" name="handback_pret"></div>
+                                <div class="d-flex justify-content-between border border-dark p-1"><span>pas pret <small>(veuillez spécifier ci-dessous)</small></span> <input type="checkbox" name="handback_pas_pret"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- BOTTOM SIGNATURES -->
+                        <div class="row g-2 mt-2">
+                            {% for role, id in [
+                                ('Receveur du permis', 'hb_receveur'),
+                                ('Validation FIAT - Ingénieur / Responsable', 'hb_FIAT'),
+                                ('Chef de Projet Entreprise', 'hb_chef'),
+                                ('HSE Entreprise', 'hb_hse')
+                            ] %}
+                            <div class="col-md-6">
+                                <div class="border border-dark">
+                                    <div class="text-center fw-bold x-small py-1 border-bottom border-dark" style="background-color: #bbdefb;">{{ role }}</div>
+                                    <div class="p-1 x-small text-muted d-flex justify-content-between align-items-center">
+                                        <span>Nom et signature:</span>
+                                        <div class="no-print">
+                                            <button type="button" class="btn btn-sm btn-light border shadow-sm text-primary" style="font-size: 0.55rem; padding: 1px 4px;" onclick="loadSignature('{{ id }}')" title="Utiliser ma signature"><i class="fas fa-magic"></i> Utiliser</button>
+                                            <button type="button" class="btn btn-sm btn-light border shadow-sm text-success" style="font-size: 0.55rem; padding: 1px 4px;" onclick="saveSignature('{{ id }}')" title="Enregistrer comme défaut"><i class="fas fa-save"></i> Enregistrer</button>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex g-0 border-bottom border-dark">
+                                        <input type="text" name="nom_{{ id }}" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; border-right: 1px solid #333 !important;" placeholder="Nom (Majuscule)">
+                                        <input type="text" name="nom_signature_{{ id }}" class="form-control form-control-sm border-0 rounded-0 px-1 py-0 w-50" style="font-size: 0.7rem; font-style: italic;" placeholder="Écrire Signature">
+                                    </div>
+                                    <div style="height: 60px; position: relative;">
+                                        <canvas id="sig_{{ id }}" class="w-100 h-100"></canvas>
+                                        <input type="hidden" name="sig_{{ id }}_data" id="sig_{{ id }}_data">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- SCAN OU PHOTO (PIÈCE JOINTE) -->
+                    <div class="border border-dark p-2 mb-3 bg-light no-print">
+                        <div class="fw-bold x-small text-uppercase mb-1"><i class="fas fa-paperclip me-1"></i> Pièce Jointe / Scan du Permis Physique (Optionnel)</div>
+                        <input type="file" name="fichier_joint" class="form-control form-control-sm border-dark rounded-0" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
+                    </div>
+
+                    <div class="row g-0 mt-3 border border-dark p-2 fw-bold align-items-center">
+                        <div class="col-6 d-flex align-items-center">
+                            <span class="me-2">Numéro d'urgence :</span>
+                            <input type="text" name="urgence_fixe" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0 w-50" style="font-weight:bold; background:transparent;">
+                        </div>
+                        <div class="col-6 d-flex align-items-center justify-content-end">
+                            <span class="me-2">Mobile :</span>
+                            <input type="text" name="urgence_mobile" class="form-control form-control-sm border-0 border-bottom border-dark rounded-0 p-0 w-50" style="font-weight:bold; background:transparent;">
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between align-items-center opacity-75 no-print" style="font-size: 0.6rem; border-top: 1px solid #ccc; pt-2;">
+                        <div style="text-transform: lowercase;">système de sécurité © 2026</div>
+                        <div class="fw-bold">Page 1/2</div>
+                    </div>
+
+                    <div class="text-center mt-3 no-print">
+                        <button type="button" onclick="submitForm()" class="btn btn-dark btn-3d px-5 fw-bold">ENREGISTRER PAGE 1/2</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ids = ['chef', 'FIAT', 'SINYLON FIAT', 'hse', 'receveur', 'hb_receveur', 'hb_FIAT', 'hb_chef', 'hb_hse'];
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        ids.forEach(id => {
+            const canvas = document.getElementById('sig_' + id);
+            if(canvas) {
+                const currentWidth = canvas.offsetWidth * ratio;
+                const currentHeight = canvas.offsetHeight * ratio;
+                if (currentWidth > 0 && currentHeight > 0) {
+                    canvas.width = currentWidth;
+                    canvas.height = currentHeight;
+                    canvas.getContext("2d").scale(ratio, ratio);
+                }
+                
+                // Draw initial state (cursive fallback or saved sig)
+                drawSignatureText(id, getSignatureText(id));
+                
+                if (window.isPermisReadOnly) {
+                    {% if permis and permis.signatures %}
+                        const savedSigs = {{ permis.signatures|tojson }};
+                        const base64Data = savedSigs['sig_' + id];
+                        if (base64Data) {
+                            const img = new Image();
+                            img.onload = function() {
+                                const ctx = canvas.getContext('2d');
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                ctx.drawImage(img, 0, 0, canvas.width / ratio, canvas.height / ratio);
+                            };
+                            img.src = base64Data;
+                        }
+                    {% endif %}
+                    return;
+                }
+                
+                // Bind input listeners
+                const inputName = document.querySelector('input[name="nom_' + id + '"]');
+                const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+                
+                function updateSig() {
+                    drawSignatureText(id, getSignatureText(id));
+                }
+                
+                if(inputName) inputName.addEventListener('input', updateSig);
+                if(inputSig) inputSig.addEventListener('input', updateSig);
+                
+                // Draw initial state
+                updateSig();
+            }
+        });
+
+        if (window.isPermisReadOnly) return;
+
+        // Force redraw when font is loaded to ensure it displays correctly
+        document.fonts.load("24px 'Dancing Script'").then(function() {
+            ids.forEach(id => {
+                drawSignatureText(id, getSignatureText(id));
+            });
+        });
+    });
+
+    function getSignatureText(id) {
+        const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+        const inputName = document.querySelector('input[name="nom_' + id + '"]');
+        return (inputSig && inputSig.value) ? inputSig.value : (inputName ? inputName.value : '');
+    }
+
+    function drawSignatureText(id, text) {
+        const canvas = document.getElementById('sig_' + id);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        // Dynamic resize if dimensions are not set or changed
+        const currentWidth = canvas.offsetWidth * ratio;
+        const currentHeight = canvas.offsetHeight * ratio;
+        if (currentWidth > 0 && currentHeight > 0 && (canvas.width !== currentWidth || canvas.height !== currentHeight)) {
+            canvas.width = currentWidth;
+            canvas.height = currentHeight;
+            ctx.scale(ratio, ratio);
+        }
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if(!text) return;
+        
+        ctx.save();
+        ctx.font = "italic 24px 'Dancing Script', 'Brush Script MT', cursive";
+        ctx.fillStyle = "blue";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, canvas.width / (2 * ratio), canvas.height / (2 * ratio));
+        ctx.restore();
+    }
+
+    function saveSignature(id) {
+        const inputName = document.querySelector('input[name="nom_' + id + '"]');
+        const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+        
+        const nameVal = inputName ? inputName.value.trim() : '';
+        const sigVal = inputSig ? inputSig.value.trim() : '';
+        
+        if (nameVal || sigVal) {
+            localStorage.setItem('noro_saved_sig_name_' + id, nameVal);
+            localStorage.setItem('noro_saved_sig_text_' + id, sigVal);
+            alert("✅ Votre signature numérique a été enregistrée !");
+        } else {
+            alert("⚠️ Veuillez saisir votre nom ou votre texte de signature avant d'enregistrer.");
+        }
+    }
+
+    function loadSignature(id) {
+        const savedName = localStorage.getItem('noro_saved_sig_name_' + id);
+        const savedSig = localStorage.getItem('noro_saved_sig_text_' + id);
+        
+        if (savedName || savedSig) {
+            const inputName = document.querySelector('input[name="nom_' + id + '"]');
+            const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+            
+            if (inputName && savedName !== null) inputName.value = savedName;
+            if (inputSig && savedSig !== null) inputSig.value = savedSig;
+            
+            drawSignatureText(id, getSignatureText(id));
+        } else {
+            alert("⚠️ Aucune signature enregistrée pour cet acteur.");
+        }
+    }
+
+    function submitForm() {
+        const ids = ['chef', 'FIAT', 'SINYLON FIAT', 'hse', 'receveur', 'hb_receveur', 'hb_FIAT', 'hb_chef', 'hb_hse'];
+        ids.forEach(id => {
+            const canvas = document.getElementById('sig_' + id);
+            if(canvas) {
+                const inputName = document.querySelector('input[name="nom_' + id + '"]');
+                const inputSig = document.querySelector('input[name="nom_signature_' + id + '"]');
+                if ((inputName && inputName.value) || (inputSig && inputSig.value)) {
+                    document.getElementById('sig_' + id + '_data').value = canvas.toDataURL();
+                }
+            }
+        });
+        document.getElementById('mainForm').submit();
+    }
+</script>
+<style>
+    .x-small { font-size: 0.65rem; }
+    .border-right-0 { border-right: 0 !important; }
+</style>
+{% endblock %}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noro Permis SINYLON FIAT 5.0 Web — SINYLON FIAT</title>
+    <meta name="description" content="Générateur professionnel de permis de travail SINYLON FIAT pour l'usine SINYLON FIAT. Système sécurisé par SINYLON FIAT.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='SINYLON FIAT/style.css') }}">
+    <style>
+        .back-to-dash {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #eab308;
+            color: #000;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .back-to-dash:hover {
+            background: #ca8a04;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Barre latérale de contrôle -->
+        <aside class="sidebar no-print">
+            <a href="{{ url_for('dashboard') }}" class="back-to-dash">⬅ RETOUR AU TABLEAU DE BORD</a>
+            <div class="logo-area">
+                <h1>SINYLON FIAT</h1>
+                <p>Pack Complet (4 Pages)</p>
+                <p style="font-size: 10px; color: #10b981; font-weight: bold; margin-top: 5px;">Système Sécurité</p>
+            </div>
+            
+            <!-- Le reste de la sidebar -->
+            <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 20px;">
+                <button id="btn-new-permit" style="width: 100%; background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 12px; font-size: 14px; transition: all 0.25s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">+ NOUVEAU PERMIS</button>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">📁 Permis Enregistrés :</div>
+                <div id="permit-list" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 5px;">
+                    <!-- Les permis apparaîtront ici dynamiquement -->
+                </div>
+            </div>
+            
+            <div class="page-selector-area" style="margin-bottom: 20px;">
+                <label style="color:#94a3b8; font-size:10px; font-weight:bold; display:block; margin-bottom:5px; text-align:center;">--- CHOISIR LA PAGE ICI ---</label>
+                <div class="page-selector" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                    <button onclick="switchPage('p1')" id="btn-p1" class="page-btn active">RECTO (P1)</button>
+                    <button onclick="switchPage('p2')" id="btn-p2" class="page-btn">VERSO (P2)</button>
+                    <button onclick="switchPage('annexeA')" id="btn-annA" class="page-btn">BLEUE (HAUTEUR)</button>
+                    <button onclick="switchPage('annexeB')" id="btn-annB" class="page-btn">ROUGE (CHAUD)</button>
+                </div>
+            </div>
+
+            <!-- DASHBOARD SINYLON FIAT -->
+            <div style="margin-top: 10px; padding: 15px; border-top: 1px solid #2c3e50; font-size: 11px; color: #95a5a6; text-align: center;">
+                <div style="margin-bottom: 10px; padding: 10px; background: #0f172a; border-radius: 8px; border: 1px solid #334155;">
+                    <div style="text-transform: uppercase; font-size: 9px; letter-spacing: 1px; color: #94a3b8; margin-bottom: 5px;">📊 Statistiques</div>
+                    <div style="font-size: 20px; color: #10b981; font-weight: bold;" id="total-permits-count">0</div>
+                    <div style="font-size: 9px; color: #94a3b8;">Permis enregistrés</div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 3px;">
+                    <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 14px; width: auto; vertical-align: middle;">
+                    <span style="color: #cbd5e1; font-weight: bold; text-transform: lowercase; letter-spacing: 1px;">noro</span>
+                </div>
+                <span style="text-transform: lowercase;">système sécurité</span> © 2026
+            </div>
+
+            <div class="form-inputs">
+                <h3>1. En-tête & Contact</h3>
+                <label>Identifiant Permis</label>
+                <input type="text" data-field="permit-id" placeholder="Ex: OR2-19/04/2026">
+                <label>Entreprise Intervenante</label>
+                <input type="text" data-field="company" placeholder="Entreprise">
+                <label>Veuillez contacter (ex: NOURI.C)</label>
+                <input type="text" data-field="contact" placeholder="Nom du contact">
+                
+                <label>Ouvrage / Zone / Tél</label>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:3px;">
+                    <input type="text" data-field="ouvrage" placeholder="Ouvrage">
+                    <input type="text" data-field="zone" placeholder="Zone">
+                    <input type="text" data-field="tel" placeholder="Tél">
+                </div>
+
+                <h3>2. Description & Lieu</h3>
+                <label>Description du travail</label>
+                <textarea data-field="work-desc" rows="3"></textarea>
+                <label>Endroit de travail</label>
+                <input type="text" data-field="location">
+
+                <h3>3. Liste des Dangers (Recto)</h3>
+                <div style="font-size: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                    <label><input type="checkbox" data-check="check-a"> A. Hauteur</label>
+                    <label><input type="checkbox" data-check="check-b-hot"> B. Chaud</label>
+                    <label><input type="checkbox" data-check="check-b-conf"> B. Espace Conf.</label>
+                    <label><input type="checkbox" data-check="check-d-exc"> D. Excavation</label>
+                    <label><input type="checkbox" data-check="check-c-elec"> C. Électrique</label>
+                    <label><input type="checkbox" data-check="check-e-tens"> E. Sous Tension</label>
+                    <label><input type="checkbox" data-check="check-d-rup"> D. Rupture</label>
+                    <label><input type="checkbox" data-check="check-f-atm"> F. Atmos.</label>
+                    <label><input type="checkbox" data-check="check-g-meth"> G. Méthode</label>
+                    <label><input type="checkbox" data-check="check-moc"> MOC ?</label>
+                </div>
+
+                <h3>4. Annexe Bleue (Détails)</h3>
+                <div style="font-size: 9px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; background: #1e293b; padding: 5px; border-radius: 4px;">
+                    <label><input type="checkbox" data-check="check-a-fixe"> Echaf. Fixe</label>
+                    <label><input type="checkbox" data-check="check-a-mob"> Echaf. Mobile</label>
+                    <label><input type="checkbox" data-check="check-a-ech"> Echelle</label>
+                    <label><input type="checkbox" data-check="check-a-app"> Approuvé</label>
+                    <label><input type="checkbox" data-check="check-a-claire"> Météo: Claire</label>
+                    <label><input type="checkbox" data-check="check-a-pluie-no"> Pas Pluie</label>
+                    <label><input type="checkbox" data-check="check-a-vent-no"> Pas Vent</label>
+                    <label><input type="checkbox" data-check="check-a-sec"> Sol Sec</label>
+                </div>
+
+                <h3>5. Annexe Rouge (Détails)</h3>
+                <div style="font-size: 9px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; background: #1e293b; padding: 5px; border-radius: 4px;">
+                    <label><input type="checkbox" data-check="check-b-inf"> Inflammables</label>
+                    <label><input type="checkbox" data-check="check-b-bac"> Bâches</label>
+                    <label><input type="checkbox" data-check="check-b-eau"> Ext: Eau</label>
+                    <label><input type="checkbox" data-check="check-b-poudre"> Ext: Poudre</label>
+                    <label><input type="checkbox" data-check="check-b-co2"> Ext: CO2</label>
+                    <label><input type="checkbox" data-check="check-b-surv"> Surveillant</label>
+                    <label><input type="checkbox" data-check="check-b-det"> Détect. OFF</label>
+                    <label><input type="checkbox" data-check="check-b-gaz"> Surveil. Gaz</label>
+                </div>
+
+                <h3>6. Temps & Signatures</h3>
+                <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:3px;">
+                    <input type="date" data-field="date-main">
+                    <input type="text" data-field="time-start" placeholder="8h00">
+                    <input type="text" data-field="time-end" placeholder="17h30">
+                </div>
+                <input type="text" data-field="chef-nom" placeholder="Chef Projet">
+                <input type="text" data-field="FIAT-nom" placeholder="FIAT (SEGULA)">
+                <input type="text" data-field="coord-nom" placeholder="Coordonnateur">
+                <input type="text" data-field="hse-nom" placeholder="HSE Entreprise">
+                <input type="text" data-field="receveur-nom" placeholder="Receveur">
+
+                <h3>5. Hand-Back</h3>
+                <div style="font-size: 10px;">
+                    <label><input type="checkbox" data-check="back-acheve"> Achevé</label>
+                    <label><input type="checkbox" data-check="back-pret"> Prêt opération</label>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="btn-save" class="btn-primary" onclick="window.print()" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.25s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">💾 PDF / IMPRIMER</button>
+                <button onclick="resetForm()" style="font-size:10px; background:#475569; color:#fff; border:none; padding:8px; border-radius:4px; cursor:pointer;">Réinitialiser</button>
+            </div>
+        </aside>
+
+        <!-- Zone de prévisualisation A4 -->
+        <main class="preview-area">
+            <div id="document-render" class="a4-page">
+                <!-- Le contenu sera injecté ici par JS -->
+                <div id="page-content"></div>
+                <!-- Filigrane de sécurité SINYLON FIAT -->
+                <div class="noro-watermark" style="text-transform: lowercase; font-size: 10px; color: #64748b; opacity: 0.85;">système de sécurité © 2026</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='SINYLON FIAT/app.js') }}"></script>
+</body>
+</html>
