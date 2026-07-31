@@ -290,22 +290,17 @@ def verifier_public(key):
     """
 
 
+DEFAULT_DOMAIN = "https://sinylon-badge-studio.onrender.com"
+
+
 @app.route('/api/qr/png/<key>')
 def get_qr_png(key):
-    domain = os.environ.get('DOMAIN_URL', '').strip()
+    domain = os.environ.get('DOMAIN_URL', DEFAULT_DOMAIN).strip()
     key_clean = str(key).strip()
-    if key_clean.startswith('PERM-') or key_clean.startswith('INSP-'):
-        if domain:
-            url = f"{domain.rstrip('/')}/permis/verifier/{key_clean}"
-        else:
-            ip = get_local_ip()
-            url = f"http://{ip}:5050/permis/verifier/{key_clean}"
+    if key_clean.startswith('PERM-') or key_clean.startswith('INSP-') or key_clean.startswith('SORTIE-'):
+        url = f"{domain.rstrip('/')}/permis/verifier/{key_clean}"
     else:
-        if domain:
-            url = f"{domain.rstrip('/')}/badge/verifier/{key_clean}"
-        else:
-            ip = get_local_ip()
-            url = f"http://{ip}:5050/badge/verifier/{key_clean}"
+        url = f"{domain.rstrip('/')}/badge/verifier/{key_clean}"
 
     qr_path = os.path.join(SCRATCH_FOLDER, f"temp_qr_{key_clean}.png")
     generate_qr_code(url, qr_path)

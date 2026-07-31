@@ -150,20 +150,16 @@ def get_local_ip():
     except Exception:
         return "127.0.0.1"
 
+DEFAULT_DOMAIN = "https://sinylon-badge-studio.onrender.com"
+
 def get_qr_url(worker):
-    domain = os.environ.get('DOMAIN_URL', '').strip()
+    domain = os.environ.get('DOMAIN_URL', DEFAULT_DOMAIN).strip()
     matricule = worker.get('matricule') or worker.get('uuid') or str(worker.get('id', ''))
-    if domain:
-        return f"{domain.rstrip('/')}/badge/verifier/{matricule}"
-    ip = get_local_ip()
-    return f"http://{ip}:5050/badge/verifier/{matricule}"
+    return f"{domain.rstrip('/')}/badge/verifier/{matricule}"
 
 def get_permit_qr_url(ref_num):
-    domain = os.environ.get('DOMAIN_URL', '').strip()
-    if domain:
-        return f"{domain.rstrip('/')}/permis/verifier/{ref_num}"
-    ip = get_local_ip()
-    return f"http://{ip}:5050/permis/verifier/{ref_num}"
+    domain = os.environ.get('DOMAIN_URL', DEFAULT_DOMAIN).strip()
+    return f"{domain.rstrip('/')}/permis/verifier/{ref_num}"
 
 
 def generate_single_badge_pdf(worker, output_pdf_path):
