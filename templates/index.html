@@ -156,14 +156,28 @@
     <!-- TAB 1 : PERSONNEL & BADGES -->
     <div id="tab-workers" class="tab-content active">
 
-      <!-- URGENCE HSE BANNER -->
-      <div style="background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.4); border-radius: 12px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 12px; color: #ef4444; font-weight: 700; font-size: 0.95rem;">
-          <i data-lucide="phone-call"></i>
-          <span>🚨 CONTACT URGENCE HSE CHANTIER :</span>
+      <!-- BANNERS HSE & BMS MÉTÉO ALGÉRIE -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <!-- BANNER URGENCE HSE -->
+        <div style="background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.4); border-radius: 12px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px; color: #ef4444; font-weight: 700; font-size: 0.95rem;">
+            <i data-lucide="phone-call"></i>
+            <span>🚨 URGENCE HSE CHANTIER :</span>
+          </div>
+          <div style="font-size: 1.05rem; font-weight: 800; color: #ffffff;">
+            Nouri : <a href="tel:0563765157" style="color: #f87171; text-decoration: none;">0563765157</a>
+          </div>
         </div>
-        <div style="font-size: 1.1rem; font-weight: 800; color: #ffffff;">
-          Nouri : <a href="tel:0563765157" style="color: #f87171; text-decoration: none;">0563765157</a>
+
+        <!-- BANNER BMS MÉTÉO ALGÉRIE (ONM ORAN) -->
+        <div style="background: {{ 'rgba(234, 179, 8, 0.15)' if bms.bms_alert else 'rgba(16, 185, 129, 0.15)' }}; border: 1px solid {{ 'rgba(234, 179, 8, 0.4)' if bms.bms_alert else 'rgba(16, 185, 129, 0.4)' }}; border-radius: 12px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px; color: {{ '#f59e0b' if bms.bms_alert else '#34d399' }}; font-weight: 700; font-size: 0.9rem;">
+            <i data-lucide="cloud-sun"></i>
+            <span>🌤️ BMS MÉTÉO ALGÉRIE (ORAN) :</span>
+          </div>
+          <div style="font-size: 0.9rem; font-weight: 800; color: #ffffff;">
+            {{ bms.bms_message }}
+          </div>
         </div>
       </div>
 
