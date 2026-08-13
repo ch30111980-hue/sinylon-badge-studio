@@ -96,7 +96,7 @@
         /* Footer avec vague svg */
         .b-footer { position: absolute; bottom: 0; width: 100%; height: 14mm; overflow: hidden; z-index: 5; text-align: center; }
         .b-footer svg { width: 100%; height: 100%; position: absolute; bottom: 0; left: 0; z-index: 6; }
-        .b-footer-SINYLON FIAT { position: absolute; bottom: 1.5mm; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-size: 10px; padding: 0.8mm 4mm; border-radius: 0.8mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .b-footer-csps { position: absolute; bottom: 1.5mm; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-size: 10px; padding: 0.8mm 4mm; border-radius: 0.8mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
         .b-footer-sf { position: absolute; bottom: 6mm; left: 50%; transform: translateX(-50%); color: #dc2626; font-size: 8px; font-weight: bold; z-index: 10; letter-spacing: 0.8px; }
 
         /* ====== VERSO ====== */
@@ -141,7 +141,7 @@
         .badge-provisoire .b-validity {
             background: #dc2626 !important;
         }
-        .badge-provisoire .b-footer-SINYLON FIAT {
+        .badge-provisoire .b-footer-csps {
             background: #991b1b !important;
         }
         .badge-provisoire .b-footer-sf {
@@ -213,8 +213,8 @@
                         {% if badge.nfc_uid %}{% set _ = qr_parts.append("NFC: " ~ badge.nfc_uid) %}{% endif %}
                         {% if badge.groupe_sanguin %}{% set _ = qr_parts.append("GS: " ~ badge.groupe_sanguin) %}{% endif %}
                         {% if badge.telephone %}{% set _ = qr_parts.append("Tel: " ~ badge.telephone) %}{% endif %}
-                        {% if badge.date_naissance %}{% set _ = qr_parts.append("Naissance: " ~ badge.date_naissance.strftime('%d/%m/%Y')) %}{% endif %}
-                        {% if badge.date_expiration %}{% set _ = qr_parts.append("Expiration: " ~ badge.date_expiration.strftime('%d/%m/%Y')) %}{% endif %}
+                        {% if badge.date_naissance %}{% set _ = qr_parts.append("Naissance: " ~ (badge.date_naissance if badge.date_naissance is string else badge.date_naissance.strftime('%d/%m/%Y'))) %}{% endif %}
+                        {% if badge.date_expiration %}{% set _ = qr_parts.append("Expiration: " ~ (badge.date_expiration if badge.date_expiration is string else badge.date_expiration.strftime('%d/%m/%Y'))) %}{% endif %}
                         
                         {# Zones & Etapes #}
                         {% if badge.zones_acces %}{% set _ = qr_parts.append("Zones: " ~ badge.zones_acces) %}{% endif %}
@@ -251,25 +251,25 @@
                         <div class="b-line">Nom : <span class="b-val">{{ (badge.nom|default('')) | upper }}</span></div>
                         <div class="b-line">Prénom : <span class="b-val">{{ badge.prenom }}</span></div>
                         <div class="b-line">Société : <span class="b-val">{{ badge.societe_affichee }}</span></div>
-                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;">{{ badge.projet|default('SINYLON FIAT Projet FIAT') }}</span></div>
+                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;">{{ badge.projet|default('CSPS Projet FIAT') }}</span></div>
                         <div class="b-line">ID Badge : <span class="b-val">{{ badge.carte_id or badge.numero_badge }}</span></div>
                     </div>
 
                     <div class="b-steps">
-                        <div class="step-wrapper"><div class="b-step">{% if 'STEP 1' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">1</div></div>
-                        <div class="step-wrapper"><div class="b-step">{% if 'STEP 2' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">2</div></div>
-                        <div class="step-wrapper"><div class="b-step">{% if 'STEP 3' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">3</div></div>
+                        <div class="step-wrapper"><div class="b-step">{% if badge.step_1_valide or 'STEP 1' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">1</div></div>
+                        <div class="step-wrapper"><div class="b-step">{% if badge.step_2_valide or 'STEP 2' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">2</div></div>
+                        <div class="step-wrapper"><div class="b-step">{% if badge.step_3_valide or 'STEP 3' in (badge.zones_acces|default('', true)) %}✓{% endif %}</div><div class="step-label">3</div></div>
                     </div>
-                    <div class="b-validity">{{ badge.date_expiration.strftime('%d/%m/%Y') if badge.date_expiration else '' }}</div>
+                    <div class="b-validity">{% if badge.date_expiration is string %}{{ badge.date_expiration }}{% elif badge.date_expiration %}{{ (badge.date_expiration if badge.date_expiration is string else badge.date_expiration.strftime('%d/%m/%Y')) }}{% else %}31/12/2026{% endif %}</div>
 
                     <div class="b-footer">
                         <svg viewBox="0 0 200 50" preserveAspectRatio="none">
-                            <path d="M0 50 L0 20 C60 40, 140 40, 200 20 L200 50 Z" fill="#1f1f21"></path>
+                            <path d="M0 50 L0 20 C60 40, 140 40, 200 20 L200 50 Z" fill="#1d664f"></path>
                             <path d="M0 20 C60 40, 140 40, 200 20" stroke="#e5e7eb" stroke-width="1.5" fill="none"></path>
                             <path d="M0 18.5 C60 38.5, 140 38.5, 200 18.5" stroke="#d1d5db" stroke-width="1" fill="none"></path>
                         </svg>
-                        <div class="b-footer-SINYLON FIAT">SINYLON FIAT</div>
                         <div class="b-footer-sf">SAFETY FIRST</div>
+                        <div class="b-footer-csps">CSPS</div>
                     </div>
                 </div>
                 {% else %}

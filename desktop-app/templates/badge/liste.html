@@ -103,7 +103,7 @@
                                 Émis: {{ b.created_at.strftime('%d/%m/%Y') if b.created_at else 'N/A' }}
                             </div>
                             <div class="x-small text-muted">
-                                Exp: {{ b.date_expiration.strftime('%d/%m/%Y') if b.date_expiration else '1 An' }}
+                                Exp: {{ b.date_expiration if b.date_expiration is string else (b.date_expiration.strftime('%d/%m/%Y') if b.date_expiration else '1 An') }}
                             </div>
                         </td>
                         <td>

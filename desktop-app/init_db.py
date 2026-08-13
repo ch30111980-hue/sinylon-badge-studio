@@ -18,10 +18,45 @@ def init_db():
             prenom TEXT NOT NULL,
             fonction TEXT NOT NULL,
             entreprise TEXT DEFAULT 'Sinylon',
+            societe_affichee TEXT DEFAULT 'Sinylon',
+            projet TEXT DEFAULT 'CSPS Projet FIAT',
+            annee TEXT DEFAULT '2026',
+            date_naissance TEXT,
+            groupe_sanguin TEXT,
+            cnas TEXT,
+            carte_id TEXT,
+            telephone TEXT,
+            departement TEXT,
+            entreprise_id INTEGER DEFAULT 1,
+            date_emission TEXT DEFAULT '2026-01-01',
+            date_expiration TEXT DEFAULT '2026-12-31',
+            step_1_valide INTEGER DEFAULT 1,
+            step_2_valide INTEGER DEFAULT 1,
+            step_3_valide INTEGER DEFAULT 0,
+            habilitation_hauteur INTEGER DEFAULT 0,
+            habilitation_soudure INTEGER DEFAULT 0,
+            habilitation_electricite INTEGER DEFAULT 0,
+            habilitation_confine INTEGER DEFAULT 0,
+            habilitation_engins INTEGER DEFAULT 0,
+            habilitation_chimique INTEGER DEFAULT 0,
+            habilitation_sst INTEGER DEFAULT 0,
+            habilitation_safety INTEGER DEFAULT 1,
+            is_blocked INTEGER DEFAULT 0,
+            motif_blocage TEXT,
             photo_path TEXT,
             qr_code_path TEXT,
             status TEXT DEFAULT 'Actif',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS entreprises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nom TEXT NOT NULL,
+            couleur TEXT DEFAULT '#1d664f',
+            couleur_fond TEXT DEFAULT '#111828',
+            email_notifications TEXT
         )
     ''')
 

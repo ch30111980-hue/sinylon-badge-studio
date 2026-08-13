@@ -7,7 +7,14 @@
   <!-- Sinylon Ultra-Fast Dark Glass Design System -->
   <link rel="stylesheet" href="/static/css/sinylon.css">
   <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/static/js/lucide.min.js"></script>
+  <script>
+    if (typeof lucide === 'undefined') {
+      var s = document.createElement('script');
+      s.src = 'https://unpkg.com/lucide@latest';
+      document.head.appendChild(s);
+    }
+  </script>
   <style>
     .worker-avatar {
       width: 42px;
@@ -80,6 +87,104 @@
       font-size: 12px;
       font-weight: 700;
     }
+    .metrics-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .metric-card-interactive {
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: 1px solid var(--border-glass);
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card-interactive:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    .metric-card-active {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.06) 100%);
+      border-color: rgba(52, 211, 153, 0.45);
+    }
+    .metric-card-active:hover {
+      border-color: #34d399;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+    }
+    .metric-card-inactive {
+      background: linear-gradient(135deg, rgba(100, 116, 139, 0.15) 0%, rgba(51, 65, 85, 0.06) 100%);
+      border-color: rgba(148, 163, 184, 0.3);
+    }
+    .metric-card-inactive:hover {
+      border-color: #94a3b8;
+      box-shadow: 0 8px 24px rgba(148, 163, 184, 0.25);
+    }
+    .status-pill-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .status-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .status-pill-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .status-pill-btn.active {
+      background: rgba(14, 165, 233, 0.2);
+      color: #38bdf8;
+      border-color: rgba(14, 165, 233, 0.5);
+    }
+    .status-pill-btn.active.pill-active-theme {
+      background: rgba(16, 185, 129, 0.22);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.55);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+    }
+    .status-pill-btn.active.pill-inactive-theme {
+      background: rgba(100, 116, 139, 0.3);
+      color: #f1f5f9;
+      border-color: rgba(148, 163, 184, 0.55);
+    }
+    .pulse-dot-green {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+      animation: pulseAnim 2s infinite;
+    }
+    @keyframes pulseAnim {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+    .worker-row-inactive {
+      opacity: 0.6;
+      background: rgba(15, 23, 42, 0.35) !important;
+    }
+    .worker-row-inactive:hover {
+      opacity: 0.95;
+    }
     .form-card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -124,13 +229,22 @@
         </div>
       </div>
     </div>
-    <div style="display: flex; gap: 12px; align-items: center;">
-      <a href="/badge/caisse" target="_blank" class="btn-secondary" style="background: rgba(14, 165, 233, 0.15); border-color: rgba(14, 165, 233, 0.4); color: #38bdf8; font-weight: 700;">
-        <i data-lucide="shield-check"></i> 💳 Caisse & Contrôle d'Accès NFC
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <a href="/badge/admin" class="btn-secondary" style="background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #34d399; font-weight: 800;">
+        <i data-lucide="sparkles"></i> 🪪 Studio Badges & IA
       </a>
-      <button class="btn-primary" onclick="openAddModal()">
-        <i data-lucide="user-plus"></i> Nouveau Travailleur
-      </button>
+      <a href="/badge/imprimer_a4" target="_blank" class="btn-secondary" style="background: rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc; font-weight: 700;">
+        <i data-lucide="printer"></i> 🖨️ Planche A4
+      </a>
+      <a href="/api/export/excel" class="btn-secondary" style="background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.4); color: #86efac; font-weight: 700;">
+        <i data-lucide="file-spreadsheet"></i> 📊 Export Excel
+      </a>
+      <a href="/badge/caisse" target="_blank" class="btn-secondary" style="background: rgba(14, 165, 233, 0.15); border-color: rgba(14, 165, 233, 0.4); color: #38bdf8; font-weight: 700;">
+        <i data-lucide="shield-check"></i> 💳 Caisse NFC
+      </a>
+      <a href="/badge/admin" class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i data-lucide="plus-circle"></i> Nouveau Badge Pro
+      </a>
     </div>
   </header>
 
@@ -142,14 +256,17 @@
       <button class="tab-btn active" onclick="switchTab('tab-workers', this)">
         <i data-lucide="users"></i> 1. Personnel & Badges Officiels
       </button>
+      <a href="/badge/admin" class="tab-btn" style="text-decoration: none; color: #34d399; font-weight: 700;">
+        <i data-lucide="layout-template"></i> 2. 🪪 Studio Badges (Modèle Officiel & IA)
+      </a>
       <button class="tab-btn" onclick="switchTab('tab-qrcodes', this)">
-        <i data-lucide="qr-code"></i> 2. 📱 Galerie QR Codes Terrain
+        <i data-lucide="qr-code"></i> 3. 📱 Galerie QR Codes Terrain
       </button>
       <button class="tab-btn" onclick="switchTab('tab-permits', this)">
-        <i data-lucide="file-check"></i> 3. Permis de Travail HSE (Noro-Unified)
+        <i data-lucide="file-check"></i> 4. Permis de Travail HSE (Noro-Unified)
       </button>
       <button class="tab-btn" onclick="switchTab('tab-forms', this)">
-        <i data-lucide="clipboard-list"></i> 4. Fiches Remplissables du Bureau
+        <i data-lucide="clipboard-list"></i> 5. Fiches Remplissables du Bureau
       </button>
     </div>
 
@@ -181,30 +298,52 @@
         </div>
       </div>
 
-      <!-- METRICS DASHBOARD -->
-      <div class="metrics-grid">
-        <div class="metric-card">
+      <!-- METRICS DASHBOARD AVEC DISTINCTION ACTIFS / INACTIFS -->
+      <div class="metrics-grid-4">
+        <!-- CARTE 1 : TRAVAILLEURS ACTIFS (37) -->
+        <div class="metric-card metric-card-interactive metric-card-active" onclick="filterByStatus('Actif', document.getElementById('pill-active'))" title="Cliquer pour afficher uniquement les 37 Actifs">
+          <div class="metric-icon" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">
+            <i data-lucide="user-check"></i>
+          </div>
+          <div class="metric-data">
+            <div class="value" style="color: #34d399; display: flex; align-items: center; gap: 8px;">
+              <span class="pulse-dot-green"></span> {{ active_count }}
+            </div>
+            <div class="label" style="color: #6ee7b7; font-weight: 700;">🟢 Actifs Chantier</div>
+          </div>
+          <div style="position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 800; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(52, 211, 153, 0.4);">
+            Terrain Actif
+          </div>
+        </div>
+
+        <!-- CARTE 2 : TRAVAILLEURS INACTIFS / ARCHIVÉS (13) -->
+        <div class="metric-card metric-card-interactive metric-card-inactive" onclick="filterByStatus('Inactif', document.getElementById('pill-inactive'))" title="Cliquer pour afficher les 13 Inactifs / Archivés">
+          <div class="metric-icon" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8;">
+            <i data-lucide="user-x"></i>
+          </div>
+          <div class="metric-data">
+            <div class="value" style="color: #cbd5e1;">{{ inactive_count }}</div>
+            <div class="label" style="color: #94a3b8;">⚪ Inactifs / Sortis</div>
+          </div>
+          <div style="position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 700; background: rgba(100, 116, 139, 0.2); color: #94a3b8; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(148, 163, 184, 0.3);">
+            Archivés
+          </div>
+        </div>
+
+        <!-- CARTE 3 : TOTAL RÉPERTOIRE (50) -->
+        <div class="metric-card metric-card-interactive" onclick="filterByStatus('all', document.getElementById('pill-all'))" title="Cliquer pour voir l'ensemble des 50 travailleurs">
           <div class="metric-icon">
             <i data-lucide="users"></i>
           </div>
           <div class="metric-data">
             <div class="value">{{ workers|length }}</div>
-            <div class="label">Travailleurs Enregistrés</div>
+            <div class="label">Total Répertoire</div>
           </div>
         </div>
 
+        <!-- CARTE 4 : IMPRESSIONS EFFECTUÉES -->
         <div class="metric-card">
-          <div class="metric-icon">
-            <i data-lucide="badge-check"></i>
-          </div>
-          <div class="metric-data">
-            <div class="value">{{ workers|length }}</div>
-            <div class="label">Badges Accrédités</div>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">
+          <div class="metric-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
             <i data-lucide="printer"></i>
           </div>
           <div class="metric-data">
@@ -214,12 +353,31 @@
         </div>
       </div>
 
-      <!-- TABLEAU WORKERS AVEC CASE À COCHER & MULTI-IMPRESSION -->
+      <!-- TABLEAU WORKERS AVEC FILTRE ACTIF / INACTIF -->
       <div class="card-section">
         <form id="batchSelectForm" action="/api/print/selected" method="POST" target="_blank">
-          <div class="section-header">
-            <h2 class="section-title">👥 Flotte des Travailleurs Sinylon ({{ workers|length }})</h2>
-            <div style="display: flex; gap: 10px; align-items: center;">
+          <div class="section-header" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h2 class="section-title" style="margin-bottom: 4px;">👥 Flotte des Travailleurs Sinylon ({{ workers|length }})</h2>
+              <div style="font-size: 12px; color: #94a3b8;">
+                <strong style="color: #34d399;">🟢 {{ active_count }} Actifs</strong> sur le chantier • <strong style="color: #cbd5e1;">⚪ {{ inactive_count }} Inactifs</strong> archivés
+              </div>
+            </div>
+
+            <!-- FILTRE RAPIDE PAR BOUTONS PILULES -->
+            <div class="status-pill-group">
+              <button type="button" class="status-pill-btn active pill-active-theme" onclick="filterByStatus('Actif', this)" id="pill-active">
+                <span class="pulse-dot-green"></span> 🟢 Actifs Chantier ({{ active_count }})
+              </button>
+              <button type="button" class="status-pill-btn" onclick="filterByStatus('all', this)" id="pill-all">
+                👥 Tous ({{ workers|length }})
+              </button>
+              <button type="button" class="status-pill-btn pill-inactive-theme" onclick="filterByStatus('Inactif', this)" id="pill-inactive">
+                ⚪ Inactifs / Archivés ({{ inactive_count }})
+              </button>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
               <input type="text" id="searchInput" class="search-input" placeholder="⚡ Recherche nom, matricule, grade..." onkeyup="filterTable()">
               <button type="button" id="selectAllBtn" class="btn-secondary" onclick="toggleSelectAllBtn()">
                 <i data-lucide="check-square"></i> Tout Cocher
@@ -228,7 +386,7 @@
                 <i data-lucide="printer"></i> Imprimer les Coché(e)s
               </button>
               <a href="/api/print/batch" target="_blank" class="btn-secondary">
-                <i data-lucide="printer"></i> Tout Imprimer (A4)
+                <i data-lucide="printer"></i> Imprimer les 37 Actifs (A4)
               </a>
             </div>
           </div>
@@ -244,15 +402,21 @@
                   <th>Nom & Prénom</th>
                   <th>Fonction / Grade</th>
                   <th>Entreprise</th>
-                  <th>Statut</th>
+                  <th>Statut Terrain</th>
                   <th style="text-align: right;">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {% for w in workers %}
-                <tr>
+                <tr data-status="{{ w.status }}" class="{{ '' if w.status == 'Actif' else 'worker-row-inactive' }}">
                   <td><input type="checkbox" name="worker_ids" value="{{ w.id }}" class="worker-checkbox"></td>
-                  <td><span style="background: rgba(14, 165, 233, 0.15); color: var(--primary-cyan); font-weight: 800; padding: 3px 8px; border-radius: 6px; font-size: 13px;">N° {{ w.seq_id }}</span></td>
+                  <td>
+                    {% if w.status == 'Actif' %}
+                      <span style="background: rgba(16, 185, 129, 0.18); color: #34d399; font-weight: 800; padding: 3px 8px; border-radius: 6px; font-size: 13px; border: 1px solid rgba(52, 211, 153, 0.3);">N° {{ w.seq_id }}</span>
+                    {% else %}
+                      <span style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; font-weight: 700; padding: 3px 8px; border-radius: 6px; font-size: 13px;">—</span>
+                    {% endif %}
+                  </td>
                   <td>
                     {% if w.photo_path %}
                       <img src="{{ w.photo_path }}" class="worker-avatar" alt="Photo {{ w.nom }}">
@@ -261,18 +425,31 @@
                     {% endif %}
                   </td>
                   <td><strong style="color: var(--primary-cyan);">{{ w.matricule }}</strong></td>
-                  <td><strong style="color: #ffffff;">{{ w.prenom }} {{ w.nom|upper }}</strong></td>
+                  <td>
+                    <strong style="color: #ffffff;">{{ w.prenom }} {{ w.nom|upper }}</strong>
+                    {% if w.status == 'Actif' %}
+                      <span style="display: inline-block; width: 6px; height: 6px; background: #34d399; border-radius: 50%; margin-left: 4px;" title="Actif sur le chantier"></span>
+                    {% endif %}
+                  </td>
                   <td><span class="role-badge">{{ w.fonction }}</span></td>
                   <td><strong style="color: #38bdf8;">Sinylon</strong></td>
                   <td>
-                    <div class="toggle-switch-wrapper" onclick="toggleBlock({{ w.id }})" title="Cliquer pour basculer le statut Actif / Inactif">
-                      <input type="checkbox" {{ 'checked' if w.status == 'Actif' else '' }} class="toggle-switch-input" readonly>
-                      <div class="toggle-switch-slider">
-                        <div class="toggle-switch-knob"></div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      {% if w.status == 'Actif' %}
+                        <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.18); color: #34d399; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(52, 211, 153, 0.35);">
+                          <span class="pulse-dot-green"></span> Actif
+                        </span>
+                      {% else %}
+                        <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(100, 116, 139, 0.2); color: #94a3b8; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.25);">
+                          ⚪ Inactif
+                        </span>
+                      {% endif %}
+                      <div class="toggle-switch-wrapper" onclick="toggleBlock({{ w.id }})" title="Cliquer pour basculer le statut Actif / Inactif">
+                        <input type="checkbox" {{ 'checked' if w.status == 'Actif' else '' }} class="toggle-switch-input" readonly>
+                        <div class="toggle-switch-slider">
+                          <div class="toggle-switch-knob"></div>
+                        </div>
                       </div>
-                      <span class="toggle-switch-label {{ 'text-success' if w.status == 'Actif' else 'text-danger' }}">
-                        {{ 'Actif' if w.status == 'Actif' else 'Inactif' }}
-                      </span>
                     </div>
                   </td>
                   <td style="text-align: right;">
@@ -357,6 +534,38 @@
         <p style="color: var(--text-muted); margin-bottom: 16px;">Cliquez sur n'importe quel permis ci-dessous pour ouvrir directement le formulaire papier officiel issu de Noro-Unified prêt à remplir et imprimer :</p>
         
         <div class="permit-paper-grid">
+          <!-- PERMIS GÉNÉRAL RECTO (PAGE 1) -->
+          <div class="permit-paper-card" style="border-left: 4px solid #0ea5e9;">
+            <div>
+              <h3 style="color: #0ea5e9; margin-bottom: 6px;">📋 Permis Général — RECTO (Page 1)</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Formulaire général officiel Sécurité Générale (P1) - Informations & Autorisations.</p>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <a href="/permis/papier/securite_generale" target="_blank" class="btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                <i data-lucide="external-link"></i> Remplir / Imprimer (P1)
+              </a>
+              <button type="button" class="btn-primary btn-sm" style="flex: 1; background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);" onclick="openQrModal('PERM-GEN-RECTO', 'Permis Général (Recto P1)')">
+                <i data-lucide="qr-code"></i> QR Code
+              </button>
+            </div>
+          </div>
+
+          <!-- PERMIS GÉNÉRAL VERSO (PAGE 2) -->
+          <div class="permit-paper-card" style="border-left: 4px solid #6366f1;">
+            <div>
+              <h3 style="color: #6366f1; margin-bottom: 6px;">🔄 Permis Général — VERSO (Page 2)</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Formulaire général officiel Revalidation & Conditions de Sécurité (P2).</p>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <a href="/permis/papier/revalidation?theme=securite_generale" target="_blank" class="btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                <i data-lucide="external-link"></i> Remplir / Imprimer (P2)
+              </a>
+              <button type="button" class="btn-primary btn-sm" style="flex: 1; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);" onclick="openQrModal('PERM-GEN-VERSO', 'Permis Général (Verso P2)')">
+                <i data-lucide="qr-code"></i> QR Code
+              </button>
+            </div>
+          </div>
+
           <div class="permit-paper-card">
             <div>
               <h3 style="color: #f59e0b; margin-bottom: 6px;">🔥 Permis Travaux à Chaud (Feu)</h3>
@@ -781,7 +990,9 @@
     function closeQrModal() {
       document.getElementById('qrDisplayModal').classList.remove('active');
     }
-    lucide.createIcons();
+    if (window.lucide && typeof lucide.createIcons === 'function') {
+      lucide.createIcons();
+    }
 
     // Onglets Navigation
     function switchTab(tabId, btn) {
@@ -865,21 +1076,36 @@
       document.getElementById('badgeIframe').src = "about:blank";
     }
 
+    let currentStatusFilter = 'all';
+
+    function filterByStatus(status, btn) {
+      currentStatusFilter = status;
+      document.querySelectorAll('.status-pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      filterTable();
+    }
+
     function filterTable() {
       let input = document.getElementById("searchInput").value.toLowerCase();
       let table = document.getElementById("workersTable");
       let trs = table.getElementsByTagName("tr");
 
       for (let i = 1; i < trs.length; i++) {
+        let rowStatus = trs[i].getAttribute("data-status") || "";
+        let statusMatch = (currentStatusFilter === 'all' || rowStatus.toLowerCase() === currentStatusFilter.toLowerCase());
+        
         let tdSeq = trs[i].getElementsByTagName("td")[1];
         let tdMat = trs[i].getElementsByTagName("td")[3];
         let tdName = trs[i].getElementsByTagName("td")[4];
         let tdRole = trs[i].getElementsByTagName("td")[5];
         
-        if (tdMat || tdName || tdRole) {
+        let textMatch = true;
+        if (input && (tdMat || tdName || tdRole)) {
           let text = ((tdSeq ? tdSeq.textContent : "") + " " + tdMat.textContent + " " + tdName.textContent + " " + tdRole.textContent).toLowerCase();
-          trs[i].style.display = text.includes(input) ? "" : "none";
+          textMatch = text.includes(input);
         }
+
+        trs[i].style.display = (statusMatch && textMatch) ? "" : "none";
       }
     }
   </script>

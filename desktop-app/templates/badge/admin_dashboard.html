@@ -101,7 +101,7 @@
 .b-validity { position:absolute; bottom:13mm; right:3mm; background:#475569; color:#fff; padding:1mm 2mm; border-radius:1mm; font-size:8px; font-weight:bold; }
 .b-footer { position:absolute; bottom:0; left:0; width:100%; height:11mm; overflow:hidden; z-index: 5; text-align: center; }
 .b-footer svg { width:100%; height:100%; position:absolute; bottom:0; left:0; transition: fill 0.3s; z-index: 6; }
-.b-footer-SINYLON FIAT { position: absolute; bottom: 1.2mm; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-size: 7px; padding: 0.5mm 2.5mm; border-radius: 0.5mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+.b-footer-csps { position: absolute; bottom: 1.2mm; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-size: 7px; padding: 0.5mm 2.5mm; border-radius: 0.5mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
 .b-footer-sf { position: absolute; bottom: 4.8mm; left: 50%; transform: translateX(-50%); color: #dc2626; font-size: 5.5px; font-weight: bold; z-index: 10; letter-spacing: 0.5px; }
 
 
@@ -121,7 +121,7 @@
 .badge-provisoire .b-photo { width: 20mm; height: 24mm; border: 1.5px solid #dc2626; }
 .badge-provisoire .b-qr { width: 20mm; height: 20mm; border: 1px solid #dc2626; }
 .badge-provisoire .b-validity { background: #dc2626 !important; }
-.badge-provisoire .b-footer-SINYLON FIAT { background: #991b1b !important; }
+.badge-provisoire .b-footer-csps { background: #991b1b !important; }
 .badge-provisoire .b-footer-sf { color: #ffffff !important; }
 .prov-tag {
     position: absolute;
@@ -217,7 +217,7 @@
                             <input type="text" name="societe" id="f_societe" placeholder="ex: AMCE CONSTRUCTION" required>
                         </div>
                         <div class="r2">
-                            <div class="field"><label>Projet</label><input type="text" name="projet" id="f_projet" value="SINYLON FIAT Projet FIAT"></div>
+                            <div class="field"><label>Projet</label><input type="text" name="projet" id="f_projet" value="CSPS Projet FIAT"></div>
                             <div class="field"><label>Année</label><input type="text" name="annee" id="f_annee" value="2026"></div>
                         </div>
                     </div>
@@ -546,7 +546,7 @@
                         <div class="b-line">Nom : <span class="b-val" id="prev-nom">...</span></div>
                         <div class="b-line">Prénom : <span class="b-val" id="prev-prenom">...</span></div>
                         <div class="b-line">Société : <span class="b-val" id="prev-societe">...</span></div>
-                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;" id="prev-projet">SINYLON FIAT Projet FIAT</span></div>
+                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;" id="prev-projet">CSPS Projet FIAT</span></div>
                         <div class="b-line">ID Badge : <span class="b-val" id="prev-num">...</span></div>
                     </div>
 
@@ -568,7 +568,7 @@
                             <path d="M0 20 C60 40, 140 40, 200 20" stroke="#e5e7eb" stroke-width="1.5" fill="none"></path>
                             <path d="M0 18.5 C60 38.5, 140 38.5, 200 18.5" stroke="#d1d5db" stroke-width="1" fill="none"></path>
                         </svg>
-                        <div class="b-footer-SINYLON FIAT">SINYLON FIAT</div>
+                        <div class="b-footer-csps">SINYLON FIAT</div>
                         <div class="b-footer-sf">SAFETY FIRST</div>
                     </div>
                 </div>
@@ -666,7 +666,7 @@
                                 {% else %}<span style="color:#3d435c;">—</span>{% endif %}
                             </td>
                             <td style="color:{% if badge.is_blocked or badge.statut == 'expire' %}#ef4444{% else %}#1d664f{% endif %};">
-                                {{ badge.date_expiration.strftime('%d/%m/%Y') if badge.date_expiration else 'N/A' }}
+                                {{ badge.date_expiration if badge.date_expiration is string else ((badge.date_expiration if badge.date_expiration is string else (badge.date_expiration if badge.date_expiration is string else badge.date_expiration.strftime('%d/%m/%Y'))) if badge.date_expiration else 'N/A') }}
                             </td>
                             <td>
                                 <span style="background:{% if badge.is_blocked %}#ef4444{% elif badge.statut == 'provisoire' %}#dc2626{% elif badge.statut == 'actif' %}#1d664f{% elif badge.statut == 'expire' %}#ef4444{% else %}#f59e0b{% endif %};color:{% if badge.statut == 'provisoire' or badge.is_blocked or badge.statut == 'expire' %}#fff{% else %}#000{% endif %};padding:3px 8px;border-radius:4px;font-size:10px;font-family:'Oswald',sans-serif;font-weight:bold;">
@@ -1211,7 +1211,7 @@ async function handleAiBadgeAnalysis(file) {
         const base64Data = reader.result.split(',')[1];
         const mimeType = file.type || "image/png";
         
-        const promptText = `Tu es l'agent HSE du système SINYLON FIAT FIAT. Analyse cette image ou document de travailleur (carte d'identité, passeport, CNAS, attestation) et extrais-en les informations correspondantes pour notre formulaire de badge.
+        const promptText = `Tu es l'agent HSE du système CSPS FIAT. Analyse cette image ou document de travailleur (carte d'identité, passeport, CNAS, attestation) et extrais-en les informations correspondantes pour notre formulaire de badge.
         Retourne un objet JSON valide avec les clés suivantes si tu trouves des informations correspondantes :
         - "nom" (nom de famille, en majuscules)
         - "prenom" (prénom)

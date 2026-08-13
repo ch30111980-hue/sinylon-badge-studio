@@ -1034,7 +1034,7 @@
                                     </td>
                                     <td>{{ b.entreprise_rel.nom }}</td>
                                     <td>
-                                        <form action="{{ url_for('badge.valider_SINYLON FIAT_new', id=b.id) }}" method="POST" class="d-inline" style="margin:0;padding:0;">
+                                        <form action="{{ url_for('badge.valider_csps_new', id=b.id) }}" method="POST" class="d-inline" style="margin:0;padding:0;">
                                             <button type="submit" class="btn btn-success btn-sm text-white fw-bold px-3 py-1" style="border-radius: 12px; font-size: 0.72rem; border: none; background: #10b981;">
                                                 <i class="fas fa-check-double me-1"></i> Valider & Diffuser
                                             </button>
@@ -1523,7 +1523,7 @@
                                 <span class="text-dark font-monospace" style="font-size: 0.8rem;">{{ b.carte_id or '—' }}</span>
                             </td>
                             <td>
-                                <div class="small fw-semibold text-dark">Exp: {{ b.date_expiration.strftime('%d/%m/%Y') if b.date_expiration else 'N/A' }}</div>
+                                <div class="small fw-semibold text-dark">Exp: {{ b.date_expiration if b.date_expiration is string else (b.date_expiration.strftime('%d/%m/%Y') if b.date_expiration else 'N/A') }}</div>
                                 {% if b.date_expiration and today %}
                                     {% set days_left = (b.date_expiration - today).days %}
                                     {% if days_left >= 0 %}
@@ -1564,13 +1564,13 @@
                                     
                                     <!-- Actions directes de validation pour l'Admin sur les badges provisoires en attente -->
                                     {% if b.statut == 'attente_provisoire' and (current_user.role == 'admin' or current_user.role == 'SINYLON FIAT') %}
-                                        <a href="{{ url_for('badge.valider_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-outline-success py-1 px-2 border-0" title="Valider et Notifier">
+                                        <a href="{{ url_for('badge.valider_csps', id=b.id) }}" class="btn btn-sm btn-outline-success py-1 px-2 border-0" title="Valider et Notifier">
                                             <i class="fas fa-check fs-5"></i>
                                         </a>
-                                        <a href="{{ url_for('badge.refaire_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-outline-warning py-1 px-2 border-0" title="À refaire (Incomplet)">
+                                        <a href="{{ url_for('badge.refaire_csps', id=b.id) }}" class="btn btn-sm btn-outline-warning py-1 px-2 border-0" title="À refaire (Incomplet)">
                                             <i class="fas fa-redo fs-5"></i>
                                         </a>
-                                        <a href="{{ url_for('badge.refuser_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-outline-danger py-1 px-2 border-0" title="Refuser définitivement">
+                                        <a href="{{ url_for('badge.refuser_csps', id=b.id) }}" class="btn btn-sm btn-outline-danger py-1 px-2 border-0" title="Refuser définitivement">
                                             <i class="fas fa-times fs-5"></i>
                                         </a>
                                     {% endif %}
@@ -2164,7 +2164,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             </div>
             <div class="modal-footer border-0 px-4 pb-4 pt-3">
-                <a href="{{ url_for('SINYLON FIAT_dashboard') }}" class="btn btn-sm" style="background:#0ea5e9;color:#fff;border-radius:20px;border:none;"><i class="fas fa-building me-1"></i> SINYLON FIAT Entreprises</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-sm" style="background:#0ea5e9;color:#fff;border-radius:20px;border:none;"><i class="fas fa-building me-1"></i> SINYLON FIAT Entreprises</a>
             </div>
         </div>
     </div>

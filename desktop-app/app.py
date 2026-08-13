@@ -104,9 +104,49 @@ def add_header(response):
 
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
+
+class WorkerItem(dict):
+    """Wrapper pour assurer la compatibilité totale avec les templates Jinja2 (attributs, méthodes)."""
+    def __init__(self, d, entreprises_dict=None):
+        super().__init__(d)
+        self.__dict__ = self
+        self.entreprises_dict = entreprises_dict or {}
+
+    def full_name(self):
+        return f"{self.get('prenom', '')} {self.get('nom', '').upper()}".strip()
+
+    def get_photo_url(self):
+        p = self.get('photo_path')
+        if p and p.startswith('/static/'):
+            return p
+        if p:
+            return f"/static/photos/{os.path.basename(p)}"
+        return "/static/img/default_avatar.png"
+
+    @property
+    def photo_filename(self):
+        return self.get('photo_path')
+
+    @property
+    def numero_badge(self):
+        return self.get('matricule') or f"SIN-{self.get('id', 0):04d}"
+
+    @property
+    def statut(self):
+        s = (self.get('status') or 'actif').lower()
+        if self.get('is_blocked'):
+            return 'bloque'
+        return s
+
+    @property
+    def entreprise_rel(self):
+        ent_id = self.get('entreprise_id')
+        if ent_id and ent_id in self.entreprises_dict:
+            return self.entreprises_dict[ent_id]
+        return {'id': 1, 'nom': self.get('societe_affichee') or self.get('entreprise') or 'Sinylon', 'couleur': '#1d664f', 'couleur_fond': '#111828'}
 
 GRADE_RANKS = [
     'directeur', 'director', 'manager', 'chef', 'responsable', 'head',
@@ -136,20 +176,40 @@ def index():
     conn = get_db()
     cursor = conn.cursor()
     
+    # Entreprises
+    ent_rows = cursor.execute('SELECT * FROM entreprises').fetchall()
+    entreprises = [dict(e) for e in ent_rows]
+    ent_map = {e['id']: e for e in entreprises}
+
     rows = cursor.execute('SELECT * FROM workers').fetchall()
-    workers = sort_workers_by_grade(rows)
+    sorted_rows = sort_workers_by_grade(rows)
+    workers = [WorkerItem(w, ent_map) for w in sorted_rows]
     print_count = cursor.execute('SELECT COUNT(*) FROM print_logs').fetchone()[0]
+    
+    active_count = sum(1 for w in workers if w.get('status') == 'Actif')
+    inactive_count = sum(1 for w in workers if w.get('status') != 'Actif')
     
     permits = cursor.execute('SELECT * FROM permits ORDER BY id DESC').fetchall()
     forms = cursor.execute('SELECT * FROM forms_generated ORDER BY id DESC').fetchall()
 
     conn.close()
-    return render_template('index.html', workers=workers, print_count=print_count, permits=permits, forms=forms)
+    return render_template('index.html', workers=workers, entreprises=entreprises, active_count=active_count, inactive_count=inactive_count, print_count=print_count, permits=permits, forms=forms)
 
 @app.route('/login', endpoint='login')
 @app.route('/logout', endpoint='logout')
 def auth_fallback():
     return redirect(url_for('index'))
+
+@app.route('/api/v1/admin/pending_counts')
+def api_pending_counts():
+    return jsonify({'total_permis': 0, 'total_badges': 0, 'permits': [], 'badges': []})
+
+@app.route('/favicon.ico')
+def favicon():
+    fiat_icon = os.path.join(os.path.dirname(__file__), 'static', 'img', 'fiat_logo.png')
+    if os.path.exists(fiat_icon):
+        return send_file(fiat_icon, mimetype='image/png')
+    return ('', 204)
 
 @app.route('/badge/caisse', endpoint='badge.caisse')
 @app.route('/caisse', endpoint='caisse')
@@ -415,36 +475,239 @@ def verifier_permis_public(ref_num):
     """
 
 
+# ================= BADGE STUDIO & WORKERS ROUTES =================
+
+@app.route('/badge/admin', endpoint='badge.admin_dashboard')
+@app.route('/badge/studio', endpoint='badge.studio')
+def badge_admin_dashboard():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    ent_rows = cursor.execute('SELECT * FROM entreprises').fetchall()
+    entreprises = [dict(e) for e in ent_rows]
+    ent_map = {e['id']: e for e in entreprises}
+
+    rows = cursor.execute('SELECT * FROM workers').fetchall()
+    sorted_rows = sort_workers_by_grade(rows)
+    workers_list = [WorkerItem(w, ent_map) for w in sorted_rows]
+    conn.close()
+
+    return render_template('badge/admin_dashboard.html', entreprises=entreprises, badges=workers_list, workers=workers_list)
+
+
+@app.route('/badge/imprimer_a4', endpoint='badge.imprimer_a4')
+def badge_imprimer_a4():
+    lot_filter = request.args.get('lot', '').strip()
+    ids_filter = request.args.get('ids', '').strip()
+    
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    ent_rows = cursor.execute('SELECT * FROM entreprises').fetchall()
+    entreprises = [dict(e) for e in ent_rows]
+    ent_map = {e['id']: e for e in entreprises}
+
+    if ids_filter:
+        ids_list = [int(i.strip()) for i in ids_filter.split(',') if i.strip().isdigit()]
+        if ids_list:
+            placeholders = ','.join('?' for _ in ids_list)
+            rows = cursor.execute(f'SELECT * FROM workers WHERE id IN ({placeholders})', ids_list).fetchall()
+        else:
+            rows = cursor.execute('SELECT * FROM workers').fetchall()
+    elif lot_filter:
+        rows = cursor.execute('SELECT * FROM workers WHERE entreprise_id = ? OR entreprise LIKE ? OR societe_affichee LIKE ?', (lot_filter, f"%{lot_filter}%", f"%{lot_filter}%")).fetchall()
+    else:
+        rows = cursor.execute('SELECT * FROM workers').fetchall()
+
+    sorted_rows = sort_workers_by_grade(rows)
+    workers_list = [WorkerItem(w, ent_map) for w in sorted_rows]
+    conn.close()
+
+    return render_template('badge/imprimer_a4.html', badges=workers_list, lot=lot_filter)
+
+
+@app.route('/badge/export_csv', endpoint='badge.export_csv')
+@app.route('/api/export/excel', endpoint='api.export_excel')
+def export_workers_csv():
+    import csv
+    import io
+
+    conn = get_db()
+    cursor = conn.cursor()
+    rows = cursor.execute('SELECT * FROM workers ORDER BY id ASC').fetchall()
+    conn.close()
+
+    output = io.StringIO()
+    # UTF-8 BOM pour ouverture directe et propre dans Excel
+    output.write('\ufeff')
+    writer = csv.writer(output, delimiter=';')
+    
+    writer.writerow([
+        'ID', 'Matricule / N° Badge', 'Nom', 'Prénom', 'Société', 'Projet', 'Année',
+        'Fonction / Poste', 'Date de Naissance', 'Groupe Sanguin', 'N° CNAS', 'N° CNI / Passeport',
+        'Téléphone', 'Département', 'Statut', 'Date Émission', 'Date Expiration',
+        'Step 1 Validé', 'Step 2 Validé', 'Step 3 Validé',
+        'Hab. Hauteur', 'Hab. Soudure', 'Hab. Électricité', 'Hab. Espace Confiné', 'Hab. Engins', 'Hab. SST'
+    ])
+
+    for r in rows:
+        w = dict(r)
+        writer.writerow([
+            w.get('id', ''),
+            w.get('matricule', ''),
+            (w.get('nom') or '').upper(),
+            (w.get('prenom') or '').title(),
+            w.get('societe_affichee') or w.get('entreprise') or 'Sinylon',
+            w.get('projet') or 'CSPS Projet FIAT',
+            w.get('annee') or '2026',
+            w.get('fonction') or '',
+            w.get('date_naissance') or '',
+            w.get('groupe_sanguin') or '',
+            w.get('cnas') or '',
+            w.get('carte_id') or '',
+            w.get('telephone') or '',
+            w.get('departement') or '',
+            w.get('status') or 'Actif',
+            w.get('date_emission') or '01/01/2026',
+            w.get('date_expiration') or '31/12/2026',
+            'OUI' if w.get('step_1_valide') else 'NON',
+            'OUI' if w.get('step_2_valide') else 'NON',
+            'OUI' if w.get('step_3_valide') else 'NON',
+            'OUI' if w.get('habilitation_hauteur') else 'NON',
+            'OUI' if w.get('habilitation_soudure') else 'NON',
+            'OUI' if w.get('habilitation_electricite') else 'NON',
+            'OUI' if w.get('habilitation_confine') else 'NON',
+            'OUI' if w.get('habilitation_engins') else 'NON',
+            'OUI' if w.get('habilitation_sst') else 'NON'
+        ])
+
+    csv_data = output.getvalue()
+    filename = f"Export_Badges_Sinylon_Fiat_{datetime.date.today().strftime('%Y%m%d')}.csv"
+    response = make_response(csv_data)
+    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+    response.headers["Content-type"] = "text/csv; charset=utf-8-sig"
+    return response
+
+
+@app.route('/badge/nouveau', methods=['POST'], endpoint='badge.nouveau')
 @app.route('/api/workers', methods=['POST'])
-def add_worker():
+def add_or_update_worker():
+    edit_id = request.form.get('edit_id', '').strip()
     nom = request.form.get('nom', '').strip()
     prenom = request.form.get('prenom', '').strip()
-    matricule = request.form.get('matricule', '').strip()
-    fonction = request.form.get('fonction', '').strip()
+    matricule = (request.form.get('matricule') or request.form.get('numero_badge') or '').strip()
+    fonction = (request.form.get('fonction') or request.form.get('poste') or '').strip()
+    
+    societe = request.form.get('societe_affichee', '').strip() or request.form.get('societe', '').strip() or 'Sinylon'
+    projet = request.form.get('projet', 'CSPS Projet FIAT').strip()
+    annee = request.form.get('annee', '2026').strip()
+    date_naissance = request.form.get('date_naissance', '').strip()
+    groupe_sanguin = request.form.get('groupe_sanguin', '').strip()
+    cnas = request.form.get('cnas', '').strip()
+    carte_id = request.form.get('carte_id', '').strip()
+    telephone = request.form.get('telephone', '').strip()
+    departement = request.form.get('departement', '').strip()
+    entreprise_id = request.form.get('entreprise_id', '1').strip()
+    date_emission = request.form.get('date_emission', '01/01/2026').strip()
+    date_expiration = request.form.get('date_expiration', '31/12/2026').strip()
+    
+    step_1_valide = 1 if request.form.get('step_1_valide') in ['on', '1', 'true', True] else 0
+    step_2_valide = 1 if request.form.get('step_2_valide') in ['on', '1', 'true', True] else 0
+    step_3_valide = 1 if request.form.get('step_3_valide') in ['on', '1', 'true', True] else 0
+    
+    hab_hauteur = 1 if request.form.get('habilitation_hauteur') in ['on', '1', 'true', True] else 0
+    hab_soudure = 1 if request.form.get('habilitation_soudure') in ['on', '1', 'true', True] else 0
+    hab_elec = 1 if request.form.get('habilitation_electricite') in ['on', '1', 'true', True] else 0
+    hab_confine = 1 if request.form.get('habilitation_confine') in ['on', '1', 'true', True] else 0
+    hab_engins = 1 if request.form.get('habilitation_engins') in ['on', '1', 'true', True] else 0
+    hab_sst = 1 if request.form.get('habilitation_sst') in ['on', '1', 'true', True] else 0
+
+    status = request.form.get('status', 'Actif').strip()
 
     photo_path = None
     if 'photo' in request.files:
         file = request.files['photo']
         if file and file.filename != '':
-            filename = f"{matricule}_{file.filename}"
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            photo_path = f"/static/photos/{filename}"
+            ext = os.path.splitext(file.filename)[1].lower() or '.jpg'
+            safe_fname = f"worker_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6]}{ext}"
+            file.save(os.path.join(UPLOAD_FOLDER, safe_fname))
+            photo_path = f"/static/photos/{safe_fname}"
 
-    if nom and prenom and matricule:
-        conn = get_db()
-        cursor = conn.cursor()
-        try:
+    conn = get_db()
+    cursor = conn.cursor()
+
+    if edit_id and edit_id.isdigit():
+        # Update existing worker
+        worker_id = int(edit_id)
+        if photo_path:
             cursor.execute('''
-                INSERT INTO workers (uuid, matricule, nom, prenom, fonction, entreprise, photo_path, status)
-                VALUES (?, ?, ?, ?, ?, 'Sinylon', ?, 'Actif')
-            ''', (str(uuid.uuid4()), matricule, nom, prenom, fonction, photo_path))
-            conn.commit()
-        except sqlite3.IntegrityError:
-            pass
-        finally:
-            conn.close()
+                UPDATE workers 
+                SET nom = ?, prenom = ?, matricule = ?, fonction = ?, entreprise = ?, societe_affichee = ?,
+                    projet = ?, annee = ?, date_naissance = ?, groupe_sanguin = ?, cnas = ?, carte_id = ?,
+                    telephone = ?, departement = ?, entreprise_id = ?, date_emission = ?, date_expiration = ?,
+                    step_1_valide = ?, step_2_valide = ?, step_3_valide = ?,
+                    habilitation_hauteur = ?, habilitation_soudure = ?, habilitation_electricite = ?,
+                    habilitation_confine = ?, habilitation_engins = ?, habilitation_sst = ?,
+                    status = ?, photo_path = ?
+                WHERE id = ?
+            ''', (nom, prenom, matricule, fonction, societe, societe, projet, annee, date_naissance, groupe_sanguin, cnas, carte_id,
+                  telephone, departement, entreprise_id, date_emission, date_expiration,
+                  step_1_valide, step_2_valide, step_3_valide,
+                  hab_hauteur, hab_soudure, hab_elec, hab_confine, hab_engins, hab_sst,
+                  status, photo_path, worker_id))
+        else:
+            cursor.execute('''
+                UPDATE workers 
+                SET nom = ?, prenom = ?, matricule = ?, fonction = ?, entreprise = ?, societe_affichee = ?,
+                    projet = ?, annee = ?, date_naissance = ?, groupe_sanguin = ?, cnas = ?, carte_id = ?,
+                    telephone = ?, departement = ?, entreprise_id = ?, date_emission = ?, date_expiration = ?,
+                    step_1_valide = ?, step_2_valide = ?, step_3_valide = ?,
+                    habilitation_hauteur = ?, habilitation_soudure = ?, habilitation_electricite = ?,
+                    habilitation_confine = ?, habilitation_engins = ?, habilitation_sst = ?,
+                    status = ?
+                WHERE id = ?
+            ''', (nom, prenom, matricule, fonction, societe, societe, projet, annee, date_naissance, groupe_sanguin, cnas, carte_id,
+                  telephone, departement, entreprise_id, date_emission, date_expiration,
+                  step_1_valide, step_2_valide, step_3_valide,
+                  hab_hauteur, hab_soudure, hab_elec, hab_confine, hab_engins, hab_sst,
+                  status, worker_id))
+        conn.commit()
+    else:
+        # Create new worker
+        if not matricule:
+            last_id_row = cursor.execute('SELECT MAX(id) FROM workers').fetchone()
+            next_num = (last_id_row[0] or 0) + 1
+            matricule = f"SIN-{next_num:04d}"
 
+        new_uuid = str(uuid.uuid4())
+        cursor.execute('''
+            INSERT INTO workers (
+                uuid, matricule, nom, prenom, fonction, entreprise, societe_affichee,
+                projet, annee, date_naissance, groupe_sanguin, cnas, carte_id,
+                telephone, departement, entreprise_id, date_emission, date_expiration,
+                step_1_valide, step_2_valide, step_3_valide,
+                habilitation_hauteur, habilitation_soudure, habilitation_electricite,
+                habilitation_confine, habilitation_engins, habilitation_sst,
+                photo_path, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            new_uuid, matricule, nom, prenom, fonction, societe, societe,
+            projet, annee, date_naissance, groupe_sanguin, cnas, carte_id,
+            telephone, departement, entreprise_id, date_emission, date_expiration,
+            step_1_valide, step_2_valide, step_3_valide,
+            hab_hauteur, hab_soudure, hab_elec, hab_confine, hab_engins, hab_sst,
+            photo_path, status
+        ))
+        conn.commit()
+
+    conn.close()
+
+    # Redirection vers la page appropriée
+    ref = request.headers.get('Referer', '')
+    if 'badge/admin' in ref or 'badge/studio' in ref:
+        return redirect(url_for('badge.admin_dashboard'))
     return redirect(url_for('index'))
+
 
 @app.route('/api/workers/edit/<int:worker_id>', methods=['POST'])
 def edit_worker(worker_id):
@@ -461,9 +724,10 @@ def edit_worker(worker_id):
     if 'photo' in request.files:
         file = request.files['photo']
         if file and file.filename != '':
-            filename = f"{matricule}_{file.filename}"
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            photo_path = f"/static/photos/{filename}"
+            ext = os.path.splitext(file.filename)[1].lower() or '.jpg'
+            safe_fname = f"worker_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6]}{ext}"
+            file.save(os.path.join(UPLOAD_FOLDER, safe_fname))
+            photo_path = f"/static/photos/{safe_fname}"
 
     if photo_path:
         cursor.execute('''
@@ -481,29 +745,47 @@ def edit_worker(worker_id):
     conn.commit()
     conn.close()
 
+    ref = request.headers.get('Referer', '')
+    if 'badge/admin' in ref:
+        return redirect(url_for('badge.admin_dashboard'))
     return redirect(url_for('index'))
 
+
 @app.route('/api/workers/delete/<int:worker_id>', methods=['POST'])
+@app.route('/badge/supprimer/<int:worker_id>', endpoint='badge.supprimer')
 def delete_worker(worker_id):
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('DELETE FROM workers WHERE id = ?', (worker_id,))
     conn.commit()
     conn.close()
+    
+    ref = request.headers.get('Referer', '')
+    if 'badge/admin' in ref:
+        return redirect(url_for('badge.admin_dashboard'))
     return redirect(url_for('index'))
 
+
 @app.route('/api/workers/toggle_block/<int:worker_id>', methods=['POST'])
+@app.route('/badge/bloquer/<int:worker_id>', endpoint='badge.bloquer')
 def toggle_block_worker(worker_id):
     conn = get_db()
     cursor = conn.cursor()
-    row = cursor.execute('SELECT status FROM workers WHERE id = ?', (worker_id,)).fetchone()
+    row = cursor.execute('SELECT status, is_blocked FROM workers WHERE id = ?', (worker_id,)).fetchone()
     if row:
         new_status = 'Bloqué' if row['status'] == 'Actif' else 'Actif'
-        cursor.execute('UPDATE workers SET status = ? WHERE id = ?', (new_status, worker_id))
+        new_blocked = 1 if new_status == 'Bloqué' else 0
+        cursor.execute('UPDATE workers SET status = ?, is_blocked = ? WHERE id = ?', (new_status, new_blocked, worker_id))
         conn.commit()
     conn.close()
+    
+    ref = request.headers.get('Referer', '')
+    if 'badge/admin' in ref:
+        return redirect(url_for('badge.admin_dashboard'))
     return redirect(url_for('index'))
 
+
+@app.route('/badge/telecharger_pdf/<int:worker_id>', endpoint='badge.telecharger_pdf')
 @app.route('/api/print/single/<int:worker_id>')
 def print_single(worker_id):
     conn = get_db()
@@ -529,6 +811,7 @@ def print_single(worker_id):
     response.headers['Expires'] = '0'
     return response
 
+
 @app.route('/api/print/batch')
 def print_batch():
     conn = get_db()
@@ -550,9 +833,15 @@ def print_batch():
 
     return send_file(output_pdf, mimetype='application/pdf')
 
+
 @app.route('/api/print/selected', methods=['POST'])
 def print_selected_batch():
-    worker_ids = request.form.getlist('worker_ids')
+    worker_ids = request.form.getlist('worker_ids') or request.form.getlist('badge_ids')
+    if not worker_ids:
+        raw_ids = request.form.get('ids', '')
+        if raw_ids:
+            worker_ids = [i.strip() for i in raw_ids.split(',') if i.strip()]
+
     if not worker_ids:
         return "Aucun travailleur sélectionné", 400
 
@@ -572,9 +861,98 @@ def print_selected_batch():
 
     return send_file(output_pdf, mimetype='application/pdf')
 
+
+@app.route('/badge/api_update_ent', methods=['POST'], endpoint='badge.api_update_ent')
+def api_update_ent():
+    data = request.get_json(silent=True) or request.form
+    ent_id = data.get('id')
+    couleur = data.get('couleur')
+    couleur_fond = data.get('couleur_fond')
+    email_notifications = data.get('email_notifications')
+
+    if not ent_id:
+        return jsonify({'success': False, 'error': 'ID requis'}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE entreprises
+        SET couleur = COALESCE(?, couleur),
+            couleur_fond = COALESCE(?, couleur_fond),
+            email_notifications = COALESCE(?, email_notifications)
+        WHERE id = ?
+    ''', (couleur, couleur_fond, email_notifications, ent_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True})
+
+
+@app.route('/badge/api/entreprise/creer', methods=['POST'])
+def api_create_entreprise():
+    nom = request.form.get('nom', '').strip()
+    couleur = request.form.get('couleur', '#1d664f').strip()
+    couleur_fond = request.form.get('couleur_fond', '#111828').strip()
+
+    if not nom:
+        return redirect(url_for('badge.admin_dashboard'))
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO entreprises (nom, couleur, couleur_fond) VALUES (?, ?, ?)', (nom, couleur, couleur_fond))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('badge.admin_dashboard'))
+
+
+@app.route('/badge/api/entreprise/delete/<int:ent_id>', methods=['POST'])
+def api_delete_entreprise(ent_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM entreprises WHERE id = ?', (ent_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('badge.admin_dashboard'))
+
+
+@app.route('/api/ai/parse_document', methods=['POST'])
+def api_ai_parse_document():
+    """Endpoint backend pour parser les CNI/Passeports/CNAS si besoin."""
+    if 'document' not in request.files:
+        return jsonify({'success': False, 'error': 'Aucun fichier reçu'}), 400
+    
+    file = request.files['document']
+    if not file or file.filename == '':
+        return jsonify({'success': False, 'error': 'Nom de fichier vide'}), 400
+
+    # Sauvegarde temporaire
+    ext = os.path.splitext(file.filename)[1].lower() or '.jpg'
+    safe_name = f"scan_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6]}{ext}"
+    saved_path = os.path.join(UPLOAD_FOLDER, safe_name)
+    file.save(saved_path)
+
+    # Réponse par défaut avec détection basique de nom de fichier
+    res_data = {
+        'success': True,
+        'photo_url': f"/static/photos/{safe_name}",
+        'nom': '',
+        'prenom': '',
+        'fonction': 'Ouvrier Spécialisé',
+        'societe': 'Sinylon',
+        'projet': 'CSPS Projet FIAT',
+        'annee': '2026',
+        'cnas': '',
+        'carte_id': ''
+    }
+    return jsonify(res_data)
+
 # ================= PERMIS PAPIER OFFICIELS NORO-UNIFIED =================
-@app.route('/permis/papier/<type_name>')
-def render_permis_papier(type_name):
+@app.route('/permis/papier/<type_name>', methods=['GET', 'POST'], endpoint='permis.formulaire_papier')
+@app.route('/permis/nouveau', methods=['GET', 'POST'], endpoint='permis.nouveau')
+@app.route('/permis/creer', methods=['GET', 'POST'], endpoint='permis.creer')
+def render_permis_papier(type_name='securite_generale'):
     valid_templates = {
         'chaud': 'permis/papier/chaud.html',
         'fouille': 'permis/papier/fouille.html',
@@ -582,16 +960,85 @@ def render_permis_papier(type_name):
         'hauteur': 'permis/papier/hauteur.html',
         'levage': 'permis/papier/levage.html',
         'electrique': 'permis/papier/electrique.html',
-        'securite_generale': 'permis/papier/securite_generale.html'
+        'securite_generale': 'permis/papier/securite_generale.html',
+        'revalidation': 'permis/papier/revalidation.html',
+        'vehicule': 'permis/papier/vehicule.html',
+        'materiel': 'permis/papier/materiel.html',
+        'permis_general': 'permis/papier/securite_generale.html',
+        'permis_general_recto': 'permis/papier/securite_generale.html',
+        'permis_general_verso': 'permis/papier/revalidation.html'
     }
-    if type_name in valid_templates:
-        return render_template(valid_templates[type_name])
-    return "Modèle de permis non trouvé", 404
+
+    if request.method == 'POST':
+        demandeur = (request.form.get('demandeur') or request.form.get('responsable') or request.form.get('nom_demandeur') or 'Responsable Chantier').strip()
+        entreprise = (request.form.get('entreprise') or 'Sinylon').strip()
+        zone = (request.form.get('zone') or request.form.get('emplacement') or 'Zone Chantier').strip()
+        description = (request.form.get('description') or request.form.get('nature_travaux') or f"Permis Papier {type_name.replace('_', ' ').title()}").strip()
+        
+        try:
+            vent_kmh = float(request.form.get('vent_kmh', 0) or 0)
+        except (ValueError, TypeError):
+            vent_kmh = 0.0
+            
+        try:
+            temp_celsius = float(request.form.get('temp_celsius', 0) or 0)
+        except (ValueError, TypeError):
+            temp_celsius = 0.0
+
+        type_title = type_name.replace('_', ' ').title()
+        ref_num = f"PERM-{type_name.upper()[:4]}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+        status = "VALIDE"
+        if vent_kmh > 60 or temp_celsius > 40:
+            status = "ARRÊT MÉTÉO"
+
+        try:
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO permits (ref_num, type_permis, entreprise, demandeur, zone, description, vent_kmh, temp_celsius, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (ref_num, f"Permis Papier {type_title}", entreprise, demandeur, zone, description, vent_kmh, temp_celsius, status))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"⚠️ Erreur enregistrement permis ({type_name}): {e}")
+
+        return redirect(url_for('index'))
+
+    type_key = request.args.get('type_form') or type_name
+    if type_key in valid_templates:
+        return render_template(valid_templates[type_key])
+    return render_template('permis/papier/securite_generale.html')
 
 # ================= FICHES DU BUREAU (SORTIE MATÉRIEL & PEMP) =================
 @app.route('/fiches/sortie_materiel')
 def render_fiche_sortie_materiel():
     return render_template('fiches/sortie_materiel.html')
+
+@app.route('/fiches/entree_depannage')
+def render_fiche_entree_depannage():
+    return render_template('fiches/entree_depannage.html')
+
+@app.route('/inspection_nacelle/<sn>')
+@app.route('/verifier/nacelle/<sn>')
+def verifier_nacelle_sinylon(sn):
+    clean_sn = str(sn).strip()
+    nacelle_models = {
+        's4726e-01-180400318': {'modele': 'Nacelle Ciseaux Électrique S4726E', 'marque': 'Sinoboom / Haulotte', 'code': 'NAC-S4726E-01'},
+        'mp12h467122026': {'modele': 'Nacelle Ciseaux MP12H', 'marque': 'Magni / Dingli', 'code': 'NAC-MP12H-01'},
+        'jcpt1212': {'modele': 'Nacelle Ciseaux JCPT1212', 'marque': 'Dingli JCPT', 'code': 'NAC-JCPT1212-01'},
+        'mp12h': {'modele': 'Nacelle Ciseaux MP12H (Unité 2)', 'marque': 'Magni / Dingli', 'code': 'NAC-MP12H-02'},
+        'si180412-4': {'modele': 'Nacelle Ciseaux SI180412-4 Heavy Duty', 'marque': 'Sinoboom Heavy', 'code': 'NAC-SI180412-04'},
+        'man00000a01033498': {'modele': 'Nacelle Ciseaux Manitou 120 SE', 'marque': 'MANITOU / INNOVALIFT', 'code': 'NAC-MAN120SE-01'},
+        'man00000a01033499': {'modele': 'Nacelle Ciseaux Manitou 120 SE (Unité 2)', 'marque': 'MANITOU / INNOVALIFT', 'code': 'NAC-MAN120SE-02'},
+        'man00000l01033499': {'modele': 'Nacelle Ciseaux Manitou 120 SE (Unité 2)', 'marque': 'MANITOU / INNOVALIFT', 'code': 'NAC-MAN120SE-02'}
+    }
+    info = nacelle_models.get(clean_sn.lower(), {
+        'modele': f'Nacelle à Ciseaux ({clean_sn})',
+        'marque': 'PEMP Sinylon Fiat',
+        'code': f'NAC-{clean_sn[:8].upper()}'
+    })
+    return render_template('verifier_nacelle.html', sn=clean_sn, nacelle_info=info)
 
 @app.route('/fiches/inspection_pemp')
 def render_fiche_inspection_pemp():
@@ -705,7 +1152,199 @@ def create_inspection_pemp():
 
     return send_file(output_pdf, mimetype='application/pdf')
 
+
+# ══════════════════════════════════════════════════════════════
+# PERMIS DE TRAVAIL QUOTIDIEN — Routes
+# ══════════════════════════════════════════════════════════════
+
+import json as _json
+import hashlib as _hashlib
+
+@app.route('/permis/scan/<path:permis_key>')
+@app.route('/permis/scan/DAILY-<permis_id>')
+@app.route('/permis/scan')
+@app.route('/permis/travail')
+def permis_travail_scan(permis_key=None, permis_id=None):
+    """
+    Page mobile scannée via QR Code — affiche le permis du jour.
+    Gère aussi bien les filtres d'activités (hauteur, chaud, tuyauterie...) que le portail général.
+    """
+    today_iso = datetime.date.today().isoformat()
+    today_pid = _hashlib.sha256(today_iso.encode()).hexdigest()[:8].upper()
+
+    key_clean = (permis_key or permis_id or "all").replace("DAILY-", "").lower().strip()
+    selected_slug = key_clean
+    
+    # Mapping des slugs d'activités
+    # Dictionnaire des métadonnées pour chaque discipline
+    permis_details = {
+        'hauteur': {
+            'nom': 'Travaux en Hauteur & Nacelles',
+            'nom_cn': '高空作业与升降机安全许可证',
+            'code': 'PT-HAU',
+            'icone': '🪢',
+            'risque': 'ÉLEVÉ (CLASSE 1)',
+            'couleur_risque': '#ef4444',
+            'epi': ['Harnais antichute EN361', 'Longe double avec absorbeur', 'Casque avec jugulaire', 'Chaussures sécurité S3', 'Ligne de vie certifiée'],
+            'precautions': [
+                'Arrêt obligatoire des travaux si vent > 45 km/h.',
+                'Balisage d\'un périmètre d\'exclusion de 10 m au sol.',
+                'Contrôle journalier de conformité des nacelles PEMP.',
+                'Points d\'ancrage inspectés et testés avant toute montée.',
+                'Interdiction formelle de travailler seul en élévation.'
+            ]
+        },
+        'chaud': {
+            'nom': 'Travaux à Chaud & Soudage (Permis Feu)',
+            'nom_cn': '动火作业与焊接气割安全许可证',
+            'code': 'PT-CHD',
+            'icone': '🔥',
+            'risque': 'ÉLEVÉ (PERMIS FEU)',
+            'couleur_risque': '#ef4444',
+            'epi': ['Masque soudeur cristaux liquides', 'Gants soudeur cuir croûte', 'Tablier ignifugé', 'Chaussures sécurité S3', 'Lunettes meulage'],
+            'precautions': [
+                'Éloignement de toutes matières combustibles dans un rayon de 10 m.',
+                'Bâches ignifugées M0 déployées sous la zone de projection.',
+                'Extincteur 6kg CO₂ / Poudre placé à moins de 3 mètres.',
+                'Contrôle d\'atmosphère par explosimètre si proximité réseaux fluides.',
+                'Ronde de surveillance obligatoire pendant 2h après l\'arrêt des feux.'
+            ]
+        },
+        'tuyauterie': {
+            'nom': 'Installation Tuyauterie Industrielle & Piping',
+            'nom_cn': '工业管道与配管安装作业许可证',
+            'code': 'PT-PIP',
+            'icone': '🚰',
+            'risque': 'MOYEN (PRESSION & FLUIDES)',
+            'couleur_risque': '#f59e0b',
+            'epi': ['Gants anti-coupure Niveau 5', 'Lunettes étanches', 'Casque de chantier', 'Chaussures sécurité S3', 'Protection auditive'],
+            'precautions': [
+                'Purge, dégazage et vérification de l\'absence de pression résiduelle.',
+                'Élingage et arrimage certifié des tronçons de tuyauterie.',
+                'Serrage des brides au couple prescrit avec joint neuf.',
+                'Balisage strict lors des épreuves hydrostatiques sous pression.',
+                'Contrôle des fixations antivibratiles et des pentes.'
+            ]
+        },
+        'charpente': {
+            'nom': 'Charpente Métallique & Levage Poutres',
+            'nom_cn': '钢结构安装、吊装与高空装配许可证',
+            'code': 'PT-CHA',
+            'icone': '🏗️',
+            'risque': 'ÉLEVÉ (LEVAGE LOURD)',
+            'couleur_risque': '#ef4444',
+            'epi': ['Harnais antichute EN361', 'Casque avec jugulaire', 'Gants anti-écrasement', 'Chaussures S3 montantes', 'Gilet haute visibilité'],
+            'precautions': [
+                'Plan de levage formellement validé avant manœuvre.',
+                'Utilisation obligatoire de cordes de guidage (taglines).',
+                'Interdiction formelle de stationner sous charge suspendue.',
+                'Contrôle du couple de serrage de la boulonnerie HR.',
+                'Arrêt immédiat du grutage si les rafales dépassent 35 km/h.'
+            ]
+        },
+        'rails': {
+            'nom': 'Rails Suspendus & Convoyeurs Aériens',
+            'nom_cn': '悬挂轨道、输送线与起重机械作业许可证',
+            'code': 'PT-RAI',
+            'icone': '🚡',
+            'risque': 'ÉLEVÉ (HAUTEUR & FIXATIONS)',
+            'couleur_risque': '#ef4444',
+            'epi': ['Harnais de sécurité', 'Casque de protection EN397', 'Gants renforcés', 'Chaussures de sécurité S3'],
+            'precautions': [
+                'Contrôle du serrage des platines d\'ancrage et suspentes au couple requis.',
+                'Contrôle de l\'alignement et nivellement par laser des rails.',
+                'Élingage équilibré et sécurisé pendant le hissage en hauteur.',
+                'Inspection des butées mécaniques de fin de course et arrêts d\'urgence.',
+                'Essais statiques et dynamiques à vide avant mise sous charge.'
+            ]
+        },
+        'equipements': {
+            'nom': 'Installation Équipements & Machinerie',
+            'nom_cn': '机械设备、工业生产线与机器安装许可证',
+            'code': 'PT-EQP',
+            'icone': '⚙️',
+            'risque': 'MOYEN (RIPAGE & MANUTENTION)',
+            'couleur_risque': '#f59e0b',
+            'epi': ['Chaussures renfort métatarse', 'Gants mécaniques', 'Lunettes de sécurité', 'Casque de chantier'],
+            'precautions': [
+                'Utilisation de rouleurs de charge et vérins hydrauliques homologués.',
+                'Vérification de la portance de la dalle béton avant ripage.',
+                'Calage mécanique et scellements chimiques rigoureusement contrôlés.',
+                'Consignation mécanique et arrêt sécurisé des équipements adjacents.',
+                'Signalement et protection des angles saillants et pièces mobiles.'
+            ]
+        },
+        'cables': {
+            'nom': 'Tirage de Câbles & Travaux Électriques',
+            'nom_cn': '电缆敷设、桥架安装与电气作业安全许可证',
+            'code': 'PT-CAB',
+            'icone': '⚡',
+            'risque': 'ÉLECTRIQUE (HABILITATION REQUISE)',
+            'couleur_risque': '#f59e0b',
+            'epi': ['Gants isolants 1000V', 'Écran facial anti-arc', 'Outillage isolé IEC 60900', 'Chaussures sans métal'],
+            'precautions': [
+                'Consignation électrique stricte LOTO (Cadenassage & Balisage armoires).',
+                'Vérification d\'Absence de Tension (VAT) systématique avant travail.',
+                'Dérouleurs de tourets solidement freinés et arrimés au sol.',
+                'Protection des mains lors du tirage mécanique dans les caniveaux.',
+                'Personnel obligatoirement détenteur de l\'habilitation B1V / B2V valide.'
+            ]
+        },
+        'installations': {
+            'nom': 'Autres Installations & Génie Civil',
+            'nom_cn': '土建综合配套安装与现场通用施工作业许可证',
+            'code': 'PT-DIV',
+            'icone': '🛠️',
+            'risque': 'MODÉRÉ (TRAVAUX GÉNÉRAUX)',
+            'couleur_risque': '#10b981',
+            'epi': ['Gants de protection', 'Masque anti-poussière FFP3', 'Protection auditive', 'Chaussures sécurité S3'],
+            'precautions': [
+                'Détection des réseaux enterrés ou encastrés avant tout carottage.',
+                'Ventilation forcée lors de travaux en espace semi-confiné.',
+                'Nettoyage et évacuation régulière des gravats et déblais.',
+                'Signalisation et barriérage des réservations ou tranchées ouvertes.',
+                'Port des lunettes étanches lors des phases de piquage / découpe béton.'
+            ]
+        }
+    }
+
+    context = {
+        "today_iso": today_iso,
+        "today_pid": today_pid,
+        "selected_slug": selected_slug,
+        "permis_details": permis_details
+    }
+
+    if selected_slug in permis_details:
+        context["permis_info"] = permis_details[selected_slug]
+        return render_template('permis/verifier_permis_travail.html', **context)
+
+    return render_template('permis/permis_travail_scan.html', **context)
+
+
+
+
+@app.route('/permis/travail/pdf')
+def permis_travail_pdf():
+    """Télécharge ou re-génère le PDF du permis du jour."""
+    import os as _os
+    today_iso = datetime.date.today().isoformat()
+    pdf_name = f"PERMIS_TRAVAIL_{today_iso}.pdf"
+    pdf_path = _os.path.join(_os.path.dirname(__file__), 'static', 'fiches', pdf_name)
+
+    if not _os.path.exists(pdf_path):
+        # Re-génère si absent
+        from generate_permis_travail_daily import main as _gen
+        _gen()
+
+    if _os.path.exists(pdf_path):
+        return send_file(pdf_path, mimetype='application/pdf',
+                         download_name=pdf_name, as_attachment=False)
+    return "PDF non disponible", 404
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5050))
     print(f"🚀 SINYLON Badge Studio Pro démarré sur http://0.0.0.0:{port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
+

@@ -715,7 +715,7 @@ input[type="checkbox"]:checked::after {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24px;
+  padding: 16px;
   background: #070a12;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-glass);
@@ -724,8 +724,10 @@ input[type="checkbox"]:checked::after {
 }
 
 .badge-preview-container iframe {
-  width: 100%;
-  height: 320px;
+  width: 380px;
+  height: 540px;
+  max-width: 100%;
   border: none;
   border-radius: var(--radius-sm);
+  background: transparent;
 }

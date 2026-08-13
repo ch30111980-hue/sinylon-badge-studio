@@ -295,7 +295,7 @@
     .b-validity { position:absolute; bottom:13mm; right:3mm; background:#475569; color:#fff; padding:1mm 2mm; border-radius:1mm; font-size:8px; font-weight:bold; }
     .b-footer { position:absolute; bottom:0; left:0; width:100%; height:11mm; overflow:hidden; z-index:5; text-align: center; }
     .b-footer svg { width:100%; height:100%; position:absolute; bottom:0; left:0; transition: fill 0.3s; z-index:6; }
-    .b-footer-SINYLON FIAT { position: absolute; bottom: 1.2mm; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-size: 7px; padding: 0.5mm 2.5mm; border-radius: 0.5mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .b-footer-csps { position: absolute; bottom: 1.2mm; left: 50%; transform: translateX(-50%); background: #dc2626; color: #fff; font-size: 7px; padding: 0.5mm 2.5mm; border-radius: 0.5mm; font-weight: bold; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
     .b-footer-sf { position: absolute; bottom: 4.8mm; left: 50%; transform: translateX(-50%); color: #dc2626; font-size: 5.5px; font-weight: bold; z-index: 10; letter-spacing: 0.5px; }
     .nb5-signature {
         text-align: center;
@@ -317,7 +317,7 @@
     .badge-provisoire .b-photo { width: 20mm; height: 24mm; border: 1.5px solid #dc2626; }
     .badge-provisoire .b-qr { width: 20mm; height: 20mm; border: 1px solid #dc2626; }
     .badge-provisoire .b-validity { background: #dc2626 !important; }
-    .badge-provisoire .b-footer-SINYLON FIAT { background: #991b1b !important; }
+    .badge-provisoire .b-footer-csps { background: #991b1b !important; }
     .badge-provisoire .b-footer-sf { color: #ffffff !important; }
     .prov-tag {
         position: absolute;
@@ -623,7 +623,7 @@
                         <div class="b-line">Nom : <span class="b-val" id="prev-nom">...</span></div>
                         <div class="b-line">Prénom : <span class="b-val" id="prev-prenom">...</span></div>
                         <div class="b-line">Société : <span class="b-val" id="prev-societe">...</span></div>
-                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;" id="prev-projet">SINYLON FIAT Projet FIAT</span></div>
+                        <div class="b-line">Projet : <span class="b-val" style="color:#1e4ed8;" id="prev-projet">CSPS Projet FIAT</span></div>
                         <div class="b-line">ID Badge : <span class="b-val" id="prev-num">...</span></div>
                     </div>
 
@@ -646,7 +646,7 @@
                             <path d="M0 20 C60 40, 140 40, 200 20" stroke="#e5e7eb" stroke-width="1.5" fill="none"></path>
                             <path d="M0 18.5 C60 38.5, 140 38.5, 200 18.5" stroke="#d1d5db" stroke-width="1" fill="none"></path>
                         </svg>
-                        <div class="b-footer-SINYLON FIAT">SINYLON FIAT</div>
+                        <div class="b-footer-csps">SINYLON FIAT</div>
                         <div class="b-footer-sf">SAFETY FIRST</div>
                     </div>
                 </div>
@@ -781,7 +781,7 @@
             const base64Data = reader.result.split(',')[1];
             const mimeType = file.type || "image/png";
             
-            const promptText = `Tu es l'agent HSE du système SINYLON FIAT FIAT. Analyse cette image ou document de travailleur (carte d'identité, passeport, CNAS, attestation) et extrais-en les informations correspondantes pour notre formulaire de badge.
+            const promptText = `Tu es l'agent HSE du système CSPS FIAT. Analyse cette image ou document de travailleur (carte d'identité, passeport, CNAS, attestation) et extrais-en les informations correspondantes pour notre formulaire de badge.
             Retourne un objet JSON valide avec les clés suivantes si tu trouves des informations correspondantes :
             - "nom" (nom de famille, en majuscules)
             - "prenom" (prénom)

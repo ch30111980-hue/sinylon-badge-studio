@@ -414,7 +414,7 @@
                     <i class="fa-solid fa-hourglass-end"></i>
                 </div>
                 <div class="status-title" style="color: var(--accent-red);">Badge Expiré</div>
-                <div class="status-subtitle">Date d'expiration dépassée le {{ badge.date_expiration.strftime('%d/%m/%Y') if badge.date_expiration }}</div>
+                <div class="status-subtitle">Date d'expiration dépassée le {{ (badge.date_expiration if badge.date_expiration is string else (badge.date_expiration if badge.date_expiration is string else badge.date_expiration.strftime('%d/%m/%Y'))) if badge.date_expiration }}</div>
             </div>
         {% elif badge.statut == 'provisoire' %}
             <div class="status-banner provisional">
@@ -770,7 +770,7 @@
                         <div class="item-icon"><i class="fa-solid fa-id-card-clip"></i></div>
                         <div>
                             <div class="item-label">Expiration Badge</div>
-                            <div class="item-sublabel">Valide jusqu'au {{ badge.date_expiration.strftime('%d/%m/%Y') if badge.date_expiration else 'N/A' }}</div>
+                            <div class="item-sublabel">Valide jusqu'au {{ badge.date_expiration if badge.date_expiration is string else ((badge.date_expiration if badge.date_expiration is string else (badge.date_expiration if badge.date_expiration is string else badge.date_expiration.strftime('%d/%m/%Y'))) if badge.date_expiration else 'N/A') }}</div>
                         </div>
                     </div>
                     <div>
@@ -806,14 +806,14 @@
                 <!-- Validation Actions -->
                 {% if (badge.statut == 'attente_provisoire' and current_user.role == 'admin') or (badge.statut == 'en_attente' and (current_user.role == 'admin' or current_user.role == 'SINYLON FIAT')) %}
                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <a href="{{ url_for('badge.valider_SINYLON FIAT', id=badge.id) }}" style="display: block; width: 100%; padding: 12px; background: var(--accent-green); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);">
+                    <a href="{{ url_for('badge.valider_csps', id=badge.id) }}" style="display: block; width: 100%; padding: 12px; background: var(--accent-green); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);">
                         <i class="fa-solid fa-circle-check me-1"></i> Valider / Activer le Badge
                     </a>
                     <div style="display: flex; gap: 8px;">
-                        <a href="{{ url_for('badge.refaire_SINYLON FIAT', id=badge.id) }}" style="flex: 1; padding: 10px; background: var(--accent-orange); color: #0b0f19; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                        <a href="{{ url_for('badge.refaire_csps', id=badge.id) }}" style="flex: 1; padding: 10px; background: var(--accent-orange); color: #0b0f19; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
                             <i class="fa-solid fa-rotate me-1"></i> À Refaire
                         </a>
-                        <a href="{{ url_for('badge.refuser_SINYLON FIAT', id=badge.id) }}" style="flex: 1; padding: 10px; background: var(--accent-red); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                        <a href="{{ url_for('badge.refuser_csps', id=badge.id) }}" style="flex: 1; padding: 10px; background: var(--accent-red); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
                             <i class="fa-solid fa-circle-xmark"></i> Refuser
                         </a>
                     </div>
