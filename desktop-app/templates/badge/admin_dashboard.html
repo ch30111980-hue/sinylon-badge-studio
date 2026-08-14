@@ -584,7 +584,8 @@
                     {% endfor %}
                 </select>
                 <button onclick="imprimerAdminSelection()" class="btn-act btn-green" style="border:none; cursor:pointer;" title="Imprimer uniquement les badges cochés dans la liste"><i class="fas fa-check-square me-1"></i> 🖨️ IMPRIMER SÉLECTION (A4)</button>
-                <a href="{{ url_for('badge.imprimer_a4') }}" target="_blank" id="printLotBtn" class="btn-act btn-blue" style="text-decoration:none;" title="Imprimer tous les badges affichés">🖨️ TOUT IMPRIMER (A4)</a>
+                <a href="{{ url_for('badge.imprimer_a4') }}" target="_blank" id="printLotBtn" class="btn-act btn-blue" style="text-decoration:none;" title="Ouvrir tous les badges affichés pour impression">🖨️ TOUT IMPRIMER (A4)</a>
+                <a href="/api/print/batch?download=1" class="btn-act" style="text-decoration:none; background: #0284c7; color: #fff;" title="Télécharger directement la planche complète au format PDF"><i class="fas fa-file-pdf me-1"></i> 📥 ENREGISTRER EN PDF</a>
                 <a href="{{ url_for('badge.export_csv') }}" class="btn-act btn-gold" style="text-decoration:none;">📊 EXPORT EXCEL</a>
             </div>
 

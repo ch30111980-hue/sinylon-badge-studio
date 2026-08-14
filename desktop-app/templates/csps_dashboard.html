@@ -141,9 +141,9 @@
                                     {{ b.nom }} {{ b.prenom }} ({{ b.fonction }})
                                 </div>
                                 <div class="btn-group">
-                                    <a href="{{ url_for('badge.valider_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-success py-0 px-2" title="Valider et Notifier"><i class="fas fa-check"></i></a>
-                                    <a href="{{ url_for('badge.refaire_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-warning py-0 px-2" title="À refaire (Incomplet)"><i class="fas fa-redo"></i></a>
-                                    <a href="{{ url_for('badge.refuser_SINYLON FIAT', id=b.id) }}" class="btn btn-sm btn-danger py-0 px-2" title="Refuser définitivement"><i class="fas fa-times"></i></a>
+                                    <a href="{{ url_for('badge.valider_csps', id=b.id) }}" class="btn btn-sm btn-success py-0 px-2" title="Valider et Notifier"><i class="fas fa-check"></i></a>
+                                    <a href="{{ url_for('badge.refaire_csps', id=b.id) }}" class="btn btn-sm btn-warning py-0 px-2" title="À refaire (Incomplet)"><i class="fas fa-redo"></i></a>
+                                    <a href="{{ url_for('badge.refuser_csps', id=b.id) }}" class="btn btn-sm btn-danger py-0 px-2" title="Refuser définitivement"><i class="fas fa-times"></i></a>
                                 </div>
                             </div>
                         </li>

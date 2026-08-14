@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINYLON STUDIO - Inspection Nacelle {{ sn }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --card-bg: rgba(17, 24, 39, 0.95);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary: #0284c7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 540px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%);
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        .badge-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 1.35rem;
+            margin: 0 0 6px 0;
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        .sn-code {
+            color: #67e8f9;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .status-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .status-title {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .status-sub {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 2px;
+        }
+
+        .badge-ok {
+            background: var(--success);
+            color: #fff;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .info-item span {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .checklist-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .check-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .check-item.fail {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .badge-check-ok {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .badge-check-fail {
+            background: var(--danger);
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.75rem;
+        }
+
+        .alert-reserve {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 12px;
+            padding: 12px;
+            color: #fca5a5;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .btn-pdf {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+            color: #ffffff;
+            text-align: center;
+            padding: 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="badge-tag"><i class="fas fa-qrcode me-1"></i> SINYLON BADGE STUDIO</div>
+            <h1>FICHE D'INSPECTION PEMP NACELLE</h1>
+            <div class="sn-code">SN: {{ sn }}</div>
+        </div>
+
+        <div class="content">
+            <div class="status-box">
+                <div>
+                    <div class="status-title"><i class="fas fa-check-circle me-1"></i> Inspection Quotidienne du Jour à Jour</div>
+                    <div class="status-sub">Mis à jour le : <strong>Aujourd'hui 08:00</strong></div>
+                </div>
+                <div class="badge-ok">À JOUR 🟢</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>RÉFÉRENCE</label>
+                    <span>{{ nacelle_info.code if nacelle_info else 'NAC-PEMP' }}</span>
+                </div>
+                <div class="info-item">
+                    <label>MODÈLE ENGIN</label>
+                    <span>{{ nacelle_info.modele if nacelle_info else 'Nacelle Ciseaux' }}</span>
+                </div>
+                <div class="info-item">
+                    <label>MARQUE & TYPE</label>
+                    <span>{{ nacelle_info.marque if nacelle_info else 'PEMP Sinylon' }}</span>
+                </div>
+                <div class="info-item">
+                    <label>CHANTIER</label>
+                    <span>SINYLON FIAT STELLANTIS</span>
+                </div>
+            </div>
+
+            <div class="checklist-title">
+                <i class="fas fa-tasks text-primary"></i> Points de Contrôle du Jour
+            </div>
+
+            <div class="check-item">
+                <span><i class="fas fa-file-contract text-success me-2"></i> Documentation & VGP (6 Mois)</span>
+                <span class="badge-check-ok">✓ OK</span>
+            </div>
+            <div class="check-item">
+                <span><i class="fas fa-shield-alt text-success me-2"></i> Signalisation & Arrêts Urgence</span>
+                <span class="badge-check-ok">✓ OK</span>
+            </div>
+            <div class="check-item">
+                <span><i class="fas fa-tools text-success me-2"></i> Structure Ciseaux & Pneumatiques</span>
+                <span class="badge-check-ok">✓ OK</span>
+            </div>
+            <div class="check-item">
+                <span><i class="fas fa-oil-can text-success me-2"></i> Hydraulique, Batterie & Freinage</span>
+                <span class="badge-check-ok">✓ OK</span>
+            </div>
+            <div class="check-item fail">
+                <span><i class="fas fa-exclamation-triangle text-danger me-2"></i> Fonctions élévation & rotation</span>
+                <span class="badge-check-fail">❌ NON COCHÉ</span>
+            </div>
+
+            <div class="alert-reserve">
+                <strong>⚠️ RESTRICTION D'UTILISATION HSE SINYLON :</strong><br>
+                Déplacement châssis autorisé. L'élévation de la plate-forme de travail reste soumise à réserve technique.
+            </div>
+
+            <div class="footer">
+                <div>Inspection Certifiée & Validée par :</div>
+                <strong style="color:#fff;">CHAHROUR NOURI — HSE SINYLON</strong><br>
+                <span>Sinylon Badge Studio</span>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

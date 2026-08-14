@@ -382,11 +382,14 @@
               <button type="button" id="selectAllBtn" class="btn-secondary" onclick="toggleSelectAllBtn()">
                 <i data-lucide="check-square"></i> Tout Cocher
               </button>
-              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" title="Ouvrir la planche des badges cochés pour impression">
                 <i data-lucide="printer"></i> Imprimer les Coché(e)s
               </button>
-              <a href="/api/print/batch" target="_blank" class="btn-secondary">
-                <i data-lucide="printer"></i> Imprimer les 37 Actifs (A4)
+              <a href="/api/print/batch" target="_blank" class="btn-secondary" title="Ouvrir la planche complète des travailleurs actifs (A4)">
+                <i data-lucide="printer"></i> Imprimer les {{ active_count }} Actifs (A4)
+              </a>
+              <a href="/api/print/batch?download=1" class="btn-secondary" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; font-weight: 700;" title="Télécharger directement le fichier PDF sur votre ordinateur">
+                <i data-lucide="download"></i> 📥 Enregistrer en PDF ({{ active_count }} Actifs)
               </a>
             </div>
           </div>

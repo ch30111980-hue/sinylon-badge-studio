@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Permis de Travail Quotidien — SINYLON SPA / FIAT ORAN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #070b14;
+            --card-bg: rgba(15, 23, 42, 0.95);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #0ea5e9;
+            --primary-glow: rgba(14, 165, 233, 0.25);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.25);
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --steel: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 14px 12px 30px;
+            background-image: 
+                radial-gradient(ellipse at 15% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 100%, rgba(16, 185, 129, 0.12) 0%, transparent 60%);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        /* ── Header ── */
+        .header-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(16px);
+        }
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(14, 165, 233, 0.35);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--success);
+            box-shadow: 0 0 12px var(--success-glow);
+        }
+        .status-badge.invalid {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: var(--danger);
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: pulse-dot-anim 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse-dot-anim {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.7); opacity: 0.4; }
+        }
+
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-title .cn-sub {
+            font-size: 0.72rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .header-title .site-desc {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ── Info Grid ── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .info-cell {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+        .info-cell .label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .info-cell .value {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-top: 2px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ── BMS Météo Banner ── */
+        .weather-banner {
+            background: rgba(14, 165, 233, 0.08);
+            border: 1px solid rgba(14, 165, 233, 0.25);
+            border-radius: 14px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            font-size: 0.75rem;
+        }
+        .weather-left { display: flex; align-items: center; gap: 8px; }
+        .weather-icon { font-size: 1.2rem; color: var(--primary); }
+        .weather-right { font-weight: 700; color: var(--success); }
+
+        /* ── Filters (Pills) ── */
+        .filters-scroll {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+            scrollbar-width: none;
+        }
+        .filters-scroll::-webkit-scrollbar { display: none; }
+        .filter-btn {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Outfit', sans-serif;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* ── Section Title ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .count-badge {
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: var(--text-main);
+        }
+
+        /* ── Activity Cards ── */
+        .activite-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .activite-card.highlighted {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+        .act-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 15px;
+            background: rgba(30, 41, 59, 0.5);
+            cursor: pointer;
+            user-select: none;
+        }
+        .act-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            overflow: hidden;
+        }
+        .act-icon {
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .act-title-box {
+            overflow: hidden;
+        }
+        .act-nom {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .act-cn {
+            font-size: 0.65rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .act-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .risk-tag {
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+        .risk-eleve {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+        .risk-moyen {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+        .risk-faible {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .chevron {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform 0.25s;
+        }
+        .chevron.open {
+            transform: rotate(180deg);
+        }
+
+        /* ── Card Body (Expanded) ── */
+        .act-body {
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: none;
+            background: rgba(10, 15, 26, 0.6);
+        }
+        .act-body.open {
+            display: block;
+        }
+
+        .epi-title, .prec-title {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .epi-title { color: #38bdf8; }
+        .prec-title { color: var(--warning); margin-top: 12px; }
+
+        .epi-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .epi-badge {
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.25);
+            color: #bae6fd;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 20px;
+        }
+
+        .prec-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .prec-item {
+            font-size: 0.72rem;
+            color: #cbd5e1;
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            line-height: 1.4;
+        }
+        .prec-item i {
+            color: var(--warning);
+            font-size: 0.7rem;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        /* ── Visa Signatures ── */
+        .visas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .visa-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+        .visa-role {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .visa-btn {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── Action Buttons ── */
+        .actions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-decoration: none;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+        .btn-pdf {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+        }
+        .btn-emergency {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+        }
+        .btn-action:active { transform: scale(0.98); }
+
+        /* ── Footer QR Box ── */
+        .footer-qr-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 16px;
+        }
+        .qr-canvas-box {
+            background: white;
+            padding: 6px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        .qr-canvas-box canvas { display: block; }
+        .footer-qr-info { overflow: hidden; }
+        .footer-qr-info h4 { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
+        .footer-qr-info p { font-size: 0.65rem; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+        .footer-qr-info .qr-ref {
+            display: inline-block;
+            margin-top: 6px;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            color: #38bdf8;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .countdown-bar {
+            text-align: center;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 16px;
+        }
+        .countdown-bar span { color: var(--warning); font-weight: 700; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ── En-tête Principal ── -->
+    <div class="header-card">
+        <div class="header-top">
+            <div class="brand-badge">
+                <i class="fa-solid fa-industry"></i> SINYLON &nbsp;|&nbsp; FIAT STELLANTIS
+            </div>
+            {% if is_valid %}
+            <div class="status-badge">
+                <div class="pulse-dot"></div> EN VIGUEUR DU JOUR
+            </div>
+            {% else %}
+            <div class="status-badge invalid">
+                <div class="pulse-dot"></div> EXPIRÉ / SUSPENDU
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="header-title">
+            <h1>PERMIS DE TRAVAIL QUOTIDIEN</h1>
+            <div class="cn-sub">每日施工安全许可证 · 8大作业类别</div>
+            <div class="site-desc">
+                <i class="fa-solid fa-location-dot" style="color:#ef4444; margin-right:4px;"></i>
+                Chantier Extension Usine Fiat Oran (Étape 3) · Zone Step 02
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Grille d'Informations Clés ── -->
+    <div class="info-grid">
+        <div class="info-cell">
+            <div class="label"><i class="fa-regular fa-calendar"></i> Date</div>
+            <div class="value" id="val-date">{{ date_str }}</div>
+        </div>
+        <div class="info-cell">
+            <div class="label"><i class="fa-solid fa-fingerprint"></i> Réf Permis</div>
+            <div class="value" style="color:var(--primary);">PT-{{ permis_id }}</div>
+        </div>
+        <div class="info-cell">
+            <div class="label"><i class="fa-solid fa-clock"></i> Maj Auto</div>
+            <div class="value" style="color:var(--success);">08:00 AM</div>
+        </div>
+    </div>
+
+    <!-- ── Météo Chantier / BMS Vent ── -->
+    <div class="weather-banner">
+        <div class="weather-left">
+            <i class="fa-solid fa-wind weather-icon"></i>
+            <div>
+                <strong>Vent Chantier : 14 km/h</strong> (Max autorisé : 45 km/h)
+                <div style="font-size:0.65rem; color:var(--text-muted);">Météo : Ciel dégagé • 28°C • Conditions optimales</div>
+            </div>
+        </div>
+        <div class="weather-right">
+            <i class="fa-solid fa-circle-check"></i> AUTORISÉ
+        </div>
+    </div>
+
+    <!-- ── Filtres / Onglets Rapides ── -->
+    <div class="filters-scroll">
+        <button class="filter-btn active" onclick="filterCategory('all', this)"><i class="fa-solid fa-layer-group"></i> Tout Voir (8)</button>
+        <button class="filter-btn" onclick="filterCategory('hauteur', this)"><i class="fa-solid fa-angles-up"></i> Hauteur</button>
+        <button class="filter-btn" onclick="filterCategory('chaud', this)"><i class="fa-solid fa-fire"></i> Chaud / Feu</button>
+        <button class="filter-btn" onclick="filterCategory('tuyauterie', this)"><i class="fa-solid fa-faucet-drip"></i> Tuyauterie</button>
+        <button class="filter-btn" onclick="filterCategory('charpente', this)"><i class="fa-solid fa-building-shield"></i> Charpente</button>
+        <button class="filter-btn" onclick="filterCategory('rails', this)"><i class="fa-solid fa-cable-car"></i> Rails</button>
+        <button class="filter-btn" onclick="filterCategory('equipements', this)"><i class="fa-solid fa-gears"></i> Équipements</button>
+        <button class="filter-btn" onclick="filterCategory('cables', this)"><i class="fa-solid fa-bolt"></i> Câbles</button>
+        <button class="filter-btn" onclick="filterCategory('installations', this)"><i class="fa-solid fa-screwdriver-wrench"></i> Divers</button>
+    </div>
+
+    <!-- ── Section Titre ── -->
+    <div class="section-header">
+        <div class="section-title">📋 Disciplines Autorisées Aujourd'hui</div>
+        <div class="count-badge" id="visible-count">8 / 8 Permis</div>
+    </div>
+
+    <!-- ── Conteneur des Activités (Généré en JS) ── -->
+    <div id="activites-list"></div>
+
+    <!-- ── Visas de Validation ── -->
+    <div class="visas-grid">
+        <div class="visa-card">
+            <div class="visa-role">Responsable HSE</div>
+            <div class="visa-btn">
+                <i class="fa-solid fa-signature"></i> Visa Nouri (HSE) ✓
+            </div>
+        </div>
+        <div class="visa-card">
+            <div class="visa-role">Chef de Projet / Chantier</div>
+            <div class="visa-btn" style="background:rgba(14,165,233,0.15); border-color:rgba(14,165,233,0.4); color:var(--primary);">
+                <i class="fa-solid fa-user-check"></i> Visa Direction ✓
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Boutons d'Action Rapide ── -->
+    <div class="actions-row">
+        <a href="/permis/travail/pdf" target="_blank" class="btn-action btn-pdf">
+            <i class="fa-solid fa-file-pdf"></i> Télécharger PDF Officiel
+        </a>
+        <a href="tel:0563765157" class="btn-action btn-emergency">
+            <i class="fa-solid fa-phone-volume"></i> Urgence HSE (0563765157)
+        </a>
+    </div>
+
+    <!-- ── Boîte QR Code du Permis ── -->
+    <div class="footer-qr-card">
+        <div class="qr-canvas-box">
+            <div id="qr-target"></div>
+        </div>
+        <div class="footer-qr-info">
+            <h4>🔗 QR Code Permanent Chantier</h4>
+            <p>Ce code est fixé sur les panneaux du chantier. Il est <b>automatiquement réactualisé</b> chaque matin à 08h00.</p>
+            <div class="qr-ref">ID DU JOUR : PT-{{ permis_id }}</div>
+        </div>
+    </div>
+
+    <!-- ── Compte à Rebours ── -->
+    <div class="countdown-bar">
+        ⏳ Ce permis est valable jusqu'à minuit — Expire dans : <span id="timer-left">--:--:--</span>
+    </div>
+
+</div>
+
+<script>
+// ── Données Complètes des 8 Disciplines ──────────────────────────
+const ACTIVITES_DATA = [
+    {
+        id: "hauteur",
+        code: "HAU",
+        nom: "Travaux en Hauteur & Nacelles",
+        nom_cn: "高空作业与升降机",
+        icone: "🪢",
+        faIcon: "fa-angles-up",
+        risque: "Élevé",
+        risqueClass: "risk-eleve",
+        epi: [
+            "Harnais EN361",
+            "Longe double + absorbeur",
+            "Casque avec jugulaire",
+            "Chaussures S3",
+            "Ligne de vie certifiée"
+        ],
+        precautions: [
+            "Arrêt obligatoire des travaux si vent > 45 km/h.",
+            "Balisage d'un périmètre d'exclusion de 10 m au sol.",
+            "Contrôle journalier de conformité des nacelles PEMP.",
+            "Points d'ancrage inspectés et testés avant toute montée.",
+            "Interdiction formelle de travailler seul en élévation."
+        ]
+    },
+    {
+        id: "chaud",
+        code: "CHD",
+        nom: "Travaux à Chaud & Soudage (Permis Feu)",
+        nom_cn: "动火作业与焊接",
+        icone: "🔥",
+        faIcon: "fa-fire",
+        risque: "Élevé",
+        risqueClass: "risk-eleve",
+        epi: [
+            "Masque cristaux liquides",
+            "Gants cuir croûte",
+            "Tablier ignifugé",
+            "Chaussures S3",
+            "Lunettes meulage"
+        ],
+        precautions: [
+            "Éloignement de toutes matières combustibles dans un rayon de 10 m.",
+            "Bâches ignifugées M0 déployées sous la zone de projection.",
+            "Extincteur 6kg CO₂ / Poudre placé à moins de 3 mètres.",
+            "Contrôle d'atmosphère par explosimètre si proximité réseaux fluides.",
+            "Ronde de surveillance obligatoire pendant 2h après l'arrêt des feux."
+        ]
+    },
+    {
+        id: "tuyauterie",
+        code: "PIP",
+        nom: "Installation Tuyauterie & Piping",
+        nom_cn: "工业管道与配管安装",
+        icone: "🚰",
+        faIcon: "fa-faucet-drip",
+        risque: "Moyen",
+        risqueClass: "risk-moyen",
+        epi: [
+            "Gants anti-coupure Niv 5",
+            "Lunettes étanches",
+            "Casque de chantier",
+            "Chaussures S3",
+            "Protection auditive"
+        ],
+        precautions: [
+            "Purge, dégazage et vérification de l'absence de pression résiduelle.",
+            "Élingage et arrimage certifié des tronçons de tuyauterie.",
+            "Serrage des brides au couple prescrit avec joint d'étanchéité neuf.",
+            "Balisage strict lors des épreuves hydrostatiques sous pression.",
+            "Contrôle des fixations antivibratiles et des pentes d'écoulement."
+        ]
+    },
+    {
+        id: "charpente",
+        code: "CHA",
+        nom: "Charpente Métallique & Levage Poutres",
+        nom_cn: "钢结构安装与吊装",
+        icone: "🏗️",
+        faIcon: "fa-building-shield",
+        risque: "Élevé",
+        risqueClass: "risk-eleve",
+        epi: [
+            "Harnais antichute EN361",
+            "Casque avec jugulaire",
+            "Gants anti-écrasement",
+            "Chaussures S3",
+            "Gilet haute visibilité"
+        ],
+        precautions: [
+            "Plan de levage formellement validé par le responsable avant manœuvre.",
+            "Utilisation obligatoire de cordes de guidage (taglines).",
+            "Interdiction formelle de stationner ou circuler sous charge suspendue.",
+            "Contrôle du couple de serrage de la boulonnerie Haute Résistance (HR).",
+            "Arrêt immédiat du grutage si les rafales dépassent 35 km/h."
+        ]
+    },
+    {
+        id: "rails",
+        code: "RAI",
+        nom: "Rails Suspendus & Convoyeurs Aériens",
+        nom_cn: "悬挂轨道与输送系统",
+        icone: "🚡",
+        faIcon: "fa-cable-car",
+        risque: "Élevé",
+        risqueClass: "risk-eleve",
+        epi: [
+            "Harnais de sécurité",
+            "Casque EN397",
+            "Gants renforcés",
+            "Chaussures de sécurité S3"
+        ],
+        precautions: [
+            "Contrôle du serrage des platines d'ancrage et suspentes au couple requis.",
+            "Contrôle de l'alignement et nivellement par laser des rails suspendus.",
+            "Élingage équilibré et sécurisé pendant le hissage des profilés en hauteur.",
+            "Inspection des butées mécaniques de fin de course et arrêts d'urgence.",
+            "Essais statiques et dynamiques à vide avant mise sous charge."
+        ]
+    },
+    {
+        id: "equipements",
+        code: "EQP",
+        nom: "Installation Équipements & Machinerie",
+        nom_cn: "机械与生产设备安装",
+        icone: "⚙️",
+        faIcon: "fa-gears",
+        risque: "Moyen",
+        risqueClass: "risk-moyen",
+        epi: [
+            "Chaussures renfort métatarse",
+            "Gants mécaniques",
+            "Lunettes de sécurité",
+            "Casque de chantier"
+        ],
+        precautions: [
+            "Utilisation de rouleurs de charge et vérins hydrauliques homologués.",
+            "Vérification de la portance de la dalle béton avant ripage des machines.",
+            "Calage mécanique et scellements chimiques rigoureusement contrôlés.",
+            "Consignation mécanique et arrêt sécurisé des équipements adjacents.",
+            "Signalement et protection des angles saillants et pièces mobiles."
+        ]
+    },
+    {
+        id: "cables",
+        code: "CAB",
+        nom: "Tirage de Câbles & Travaux Électriques",
+        nom_cn: "电缆敷设与电气施工",
+        icone: "⚡",
+        faIcon: "fa-bolt",
+        risque: "Moyen",
+        risqueClass: "risk-moyen",
+        epi: [
+            "Gants isolants 1000V",
+            "Écran facial anti-arc",
+            "Outillage isolé IEC 60900",
+            "Chaussures sans métal"
+        ],
+        precautions: [
+            "Consignation électrique stricte LOTO (Cadenassage & Balisage armoires).",
+            "Vérification d'Absence de Tension (VAT) systématique avant travail.",
+            "Dérouleurs de tourets solidement freinés et arrimés au sol.",
+            "Protection des mains lors du tirage mécanique dans les caniveaux.",
+            "Personnel obligatoirement détenteur de l'habilitation B1V / B2V valide."
+        ]
+    },
+    {
+        id: "installations",
+        code: "DIV",
+        nom: "Autres Installations & Génie Civil",
+        nom_cn: "土建与综合配套安装",
+        icone: "🛠️",
+        faIcon: "fa-screwdriver-wrench",
+        risque: "Modéré",
+        risqueClass: "risk-faible",
+        epi: [
+            "Gants de protection",
+            "Masque anti-poussière FFP3",
+            "Protection auditive",
+            "Chaussures sécurité S3"
+        ],
+        precautions: [
+            "Détection des réseaux enterrés ou encastrés avant tout carottage.",
+            "Ventilation forcée lors de travaux en espace semi-confiné.",
+            "Nettoyage et évacuation régulière des gravats et déblais.",
+            "Signalisation et barriérage des réservations ou tranchées ouvertes.",
+            "Port des lunettes étanches lors des phases de piquage / découpe béton."
+        ]
+    }
+];
+
+const selectedSlug = "{{ selected_slug }}";
+
+// ── Rendu des Cartes d'Activités ─────────────────────────────────
+function renderActivities(filter = 'all') {
+    const list = document.getElementById('activites-list');
+    list.innerHTML = '';
+
+    const items = filter === 'all' 
+        ? ACTIVITES_DATA 
+        : ACTIVITES_DATA.filter(a => a.id === filter);
+
+    document.getElementById('visible-count').innerText = `${items.length} / ${ACTIVITES_DATA.length} Permis`;
+
+    items.forEach((act, idx) => {
+        const isHighlighted = (filter !== 'all' && act.id === filter) || (selectedSlug !== 'all' && act.id === selectedSlug);
+        const isOpen = isHighlighted || (items.length === 1);
+
+        const card = document.createElement('div');
+        card.className = `activite-card ${isHighlighted ? 'highlighted' : ''}`;
+        card.id = `card-${act.id}`;
+
+        card.innerHTML = `
+            <div class="act-header" onclick="toggleCard('${act.id}')">
+                <div class="act-header-left">
+                    <span class="act-icon">${act.icone}</span>
+                    <div class="act-title-box">
+                        <div class="act-nom">${act.nom}</div>
+                        <div class="act-cn">${act.nom_cn} · PT-${act.code}</div>
+                    </div>
+                </div>
+                <div class="act-header-right">
+                    <span class="risk-tag ${act.risqueClass}">${act.risque}</span>
+                    <i class="fa-solid fa-chevron-down chevron ${isOpen ? 'open' : ''}" id="chev-${act.id}"></i>
+                </div>
+            </div>
+            <div class="act-body ${isOpen ? 'open' : ''}" id="body-${act.id}">
+                <div class="epi-title"><i class="fa-solid fa-shield-halved"></i> Équipements de Protection Individuelle (EPI) :</div>
+                <div class="epi-tags">
+                    ${act.epi.map(e => `<span class="epi-badge"><i class="fa-solid fa-check" style="font-size:0.6rem;"></i> ${e}</span>`).join('')}
+                </div>
+
+                <div class="prec-title"><i class="fa-solid fa-triangle-exclamation"></i> Consignes & Précautions Vitales :</div>
+                <ul class="prec-list">
+                    ${act.precautions.map(p => `<li class="prec-item"><i class="fa-solid fa-circle-arrow-right"></i> <span>${p}</span></li>`).join('')}
+                </ul>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function toggleCard(id) {
+    const body = document.getElementById(`body-${id}`);
+    const chev = document.getElementById(`chev-${id}`);
+    if (body && chev) {
+        body.classList.toggle('open');
+        chev.classList.toggle('open');
+    }
+}
+
+function filterCategory(cat, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderActivities(cat);
+}
+
+// ── Compte à Rebours Minuit ───────────────────────────────────────
+function updateCountdown() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    const diffMs = midnight - now;
+
+    if (diffMs <= 0) {
+        document.getElementById('timer-left').innerText = "00:00:00 (Nouveau permis requis)";
+        return;
+    }
+
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+    const pad = n => String(n).padStart(2, '0');
+    document.getElementById('timer-left').innerText = `${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`;
+}
+
+// ── Initialisation ────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialiser le QR code en bas
+    const currentUrl = window.location.href;
+    new QRCode(document.getElementById("qr-target"), {
+        text: currentUrl,
+        width: 80,
+        height: 80,
+        colorDark: "#0f172a",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // Filtre initial si présent dans l'URL
+    if (selectedSlug && selectedSlug !== 'all') {
+        const matchingBtn = Array.from(document.querySelectorAll('.filter-btn'))
+            .find(b => b.getAttribute('onclick')?.includes(`'${selectedSlug}'`));
+        if (matchingBtn) {
+            filterCategory(selectedSlug, matchingBtn);
+        } else {
+            renderActivities('all');
+        }
+    } else {
+        renderActivities('all');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+});
+</script>
+
+</body>
+</html>

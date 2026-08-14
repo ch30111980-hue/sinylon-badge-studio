@@ -927,8 +927,9 @@ def print_single(worker_id):
     return response
 
 
-@app.route('/api/print/batch')
+@app.route('/api/print/batch', methods=['GET', 'POST'])
 def print_batch():
+    download = request.values.get('download') == '1' or request.values.get('dl') == '1'
     conn = get_db()
     cursor = conn.cursor()
     
@@ -939,21 +940,28 @@ def print_batch():
         conn.close()
         return "Aucun travailleur actif à imprimer", 400
 
-    cursor.execute('INSERT INTO print_logs (type_impression) VALUES (?)', ('Planche A4 (Lot)',))
+    cursor.execute('INSERT INTO print_logs (type_impression) VALUES (?)', (f'Planche A4 (Lot {len(workers_list)} Actifs)',))
     conn.commit()
     conn.close()
 
-    output_pdf = os.path.join(SCRATCH_FOLDER, "Planche_Badges_Sinylon_A4.pdf")
+    filename = f"Planche_Badges_Sinylon_Actifs_{len(workers_list)}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    output_pdf = os.path.join(SCRATCH_FOLDER, filename)
     generate_batch_badges_pdf(workers_list, output_pdf)
 
-    return send_file(output_pdf, mimetype='application/pdf')
+    return send_file(
+        output_pdf,
+        mimetype='application/pdf',
+        as_attachment=download,
+        download_name=filename
+    )
 
 
-@app.route('/api/print/selected', methods=['POST'])
+@app.route('/api/print/selected', methods=['GET', 'POST'])
 def print_selected_batch():
-    worker_ids = request.form.getlist('worker_ids') or request.form.getlist('badge_ids')
+    download = request.values.get('download') == '1' or request.values.get('dl') == '1'
+    worker_ids = request.values.getlist('worker_ids') or request.values.getlist('badge_ids')
     if not worker_ids:
-        raw_ids = request.form.get('ids', '')
+        raw_ids = request.values.get('ids', '')
         if raw_ids:
             worker_ids = [i.strip() for i in raw_ids.split(',') if i.strip()]
 
@@ -971,10 +979,16 @@ def print_selected_batch():
     conn.commit()
     conn.close()
 
-    output_pdf = os.path.join(SCRATCH_FOLDER, "Planche_Badges_Selectionnees_A4.pdf")
+    filename = f"Planche_Badges_Selection_{len(workers_list)}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    output_pdf = os.path.join(SCRATCH_FOLDER, filename)
     generate_batch_badges_pdf(workers_list, output_pdf)
 
-    return send_file(output_pdf, mimetype='application/pdf')
+    return send_file(
+        output_pdf,
+        mimetype='application/pdf',
+        as_attachment=download,
+        download_name=filename
+    )
 
 
 @app.route('/badge/api_update_ent', methods=['POST'], endpoint='badge.api_update_ent')
