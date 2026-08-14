@@ -294,89 +294,202 @@ def check_qr_api():
 
 @app.route('/badge/verifier/<key>', endpoint='badge.verifier_public')
 @app.route('/verifier/<key>')
+@app.route('/api/badge/verifier/<key>')
 def verifier_public(key):
     conn = get_db()
     cursor = conn.cursor()
     
     key_str = str(key).strip()
-    worker = cursor.execute('SELECT * FROM workers WHERE id = ? OR uuid = ? OR matricule = ?', (key_str if key_str.isdigit() else -1, key_str, key_str)).fetchone()
+    clean_digits = ''.join(c for c in key_str if c.isdigit())
+    
+    # Recherche ultra-robuste (insensible à la casse, par matricule, uuid, id, numéro seul ou nom/prénom)
+    worker = cursor.execute('''
+        SELECT * FROM workers 
+        WHERE UPPER(TRIM(matricule)) = UPPER(?) 
+           OR UPPER(TRIM(uuid)) = UPPER(?)
+           OR (id = ? AND ? > 0)
+    ''', (key_str, key_str, int(key_str) if key_str.isdigit() else -1, int(key_str) if key_str.isdigit() else -1)).fetchone()
+    
+    if not worker and clean_digits:
+        worker = cursor.execute('''
+            SELECT * FROM workers 
+            WHERE UPPER(matricule) LIKE ? OR id = ?
+        ''', (f"%{clean_digits}%", int(clean_digits))).fetchone()
+
     if not worker:
-        worker = cursor.execute('SELECT * FROM workers WHERE nom LIKE ? OR prenom LIKE ?', (f"%{key_str}%", f"%{key_str}%")).fetchone()
+        worker = cursor.execute('''
+            SELECT * FROM workers 
+            WHERE UPPER(nom) LIKE UPPER(?) OR UPPER(prenom) LIKE UPPER(?)
+        ''', (f"%{key_str}%", f"%{key_str}%")).fetchone()
+        
     conn.close()
 
     if not worker:
         return f"""
         <!DOCTYPE html>
-        <html><head><title>SINYLON FIAT STELLANTIS - Vérification Badge</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        </head><body class="bg-light d-flex align-items-center justify-content-center min-vh-100 p-3">
-            <div class="card shadow-lg text-center p-4" style="max-width: 400px; border-radius: 16px;">
-                <div class="display-1 text-danger mb-3">❌</div>
-                <h4 class="fw-bold text-dark mb-2">Badge Inconnu</h4>
-                <p class="text-muted">Aucune accréditation trouvée pour la référence : <strong>{key_str}</strong></p>
-                <div class="badge bg-danger p-2 text-wrap">ACCÈS REFUSÉ — SINYLON FIAT STELLANTIS</div>
+        <html lang="fr">
+        <head>
+            <meta charset="utf-8">
+            <title>SINYLON FIAT STELLANTIS — Vérification Badge</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+            <style>
+                body {{ background: #0b0f19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }}
+                .verify-card {{ background: #181b24; border: 1px solid #dc2626; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(220,38,38,0.25); max-width: 420px; width: 100%; overflow: hidden; }}
+                .verify-header {{ background: #991b1b; padding: 20px; text-align: center; color: white; }}
+            </style>
+        </head>
+        <body>
+            <div class="verify-card text-center">
+                <div class="verify-header">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-2"></i>
+                    <h4 class="fw-bold mb-0">ACCÈS REFUSÉ</h4>
+                    <small style="opacity:0.9;">SINYLON · PROJET FIAT STELLANTIS</small>
+                </div>
+                <div class="p-4">
+                    <h5 class="fw-bold text-danger mb-2">Badge Inconnu ou Non Enregistré</h5>
+                    <p class="text-secondary small mb-3">Aucune accréditation trouvée pour la référence :</p>
+                    <div class="p-2 bg-dark rounded border border-danger text-danger fw-bold font-monospace mb-4">{key_str}</div>
+                    
+                    <div class="p-3 bg-dark rounded text-start small border border-secondary mb-3">
+                        <div class="d-flex align-items-center text-warning">
+                            <i class="fas fa-shield-alt fa-2x me-3"></i>
+                            <div>
+                                <strong class="d-block text-white">Contrôle de Sécurité Chantier</strong>
+                                L'accès au site est strictement interdit aux personnes non accréditées.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded text-start" style="background: rgba(239, 68, 68, 0.15); border-left: 4px solid #ef4444;">
+                        <small class="text-danger fw-bold d-block">URGENCE HSE CHANTIER :</small>
+                        <strong class="text-white fs-6">Nouri : <a href="tel:0563765157" class="text-danger text-decoration-none">0563765157</a></strong>
+                    </div>
+                </div>
             </div>
-        </body></html>
+        </body>
+        </html>
         """, 404
 
     w = dict(worker)
-    is_active = (w.get('status') == 'Actif')
-    photo = w.get('photo_path') or '/static/img/default_avatar.png'
-    fonction = (w.get('fonction') or 'Intervenant Chantier').strip()
+    is_blocked = bool(w.get('is_blocked')) or (w.get('status', '').lower() in ['bloqué', 'bloque', 'inactif'])
+    is_active = not is_blocked
     
+    photo = w.get('photo_path') or ''
+    if not photo:
+        photo = '/static/img/default_avatar.png'
+    elif not photo.startswith('/') and not photo.startswith('http'):
+        photo = '/' + photo
+        
+    fonction = (w.get('fonction') or 'Intervenant Chantier').strip()
+    nom_complet = f"{w.get('prenom', '')} {w.get('nom', '').upper()}".strip()
+    matricule = w.get('matricule') or f"SIN-{w.get('id', 0):04d}"
+    societe = w.get('societe_affichee') or w.get('entreprise') or 'Sinylon'
+    projet = w.get('projet') or 'CSPS Projet FIAT'
+    date_exp = w.get('date_expiration') or '31/12/2026'
+    
+    s1 = bool(w.get('step_1_valide', 1))
+    s2 = bool(w.get('step_2_valide', 1))
+    s3 = bool(w.get('step_3_valide', 0))
+
     return f"""
     <!DOCTYPE html>
-    <html>
+    <html lang="fr">
     <head>
-        <title>SINYLON FIAT STELLANTIS — Accréditation Chantier</title>
+        <meta charset="utf-8">
+        <title>ACCRÉDITATION OFFICIELLE — {nom_complet}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <style>
-            body {{ background: #0f172a; font-family: system-ui, -apple-system, sans-serif; }}
-            .card-badge {{ border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }}
-            .header-bar {{ background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); color: white; padding: 20px; text-align: center; }}
-            .photo-box {{ width: 110px; height: 135px; object-fit: cover; border-radius: 12px; border: 3px solid #1d4ed8; }}
+            body {{ background: #0b0f19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }}
+            .card-badge {{ border-radius: 24px; overflow: hidden; border: 1px solid {'#10b981' if is_active else '#ef4444'}; box-shadow: 0 25px 50px -12px {'rgba(16, 185, 129, 0.25)' if is_active else 'rgba(239, 68, 68, 0.25)'}; background: #181b24; max-width: 440px; width: 100%; }}
+            .header-bar {{ background: {'linear-gradient(135deg, #064e3b 0%, #047857 100%)' if is_active else 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)'}; color: white; padding: 20px; text-align: center; }}
+            .photo-box {{ width: 120px; height: 140px; object-fit: cover; border-radius: 16px; border: 3px solid {'#10b981' if is_active else '#ef4444'}; background: #1f2937; }}
+            .step-pill {{ width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; margin: 0 3px; }}
+            .step-on {{ background: #10b981; color: white; }}
+            .step-off {{ background: #334155; color: #94a3b8; border: 1px solid #475569; }}
         </style>
     </head>
-    <body class="d-flex align-items-center justify-content-center min-vh-100 p-3">
-        <div class="card card-badge w-100" style="max-width: 420px; background: white;">
+    <body>
+        <div class="card card-badge">
             <div class="header-bar">
-                <div style="font-family: Impact, sans-serif; font-size: 24px; letter-spacing: 1px; line-height: 1;">SINYLON</div>
-                <div style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #93c5fd; margin-top: 2px;">FIAT STELLANTIS</div>
-                <div style="font-size: 9px; font-weight: 700; background: rgba(255,255,255,0.2); display: inline-block; padding: 2px 10px; border-radius: 20px; margin-top: 8px;">ACCRÉDITATION CHANTIER OFFICIELLE</div>
+                <div class="d-flex justify-content-between align-items-center mb-2 px-2">
+                    <span style="font-family: Impact, sans-serif; font-size: 26px; letter-spacing: 1.5px;">FIAT</span>
+                    <span style="font-weight: 800; font-size: 13px; letter-spacing: 1px; color: #a7f3d0;">AMCE · EL DJAZAIR</span>
+                </div>
+                <div style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; background: rgba(0,0,0,0.25); display: inline-block; padding: 4px 14px; border-radius: 20px;">
+                    {'✓ ACCRÉDITATION CHANTIER OFFICIELLE' if is_active else '⚠️ ACCÈS CHANTIER BLOQUÉ'}
+                </div>
             </div>
+            
             <div class="card-body p-4 text-center">
-                <img src="{photo}" class="photo-box shadow-sm mb-3" alt="Photo">
-                <h3 class="fw-bold text-dark mb-1">{w.get('prenom', '')} {w.get('nom', '').upper()}</h3>
-                <h6 class="text-primary fw-bold mb-3"><i class="fas fa-briefcase me-1"></i> {fonction}</h6>
+                <div class="position-relative d-inline-block mb-3">
+                    <img src="{photo}" class="photo-box shadow" alt="Photo de {nom_complet}" onerror="this.src='/static/img/default_avatar.png'">
+                    <span class="position-absolute bottom-0 end-0 badge rounded-pill {'bg-success' if is_active else 'bg-danger'} p-2 border border-2 border-dark">
+                        <i class="fas {'fa-check' if is_active else 'fa-ban'}"></i>
+                    </span>
+                </div>
                 
-                <div class="bg-light p-3 rounded-3 mb-3 text-start small">
-                    <div class="d-flex justify-content-between mb-1"><span class="text-muted">Fonction / Poste:</span> <strong class="text-primary">{fonction}</strong></div>
-                    <div class="d-flex justify-content-between mb-1"><span class="text-muted">Matricule:</span> <strong class="text-dark">{w.get('matricule', '')}</strong></div>
-                    <div class="d-flex justify-content-between mb-1"><span class="text-muted">Entreprise:</span> <strong>{w.get('entreprise') or 'SINYLON FIAT STELLANTIS'}</strong></div>
-                    <div class="d-flex justify-content-between"><span class="text-muted">Projet:</span> <strong>FIAT STEP02</strong></div>
+                <h3 class="fw-bold text-white mb-1">{nom_complet}</h3>
+                <div class="badge {'bg-emerald-600 text-white' if is_active else 'bg-danger'} px-3 py-2 fs-6 mb-3" style="background: {'#059669' if is_active else '#dc2626'};">
+                    {fonction}
+                </div>
+                
+                <!-- Détails Salarié -->
+                <div class="rounded-3 p-3 text-start small mb-3" style="background: #0f172a; border: 1px solid #334155;">
+                    <div class="d-flex justify-content-between mb-2 pb-1 border-bottom border-secondary">
+                        <span class="text-secondary">Matricule ID :</span>
+                        <strong class="text-info font-monospace fs-6">{matricule}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 pb-1 border-bottom border-secondary">
+                        <span class="text-secondary">Société :</span>
+                        <strong class="text-white">{societe}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 pb-1 border-bottom border-secondary">
+                        <span class="text-secondary">Projet :</span>
+                        <strong class="text-primary-emphasis" style="color: #60a5fa !important;">{projet}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Date d'Expiration :</span>
+                        <strong class="text-warning">{date_exp}</strong>
+                    </div>
                 </div>
 
-                {'<div class="alert alert-success fw-bold p-3 rounded-3 mb-3" style="border-left: 5px solid #16a34a;"><i class="fas fa-check-circle me-2"></i>✓ ACCRÉDITÉ — ACCÈS AUTORISÉ</div>' if is_active else '<div class="alert alert-danger fw-bold p-3 rounded-3 mb-3" style="border-left: 5px solid #dc2626;"><i class="fas fa-ban me-2"></i>⚠️ ACCÈS REFUSÉ — ACCRÉDITATION BLOQUÉE</div>'}
+                <!-- Validation Steps -->
+                <div class="d-flex justify-content-between align-items-center rounded-3 p-2 mb-3" style="background: #0f172a; border: 1px solid #334155;">
+                    <span class="text-secondary small fw-bold ps-2">Validation Chantier :</span>
+                    <div>
+                        <span class="step-pill {'step-on' if s1 else 'step-off'}" title="Step 1 Accueil HSE">1</span>
+                        <span class="step-pill {'step-on' if s2 else 'step-off'}" title="Step 2 Visite Médicale">2</span>
+                        <span class="step-pill {'step-on' if s3 else 'step-off'}" title="Step 3 Habilitations Spécifiques">3</span>
+                    </div>
+                </div>
 
-                <div class="alert alert-danger bg-danger-subtle border-danger text-start p-3 rounded-3 mb-0" style="border-left: 5px solid #dc2626;">
+                <!-- Statut Décisionnel -->
+                {'<div class="alert alert-success fw-bold p-3 rounded-3 mb-3 text-start d-flex align-items-center" style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399;"><i class="fas fa-check-circle fa-2x me-3"></i><div><div class="fw-bold">ACCÈS AUTORISÉ</div><small class="text-light" style="opacity:0.85;">Badge valide pour l\'ensemble des zones du site.</small></div></div>' if is_active else '<div class="alert alert-danger fw-bold p-3 rounded-3 mb-3 text-start d-flex align-items-center" style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171;"><i class="fas fa-ban fa-2x me-3"></i><div><div class="fw-bold">ACCÈS REFUSÉ / BLOQUÉ</div><small class="text-light" style="opacity:0.85;">Veuillez vous présenter au bureau CSPS HSE.</small></div></div>'}
+
+                <!-- Contact Urgence HSE -->
+                <div class="p-3 rounded-3 text-start" style="background: rgba(239, 68, 68, 0.12); border-left: 4px solid #ef4444;">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-phone-volume text-danger fs-4 me-3"></i>
+                        <i class="fas fa-phone-volume text-danger fs-3 me-3"></i>
                         <div>
-                            <div class="fw-bold text-danger-emphasis small">URGENCE HSE CHANTIER</div>
-                            <div class="fw-bold text-dark fs-6">Nouri : <a href="tel:0563765157" class="text-danger text-decoration-none fw-extrabold">0563765157</a></div>
+                            <div class="text-danger fw-bold small">URGENCE HSE CHANTIER</div>
+                            <div class="text-white fw-bold fs-6">Nouri : <a href="tel:0563765157" class="text-danger text-decoration-none fw-bolder">0563765157</a></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card-footer bg-light text-center text-muted small py-2">
-                Système NORO UNIFIED — Contrôle de Sécurité Chantier
+            
+            <div class="card-footer text-center py-2" style="background: #0f172a; border-top: 1px solid #334155; font-size: 11px; color: #94a3b8;">
+                Système CSPS NORO · FIAT Algérie © 2026
             </div>
         </div>
     </body>
     </html>
     """
+
 
 
 DEFAULT_DOMAIN = "https://sinylon-badge-studio.onrender.com"
