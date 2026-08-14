@@ -10,9 +10,9 @@ from PIL import Image as PILImage, ImageDraw, ImageFont
 import math
 from services.qr_service import generate_qr_code
 
-# Dimensions standards badge CR80 Portrait (60mm x 86mm calibré)
-BADGE_WIDTH = 60.0 * mm
-BADGE_HEIGHT = 86.0 * mm
+# Dimensions standards badge chantier officiel (90mm x 120mm calibré porte-badge B3)
+BADGE_WIDTH = 90.0 * mm
+BADGE_HEIGHT = 120.0 * mm
 
 # Palette Couleurs Officielles Badges
 COLOR_HEADER = HexColor("#1F1F21")       # Noir En-tête FIAT
@@ -31,7 +31,7 @@ COLOR_VALID_BG = HexColor("#1E293B")     # Fond Date Validité
 
 def draw_single_badge(c, x, y, worker, qr_path):
     """
-    Dessine le badge officiel vertical (CR80 Portrait 60mm x 86mm)
+    Dessine le badge officiel vertical (Grand Format Porte-Badge 90mm x 120mm)
     conforme à la charte FIAT / CSPS / SINYLON / AMCE.
     """
     prenom = (worker.get('prenom') or '').strip()
@@ -50,33 +50,33 @@ def draw_single_badge(c, x, y, worker, qr_path):
     c.saveState()
     c.setFillColor(COLOR_WHITE)
     c.setStrokeColor(COLOR_CSPS_RED if (is_provisoire or is_blocked) else COLOR_BORDER)
-    c.setLineWidth(1.0 if (is_provisoire or is_blocked) else 0.6)
-    c.roundRect(x, y, BADGE_WIDTH, BADGE_HEIGHT, 3.5 * mm, fill=1, stroke=1)
+    c.setLineWidth(1.2 if (is_provisoire or is_blocked) else 0.8)
+    c.roundRect(x, y, BADGE_WIDTH, BADGE_HEIGHT, 4.5 * mm, fill=1, stroke=1)
     
     # 2. En-tête Supérieur (Bandeau Sombre avec vague)
-    header_h = 16.0 * mm
+    header_h = 22.5 * mm
     header_y = y + BADGE_HEIGHT - header_h
     c.setFillColor(COLOR_PROV_HEADER if is_provisoire else COLOR_HEADER)
     
     # Clip path pour respecter l'arrondi supérieur du badge
     c.saveState()
     clip_p = c.beginPath()
-    clip_p.roundRect(x, y, BADGE_WIDTH, BADGE_HEIGHT, 3.5 * mm)
+    clip_p.roundRect(x, y, BADGE_WIDTH, BADGE_HEIGHT, 4.5 * mm)
     c.clipPath(clip_p, stroke=0)
 
     # Fond noir d'en-tête avec vague inférieure
     p = c.beginPath()
     p.moveTo(x, y + BADGE_HEIGHT)
     p.lineTo(x + BADGE_WIDTH, y + BADGE_HEIGHT)
-    p.lineTo(x + BADGE_WIDTH, header_y + 1.5 * mm)
-    p.curveTo(x + BADGE_WIDTH * 0.7, header_y - 0.5 * mm, x + BADGE_WIDTH * 0.35, header_y + 3.0 * mm, x, header_y + 1.5 * mm)
+    p.lineTo(x + BADGE_WIDTH, header_y + 2.0 * mm)
+    p.curveTo(x + BADGE_WIDTH * 0.7, header_y - 1.0 * mm, x + BADGE_WIDTH * 0.35, header_y + 4.0 * mm, x, header_y + 2.0 * mm)
     p.close()
     c.drawPath(p, fill=1, stroke=0)
 
     # Double liseré décoratif argenté
     c.setStrokeColor(HexColor("#E5E7EB"))
-    c.setLineWidth(0.6)
-    c.bezier(x, header_y + 1.5 * mm, x + BADGE_WIDTH * 0.35, header_y + 3.0 * mm, x + BADGE_WIDTH * 0.7, header_y - 0.5 * mm, x + BADGE_WIDTH, header_y + 1.5 * mm)
+    c.setLineWidth(0.8)
+    c.bezier(x, header_y + 2.0 * mm, x + BADGE_WIDTH * 0.35, header_y + 4.0 * mm, x + BADGE_WIDTH * 0.7, header_y - 1.0 * mm, x + BADGE_WIDTH, header_y + 2.0 * mm)
     
     # Logo FIAT (gauche)
     base_dir = os.path.dirname(os.path.dirname(__file__))
@@ -84,56 +84,56 @@ def draw_single_badge(c, x, y, worker, qr_path):
     fiat_drawn = False
     if os.path.exists(fiat_logo):
         try:
-            c.drawImage(fiat_logo, x + 3.5 * mm, header_y + 3.5 * mm, width=15 * mm, height=8.5 * mm, preserveAspectRatio=True, mask='auto')
+            c.drawImage(fiat_logo, x + 5.5 * mm, header_y + 4.5 * mm, width=22.0 * mm, height=12.5 * mm, preserveAspectRatio=True, mask='auto')
             fiat_drawn = True
         except Exception:
             pass
     if not fiat_drawn:
         c.setFillColor(COLOR_WHITE)
-        c.setFont("Helvetica-Bold", 11)
-        c.drawString(x + 4 * mm, header_y + 6 * mm, "FIAT")
+        c.setFont("Helvetica-Bold", 14)
+        c.drawString(x + 6 * mm, header_y + 8 * mm, "FIAT")
 
     # Logo Société / Entreprise (droite)
     amce_logo = os.path.join(base_dir, 'static', 'img', 'amce_logo.png')
     amce_drawn = False
     if os.path.exists(amce_logo):
         try:
-            c.drawImage(amce_logo, x + BADGE_WIDTH - 20 * mm, header_y + 3.5 * mm, width=16.5 * mm, height=8.5 * mm, preserveAspectRatio=True, mask='auto')
+            c.drawImage(amce_logo, x + BADGE_WIDTH - 29.0 * mm, header_y + 4.5 * mm, width=23.5 * mm, height=12.5 * mm, preserveAspectRatio=True, mask='auto')
             amce_drawn = True
         except Exception:
             pass
     if not amce_drawn:
         c.setFillColor(COLOR_WHITE)
-        c.setFont("Helvetica-Bold", 7.5)
-        c.drawRightString(x + BADGE_WIDTH - 4 * mm, header_y + 6.5 * mm, (societe[:14] if societe else "SINYLON"))
+        c.setFont("Helvetica-Bold", 10)
+        c.drawRightString(x + BADGE_WIDTH - 6 * mm, header_y + 9 * mm, (societe[:14] if societe else "SINYLON"))
 
     c.restoreState() # fin du clip en-tête
 
     # 3. Bandeau Alerte / SAFETY FIRST
-    alert_h = 4.2 * mm
-    alert_y = header_y - 4.5 * mm
+    alert_h = 6.0 * mm
+    alert_y = header_y - 6.5 * mm
     c.setFillColor(COLOR_ALERT_PROV_BG if is_provisoire else COLOR_ALERT_BG)
-    c.rect(x + 0.3 * mm, alert_y, BADGE_WIDTH - 0.6 * mm, alert_h, fill=1, stroke=0)
+    c.rect(x + 0.4 * mm, alert_y, BADGE_WIDTH - 0.8 * mm, alert_h, fill=1, stroke=0)
     c.setStrokeColor(HexColor("#BAE6FD") if not is_provisoire else HexColor("#FCA5A5"))
-    c.setLineWidth(0.5)
-    c.line(x + 0.3 * mm, alert_y, x + BADGE_WIDTH - 0.3 * mm, alert_y)
+    c.setLineWidth(0.6)
+    c.line(x + 0.4 * mm, alert_y, x + BADGE_WIDTH - 0.4 * mm, alert_y)
 
     c.setFillColor(COLOR_ALERT_TEXT)
-    c.setFont("Helvetica-Bold", 6.5)
+    c.setFont("Helvetica-Bold", 9.0)
     alert_msg = "⚠️ BADGE PROVISOIRE · 10 JOURS" if is_provisoire else "SAFETY FIRST"
-    c.drawCentredString(x + BADGE_WIDTH / 2.0, alert_y + 1.2 * mm, alert_msg)
+    c.drawCentredString(x + BADGE_WIDTH / 2.0, alert_y + 1.8 * mm, alert_msg)
 
     # 4. Section Centrale : Photo + QR Code
-    mid_y = alert_y - 25.5 * mm
-    photo_w = 22.0 * mm
-    photo_h = 24.5 * mm
-    photo_x = x + 4.0 * mm
+    mid_y = alert_y - 36.5 * mm
+    photo_w = 32.0 * mm
+    photo_h = 35.5 * mm
+    photo_x = x + 5.5 * mm
 
     # Cadre Photo
     c.setFillColor(HexColor("#F1F5F9"))
     c.setStrokeColor(HexColor("#CBD5E1") if not is_provisoire else COLOR_CSPS_RED)
-    c.setLineWidth(0.8)
-    c.roundRect(photo_x, mid_y, photo_w, photo_h, 1.5 * mm, fill=1, stroke=1)
+    c.setLineWidth(1.0)
+    c.roundRect(photo_x, mid_y, photo_w, photo_h, 2.0 * mm, fill=1, stroke=1)
 
     photo_file = worker.get('photo_path') or ''
     if photo_file and photo_file.startswith('/static/'):
@@ -142,169 +142,172 @@ def draw_single_badge(c, x, y, worker, qr_path):
     photo_drawn = False
     if photo_file and os.path.exists(photo_file):
         try:
-            c.drawImage(photo_file, photo_x + 0.5 * mm, mid_y + 0.5 * mm, width=photo_w - 1.0 * mm, height=photo_h - 1.0 * mm, preserveAspectRatio=True)
+            c.drawImage(photo_file, photo_x + 0.8 * mm, mid_y + 0.8 * mm, width=photo_w - 1.6 * mm, height=photo_h - 1.6 * mm, preserveAspectRatio=True)
             photo_drawn = True
         except Exception:
             pass
     if not photo_drawn:
         c.setFillColor(COLOR_MUTED)
-        c.setFont("Helvetica-Bold", 7.5)
-        c.drawCentredString(photo_x + photo_w / 2.0, mid_y + photo_h / 2.0 - 2, "PHOTO")
+        c.setFont("Helvetica-Bold", 10)
+        c.drawCentredString(photo_x + photo_w / 2.0, mid_y + photo_h / 2.0 - 3, "PHOTO")
 
     # Cadre QR Code
-    qr_w = 26.5 * mm
-    qr_h = 24.5 * mm
-    qr_x = x + BADGE_WIDTH - qr_w - 4.0 * mm
+    qr_w = 38.0 * mm
+    qr_h = 35.5 * mm
+    qr_x = x + BADGE_WIDTH - qr_w - 5.5 * mm
     c.setFillColor(COLOR_WHITE)
     c.setStrokeColor(HexColor("#CBD5E1") if not is_provisoire else COLOR_CSPS_RED)
-    c.roundRect(qr_x, mid_y, qr_w, qr_h, 1.5 * mm, fill=1, stroke=1)
+    c.setLineWidth(1.0)
+    c.roundRect(qr_x, mid_y, qr_w, qr_h, 2.0 * mm, fill=1, stroke=1)
 
     if qr_path and os.path.exists(qr_path):
         try:
-            c.drawImage(qr_path, qr_x + 1.0 * mm, mid_y + 0.5 * mm, width=qr_w - 2.0 * mm, height=qr_h - 1.0 * mm, preserveAspectRatio=True)
+            c.drawImage(qr_path, qr_x + 1.5 * mm, mid_y + 0.8 * mm, width=qr_w - 3.0 * mm, height=qr_h - 1.6 * mm, preserveAspectRatio=True)
         except Exception:
             pass
 
-    # 5. Données d'identité & Emploi (Alignement exact selon la photo)
-    info_y = mid_y - 3.5 * mm
-    line_h = 3.5 * mm
+    # 5. Données d'identité & Emploi
+    info_y = mid_y - 5.0 * mm
+    line_h = 5.0 * mm
 
     # Nom
     c.setFillColor(COLOR_MUTED)
-    c.setFont("Helvetica", 6.5)
-    c.drawString(x + 4.0 * mm, info_y, "Nom :")
+    c.setFont("Helvetica", 9.0)
+    c.drawString(x + 5.5 * mm, info_y, "Nom :")
     c.setFillColor(COLOR_DARK)
-    c.setFont("Helvetica-Bold", 7.5)
-    c.drawString(x + 15.0 * mm, info_y, nom.upper()[:24])
+    c.setFont("Helvetica-Bold", 10.5)
+    c.drawString(x + 22.0 * mm, info_y, nom.upper()[:24])
 
     # Prénom
     info_y -= line_h
     c.setFillColor(COLOR_MUTED)
-    c.setFont("Helvetica", 6.5)
-    c.drawString(x + 4.0 * mm, info_y, "Prénom :")
+    c.setFont("Helvetica", 9.0)
+    c.drawString(x + 5.5 * mm, info_y, "Prénom :")
     c.setFillColor(COLOR_DARK)
-    c.setFont("Helvetica-Bold", 7.5)
-    c.drawString(x + 15.0 * mm, info_y, prenom.title()[:24])
+    c.setFont("Helvetica-Bold", 10.5)
+    c.drawString(x + 22.0 * mm, info_y, prenom.title()[:24])
 
     # Société
     info_y -= line_h
     c.setFillColor(COLOR_MUTED)
-    c.setFont("Helvetica", 6.5)
-    c.drawString(x + 4.0 * mm, info_y, "Société :")
+    c.setFont("Helvetica", 9.0)
+    c.drawString(x + 5.5 * mm, info_y, "Société :")
     c.setFillColor(COLOR_DARK)
-    c.setFont("Helvetica-Bold", 7.0)
-    c.drawString(x + 15.0 * mm, info_y, societe[:24])
+    c.setFont("Helvetica-Bold", 10.0)
+    c.drawString(x + 22.0 * mm, info_y, societe[:24])
 
     # Projet
     info_y -= line_h
     c.setFillColor(COLOR_MUTED)
-    c.setFont("Helvetica", 6.5)
-    c.drawString(x + 4.0 * mm, info_y, "Projet :")
+    c.setFont("Helvetica", 9.0)
+    c.drawString(x + 5.5 * mm, info_y, "Projet :")
     c.setFillColor(COLOR_BLUE_PROJ)
-    c.setFont("Helvetica-Bold", 7.0)
-    c.drawString(x + 15.0 * mm, info_y, projet[:24])
+    c.setFont("Helvetica-Bold", 10.0)
+    c.drawString(x + 22.0 * mm, info_y, projet[:24])
 
     # ID Badge
     info_y -= line_h
     c.setFillColor(COLOR_MUTED)
-    c.setFont("Helvetica", 6.5)
-    c.drawString(x + 4.0 * mm, info_y, "ID Badge :")
+    c.setFont("Helvetica", 9.0)
+    c.drawString(x + 5.5 * mm, info_y, "ID Badge :")
     c.setFillColor(COLOR_DARK)
-    c.setFont("Helvetica-Bold", 7.0)
-    c.drawString(x + 15.0 * mm, info_y, f"N. {matricule}"[:24])
+    c.setFont("Helvetica-Bold", 10.0)
+    c.drawString(x + 22.0 * mm, info_y, f"N. {matricule}"[:24])
 
-    # 6. Zone Inférieure : STEP 1, 2, 3 + Validité + Vague
-    step_y = y + 13.0 * mm
-    step_size = 4.0 * mm
+    # 6. Zone Inférieure : STEP 1, 2, 3 + Validité
+    step_y = y + 17.5 * mm
+    step_size = 5.5 * mm
 
     # Step 1
-    s1_x = x + 4.0 * mm
+    s1_x = x + 5.5 * mm
     c.setFillColor(COLOR_WHITE)
     c.setStrokeColor(HexColor("#000000"))
-    c.setLineWidth(0.6)
+    c.setLineWidth(0.8)
     c.rect(s1_x, step_y, step_size, step_size, fill=1, stroke=1)
     c.setFillColor(HexColor("#5A6080"))
-    c.setFont("Helvetica-Bold", 5.0)
-    c.drawCentredString(s1_x + step_size / 2.0, step_y - 2.0 * mm, "1")
+    c.setFont("Helvetica-Bold", 7.0)
+    c.drawCentredString(s1_x + step_size / 2.0, step_y - 2.8 * mm, "1")
     if worker.get('step_1_valide', 1):
         c.setFillColor(COLOR_GREEN_WAVE)
-        c.setFont("Helvetica-Bold", 7.0)
-        c.drawCentredString(s1_x + step_size / 2.0, step_y + 0.8 * mm, "✓")
+        c.setFont("Helvetica-Bold", 9.5)
+        c.drawCentredString(s1_x + step_size / 2.0, step_y + 1.0 * mm, "✓")
 
     # Step 2
-    s2_x = s1_x + step_size + 2.0 * mm
+    s2_x = s1_x + step_size + 3.0 * mm
     c.setFillColor(COLOR_WHITE)
     c.setStrokeColor(HexColor("#000000"))
+    c.setLineWidth(0.8)
     c.rect(s2_x, step_y, step_size, step_size, fill=1, stroke=1)
     c.setFillColor(HexColor("#5A6080"))
-    c.setFont("Helvetica-Bold", 5.0)
-    c.drawCentredString(s2_x + step_size / 2.0, step_y - 2.0 * mm, "2")
+    c.setFont("Helvetica-Bold", 7.0)
+    c.drawCentredString(s2_x + step_size / 2.0, step_y - 2.8 * mm, "2")
     if worker.get('step_2_valide', 1):
         c.setFillColor(COLOR_GREEN_WAVE)
-        c.setFont("Helvetica-Bold", 7.0)
-        c.drawCentredString(s2_x + step_size / 2.0, step_y + 0.8 * mm, "✓")
+        c.setFont("Helvetica-Bold", 9.5)
+        c.drawCentredString(s2_x + step_size / 2.0, step_y + 1.0 * mm, "✓")
 
     # Step 3
-    s3_x = s2_x + step_size + 2.0 * mm
+    s3_x = s2_x + step_size + 3.0 * mm
     c.setFillColor(COLOR_WHITE)
     c.setStrokeColor(HexColor("#000000"))
+    c.setLineWidth(0.8)
     c.rect(s3_x, step_y, step_size, step_size, fill=1, stroke=1)
     c.setFillColor(HexColor("#5A6080"))
-    c.setFont("Helvetica-Bold", 5.0)
-    c.drawCentredString(s3_x + step_size / 2.0, step_y - 2.0 * mm, "3")
+    c.setFont("Helvetica-Bold", 7.0)
+    c.drawCentredString(s3_x + step_size / 2.0, step_y - 2.8 * mm, "3")
     if worker.get('step_3_valide', 0):
         c.setFillColor(COLOR_GREEN_WAVE)
-        c.setFont("Helvetica-Bold", 7.0)
-        c.drawCentredString(s3_x + step_size / 2.0, step_y + 0.8 * mm, "✓")
+        c.setFont("Helvetica-Bold", 9.5)
+        c.drawCentredString(s3_x + step_size / 2.0, step_y + 1.0 * mm, "✓")
 
     # Pastille Date Validité (droite)
-    valid_w = 17.5 * mm
-    valid_h = 4.8 * mm
-    valid_x = x + BADGE_WIDTH - valid_w - 4.0 * mm
+    valid_w = 26.0 * mm
+    valid_h = 7.0 * mm
+    valid_x = x + BADGE_WIDTH - valid_w - 5.5 * mm
     c.setFillColor(COLOR_PROV_HEADER if is_provisoire else COLOR_VALID_BG)
-    c.roundRect(valid_x, step_y - 0.5 * mm, valid_w, valid_h, 1.2 * mm, fill=1, stroke=0)
+    c.roundRect(valid_x, step_y - 0.8 * mm, valid_w, valid_h, 1.8 * mm, fill=1, stroke=0)
     c.setFillColor(COLOR_WHITE)
-    c.setFont("Helvetica-Bold", 6.5)
+    c.setFont("Helvetica-Bold", 9.0)
     exp_date = worker.get('date_expiration') or '31/12/2026'
     if '-' in str(exp_date) and len(str(exp_date).split('-')) == 3:
         p_date = str(exp_date).split('-')
         exp_formatted = f"{p_date[2]}/{p_date[1]}/{p_date[0]}"
     else:
         exp_formatted = str(exp_date)
-    c.drawCentredString(valid_x + valid_w / 2.0, step_y + 0.8 * mm, exp_formatted)
+    c.drawCentredString(valid_x + valid_w / 2.0, step_y + 1.2 * mm, exp_formatted)
 
     # 7. Pied de Page / Vague Verte & Pastille CSPS
     c.saveState()
     clip_foot = c.beginPath()
-    clip_foot.roundRect(x, y, BADGE_WIDTH, BADGE_HEIGHT, 3.5 * mm)
+    clip_foot.roundRect(x, y, BADGE_WIDTH, BADGE_HEIGHT, 4.5 * mm)
     c.clipPath(clip_foot, stroke=0)
 
-    footer_h = 9.5 * mm
+    footer_h = 13.5 * mm
     c.setFillColor(HexColor("#991B1B") if is_provisoire else COLOR_GREEN_WAVE)
     
     # Dessin de la vague de pied
     pw = c.beginPath()
     pw.moveTo(x, y)
     pw.lineTo(x + BADGE_WIDTH, y)
-    pw.lineTo(x + BADGE_WIDTH, y + footer_h - 1.0 * mm)
-    pw.curveTo(x + BADGE_WIDTH * 0.7, y + footer_h - 2.5 * mm, x + BADGE_WIDTH * 0.35, y + footer_h + 1.5 * mm, x, y + footer_h - 0.5 * mm)
+    pw.lineTo(x + BADGE_WIDTH, y + footer_h - 1.5 * mm)
+    pw.curveTo(x + BADGE_WIDTH * 0.7, y + footer_h - 3.5 * mm, x + BADGE_WIDTH * 0.35, y + footer_h + 2.0 * mm, x, y + footer_h - 0.8 * mm)
     pw.close()
     c.drawPath(pw, fill=1, stroke=0)
 
     # Textes du Footer
     c.setFillColor(HexColor("#FFFFFF") if is_provisoire else HexColor("#EF4444"))
-    c.setFont("Helvetica-Bold", 5.2)
-    c.drawCentredString(x + BADGE_WIDTH / 2.0, y + 5.2 * mm, "SAFETY FIRST")
+    c.setFont("Helvetica-Bold", 7.5)
+    c.drawCentredString(x + BADGE_WIDTH / 2.0, y + 7.5 * mm, "SAFETY FIRST")
 
     # Pastille centrale CSPS / SINYLON
-    pill_w = 14.0 * mm
-    pill_h = 3.6 * mm
+    pill_w = 20.0 * mm
+    pill_h = 5.2 * mm
     pill_x = x + (BADGE_WIDTH - pill_w) / 2.0
     c.setFillColor(COLOR_CSPS_RED if not is_provisoire else HexColor("#7F1D1D"))
-    c.roundRect(pill_x, y + 1.2 * mm, pill_w, pill_h, 0.8 * mm, fill=1, stroke=0)
+    c.roundRect(pill_x, y + 1.8 * mm, pill_w, pill_h, 1.2 * mm, fill=1, stroke=0)
     c.setFillColor(COLOR_WHITE)
-    c.setFont("Helvetica-Bold", 6.0)
-    c.drawCentredString(x + BADGE_WIDTH / 2.0, y + 2.0 * mm, "CSPS")
+    c.setFont("Helvetica-Bold", 8.5)
+    c.drawCentredString(x + BADGE_WIDTH / 2.0, y + 3.0 * mm, "CSPS")
 
     c.restoreState() # fin du clip pied de page
     c.restoreState() # fin de l'état du badge
@@ -365,15 +368,15 @@ def generate_batch_badges_pdf(workers_list, output_pdf_path):
     page_w, page_h = A4
     
     # 4 badges verticaux par page (2 colonnes x 2 lignes)
-    # Badge: 60mm x 86mm
+    # Badge: 90mm x 120mm (calibré porte-badge B3)
     # A4: 210mm x 297mm
-    # Espace restant horizontal: 210 - (2 * 60) = 90mm => Marges 30mm, espacement 30mm
-    # Espace restant vertical: 297 - (2 * 86) = 125mm => Marges 35mm, espacement 55mm
+    # Espace restant horizontal: 210 - (2 * 90) = 30mm => Marges 10mm, espacement 10mm
+    # Espace restant vertical: 297 - (2 * 120) = 57mm => Marges 18.5mm, espacement 20mm
     
-    margin_x = 30 * mm
-    spacing_x = 30 * mm
-    margin_y = 35 * mm
-    spacing_y = 55 * mm
+    margin_x = 10 * mm
+    spacing_x = 10 * mm
+    margin_y = 18.5 * mm
+    spacing_y = 20 * mm
 
     col = 0
     row = 0
