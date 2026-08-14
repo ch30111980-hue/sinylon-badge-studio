@@ -944,7 +944,7 @@ def print_batch():
     conn.commit()
     conn.close()
 
-    filename = f"Planche_Badges_Sinylon_Actifs_{len(workers_list)}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    filename = f"Planche_Badges_Sinylon_Actifs_{len(workers_list)}_{datetime.datetime.now().strftime('%Y%m%d')}.pdf"
     output_pdf = os.path.join(SCRATCH_FOLDER, filename)
     generate_batch_badges_pdf(workers_list, output_pdf)
 
@@ -979,7 +979,7 @@ def print_selected_batch():
     conn.commit()
     conn.close()
 
-    filename = f"Planche_Badges_Selection_{len(workers_list)}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    filename = f"Planche_Badges_Selection_{len(workers_list)}_{datetime.datetime.now().strftime('%Y%m%d')}.pdf"
     output_pdf = os.path.join(SCRATCH_FOLDER, filename)
     generate_batch_badges_pdf(workers_list, output_pdf)
 
