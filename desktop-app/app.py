@@ -609,6 +609,8 @@ def badge_admin_dashboard():
 
 
 @app.route('/badge/imprimer_a4', endpoint='badge.imprimer_a4')
+@app.route('/badge/imprimer', endpoint='badge.imprimer')
+@app.route('/badge/imprimer_selection', endpoint='badge.imprimer_selection')
 def badge_imprimer_a4():
     lot_filter = request.args.get('lot', '').strip()
     ids_filter = request.args.get('ids', '').strip()
