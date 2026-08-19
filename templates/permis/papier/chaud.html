@@ -11,7 +11,7 @@
 </style>
 <div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
     <div class="d-flex gap-2">
-        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark shadow-sm">
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-dark shadow-sm">
             <i class="fas fa-arrow-left me-2"></i> Tableau de Bord
         </a>
         <div class="dropdown">
@@ -19,37 +19,37 @@
                 <i class="fas fa-plus-circle me-2"></i> Nouvelle Demande de Permis
             </button>
             <ul class="dropdown-menu shadow border-0">
-                <li><a class="dropdown-item" href="{{ url_for('permis.nouveau') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-file-signature me-2 text-primary"></i> <strong>DEMANDE DE PERMIS (SINYLON FIAT)</strong> — En ligne
                 </a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><h6 class="dropdown-header small text-uppercase fw-bold">Choisir le type de permis</h6></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='securite_generale') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-file-contract me-2 text-dark"></i> <strong>RECTO (P1)</strong> — Sécurité Générale
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='revalidation', theme='chaud') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-sync me-2 text-secondary"></i> <strong>VERSO (P2)</strong> — Revalidation
                 </a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='hauteur') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-hard-hat me-2 text-primary"></i> <strong>BLEUE (A)</strong> — Travail en Hauteur
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='chaud') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-fire me-2 text-danger"></i> <strong>ROUGE (B)</strong> — Travail à Chaud
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='levage') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-dolly me-2 text-warning"></i> <strong>JAUNE (C)</strong> — Permis de Levage
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='vehicule') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-car me-2 text-info"></i> <strong>VIOLETTE (D)</strong> — Inspection Engins
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='espace_confine') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-door-closed me-2 text-success"></i> <strong>CYAN (E)</strong> — Espace Confiné
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='fouille') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-shovel me-2" style="color: #2e7d32;"></i> <strong>PERMIS D'EXCAVATION (F)</strong>
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='electrique') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-bolt me-2" style="color: #ff9500;"></i> <strong>ORANGE (G)</strong> — Travail Électrique
                 </a></li>
             </ul>
@@ -325,8 +325,8 @@
         const sigVal = inputSig ? inputSig.value.trim() : '';
         
         if (nameVal || sigVal) {
-            localStorage.setItem('noro_saved_sig_name_' + id, nameVal);
-            localStorage.setItem('noro_saved_sig_text_' + id, sigVal);
+            localStorage.setItem('sinylon_saved_sig_name_' + id, nameVal);
+            localStorage.setItem('sinylon_saved_sig_text_' + id, sigVal);
             alert("✅ Votre signature numérique a été enregistrée !");
         } else {
             alert("⚠️ Veuillez saisir votre nom ou votre texte de signature avant d'enregistrer.");
@@ -334,8 +334,8 @@
     }
 
     function loadSignature(id) {
-        const savedName = localStorage.getItem('noro_saved_sig_name_' + id);
-        const savedSig = localStorage.getItem('noro_saved_sig_text_' + id);
+        const savedName = localStorage.getItem('sinylon_saved_sig_name_' + id);
+        const savedSig = localStorage.getItem('sinylon_saved_sig_text_' + id);
         
         if (savedName || savedSig) {
             const inputName = document.querySelector('input[name="nom_' + id + '"]');

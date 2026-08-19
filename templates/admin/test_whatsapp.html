@@ -9,8 +9,8 @@
             <p class="text-muted small mb-0">Testez l'envoi direct wa.me et l'API automatique en temps réel.</p>
         </div>
         <div>
-            <a href="{{ url_for('main.config_whatsapp') }}" class="btn btn-success btn-sm fw-bold me-2"><i class="fas fa-cog me-1"></i> Configurer API Meta</a>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm fw-bold">← Retour Dashboard</a>
+            <a href="#" data-disabled="true" class="btn btn-success btn-sm fw-bold me-2"><i class="fas fa-cog me-1"></i> Configurer API Meta</a>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary btn-sm fw-bold">← Retour Dashboard</a>
         </div>
     </div>
 
@@ -22,7 +22,7 @@
                     <i class="fas fa-paper-plane me-2 text-warning"></i> Formulaire de Test WhatsApp
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('main.test_whatsapp') }}">
+                    <form method="POST" action="#" onsubmit="return false;">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Numéro de Téléphone *</label>
                             <input type="text" name="phone" class="form-control font-monospace" placeholder="ex: 0550112233 ou 213550112233" value="{{ test_phone or '' }}" required>

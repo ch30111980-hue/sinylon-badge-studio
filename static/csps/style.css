@@ -332,8 +332,8 @@ body {
     font-weight: bold;
 }
 
-/* --- SIGNATURE OFFICIELLE MES NORO --- */
-.noro-watermark {
+/* --- SIGNATURE OFFICIELLE SINYLON CSPS --- */
+.sinylon-watermark {
     display: none;
     position: absolute;
     bottom: 5mm;
@@ -346,5 +346,5 @@ body {
 
 @media print {
     .no-print { display: none !important; }
-    .noro-watermark { display: block !important; }
+    .sinylon-watermark { display: block !important; }
 }

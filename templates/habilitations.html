@@ -157,7 +157,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ url_for('badge.liste') }}?search={{ b.numero_badge }}" class="btn btn-sm btn-outline-primary fw-bold" style="border-radius: 8px; font-size: 0.78rem;">
+                                    <a href="{{ url_for('workers.annuaire') }}?q={{ b.numero_badge }}" class="btn btn-sm btn-outline-primary fw-bold" style="border-radius: 8px; font-size: 0.78rem;">
                                         <i class="fas fa-edit me-1"></i> Gérer Badge
                                     </a>
                                 </td>

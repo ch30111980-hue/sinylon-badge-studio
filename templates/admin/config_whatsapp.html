@@ -8,7 +8,7 @@
             <h2 class="fw-bold text-dark mb-1"><i class="fab fa-whatsapp text-success me-2"></i>Configuration Meta WhatsApp API</h2>
             <p class="text-muted small mb-0">Configurez l'envoi automatique 24h/24 via l'API officielle WhatsApp Business (Meta) ou CallMeBot.</p>
         </div>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm fw-bold">← Retour Dashboard</a>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary btn-sm fw-bold">← Retour Dashboard</a>
     </div>
 
     <div class="row g-4">
@@ -19,7 +19,7 @@
                     <i class="fas fa-key me-2 text-warning"></i> Paramètres WhatsApp Business Cloud API (Meta)
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('main.config_whatsapp') }}">
+                    <form method="POST" action="#" onsubmit="return false;">
                         <div class="alert alert-info border-0 mb-4" style="border-radius:10px;">
                             <i class="fas fa-info-circle me-2"></i>
                             <strong>Meta WhatsApp Cloud API</strong> permet d'envoyer jusqu'à <strong>1 000 messages gratuits par mois</strong> de manière 100% automatique à tous les intervenants et sous-traitants.
@@ -62,7 +62,7 @@
                 </div>
                 <div class="card-body p-4 text-center">
                     <p class="small text-muted mb-3">Après avoir enregistré vos clés, cliquez ci-dessous pour effectuer un test d'envoi en direct vers votre numéro.</p>
-                    <a href="{{ url_for('main.test_whatsapp') }}" class="btn btn-outline-success w-100 fw-bold py-2 shadow-sm">
+                    <a href="#" data-disabled="true" class="btn btn-outline-success w-100 fw-bold py-2 shadow-sm">
                         <i class="fab fa-whatsapp me-2"></i> Ouvrir le Testeur WhatsApp en Direct
                     </a>
                 </div>

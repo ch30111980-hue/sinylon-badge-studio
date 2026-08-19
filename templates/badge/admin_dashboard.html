@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Admin Badge — NORO BADGE 5.0 PRO{% endblock %}
+{% block title %}Admin Badge — SINYLON BADGE STUDIO PRO{% endblock %}
 
 {% block content %}
 <style>
@@ -140,8 +140,8 @@
 
 <!-- Nav -->
 <div class="d-flex gap-2 mb-3 align-items-center">
-    <a href="{{ url_for('dashboard') }}" class="nb5-back"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
-    <a href="{{ url_for('badge.liste') }}" class="nb5-back"><i class="fas fa-list me-1"></i> Liste</a>
+    <a href="{{ url_for('dashboard.index') }}" class="nb5-back"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
+    <a href="#" data-disabled="true" class="nb5-back"><i class="fas fa-list me-1"></i> Liste</a>
     <span style="color:#ffc107; font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:2px; margin-left:8px;">👑 MODE ADMINISTRATEUR</span>
 </div>
 
@@ -150,8 +150,8 @@
     <div class="nb5-hdr">
         <div class="logo">FIAT</div>
         <div class="title" style="display: inline-flex; align-items: center; gap: 8px;">
-            <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 24px; width: auto; vertical-align: middle;">
-            <span>NORO BADGE 5.0 PRO — ADMIN</span>
+            <img src="{{ url_for('static', filename='img/img/logo.png') }}" alt="Sinylon" style="height: 24px; width: auto; vertical-align: middle;">
+            <span>SINYLON BADGE STUDIO PRO — ADMIN</span>
         </div>
         <div style="font-size:11px; color:#ffc107; font-family:'Oswald',sans-serif; letter-spacing:2px;">{{ current_user.full_name() }}</div>
     </div>
@@ -188,13 +188,13 @@
 
             <!-- TAB: BADGES FORM -->
             <div id="tab-badges" class="nb5-form">
-                <form method="POST" action="{{ url_for('badge.nouveau') }}" enctype="multipart/form-data" id="badgeForm">
+                <form method="POST" action="#" onsubmit="return false;" enctype="multipart/form-data" id="badgeForm">
                     <input type="hidden" name="edit_id" id="editId">
 
-                    <!-- Scanner intelligent Noro AI -->
+                    <!-- Scanner intelligent SINYLON AI -->
                     <div class="sec" style="background: rgba(59, 130, 246, 0.05); border: 2px dashed #3b82f6; border-radius: 10px; padding: 15px; margin-bottom: 20px; cursor: pointer; text-align: center;" id="ai-scan-zone">
                         <div style="font-family: 'Oswald', sans-serif; font-size: 13px; color: #3b82f6; font-weight: bold; margin-bottom: 5px;">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> REMPLIR VIA NORO AI
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> REMPLIR VIA SINYLON AI
                         </div>
                         <div style="font-size: 11px; color: #8a94a6; line-height: 1.4;">
                             Déposez la CNI, le Passeport ou la carte CNAS du travailleur ici pour corriger ou pré-remplir le formulaire.
@@ -255,7 +255,7 @@
 
                     <div class="sec">
                         <div class="sec-title">🔐 Accès & Validité</div>
-                        <div class="field"><label>N° Badge *</label><input type="text" name="numero_badge" id="f_num" placeholder="NORO-XXXX" required></div>
+                        <div class="field"><label>N° Badge *</label><input type="text" name="numero_badge" id="f_num" placeholder="SIN-XXXX" required></div>
                         <div class="r2">
                             <div class="field"><label>Date Émission *</label><input type="date" name="date_emission" id="f_emit" required></div>
                             <div class="field"><label>Date Expiration *</label><input type="date" name="date_expiration" id="f_exp" value="2026-12-31" required></div>
@@ -487,7 +487,7 @@
 • Respectez les zones.
 • En cas d'urgence, appelez.</textarea>
                 </div>
-                <a href="{{ url_for('admin_sync_firebase') if 'admin_sync_firebase' in url_for.__module__ else url_for('sync_firebase') }}" class="btn-act btn-blue" style="display:block;text-align:center;text-decoration:none;padding:10px;border-radius:6px;">
+                <a href="#" data-disabled="true" class="btn-act btn-blue" style="display:block;text-align:center;text-decoration:none;padding:10px;border-radius:6px;">
                     🔄 Synchroniser Firebase
                 </a>
             </div>
@@ -584,9 +584,9 @@
                     {% endfor %}
                 </select>
                 <button onclick="imprimerAdminSelection()" class="btn-act btn-green" style="border:none; cursor:pointer;" title="Imprimer uniquement les badges cochés dans la liste"><i class="fas fa-check-square me-1"></i> 🖨️ IMPRIMER SÉLECTION (A4)</button>
-                <a href="{{ url_for('badge.imprimer_a4') }}" target="_blank" id="printLotBtn" class="btn-act btn-blue" style="text-decoration:none;" title="Ouvrir tous les badges affichés pour impression">🖨️ TOUT IMPRIMER (A4)</a>
+                <a href="#" data-disabled="true" target="_blank" id="printLotBtn" class="btn-act btn-blue" style="text-decoration:none;" title="Ouvrir tous les badges affichés pour impression">🖨️ TOUT IMPRIMER (A4)</a>
                 <a href="/api/print/batch?download=1" class="btn-act" style="text-decoration:none; background: #0284c7; color: #fff;" title="Télécharger directement la planche complète au format PDF"><i class="fas fa-file-pdf me-1"></i> 📥 ENREGISTRER EN PDF</a>
-                <a href="{{ url_for('badge.export_csv') }}" class="btn-act btn-gold" style="text-decoration:none;">📊 EXPORT EXCEL</a>
+                <a href="#" data-disabled="true" class="btn-act btn-gold" style="text-decoration:none;">📊 EXPORT EXCEL</a>
             </div>
 
             <!-- Table des badges -->
@@ -737,13 +737,13 @@
                                         data-blacklist="{{ 'true' if badge.blacklist else 'false' }}"
                                         data-warns="{{ badge.avertissements or 0 }}"
                                         onclick="editBadgeFromBtn(this)" class="btn-act btn-gold" style="font-size:10px;padding:5px 8px;" title="Éditer le badge">✏️</button>
-                                    <a href="{{ url_for('badge.telecharger_pdf', id=badge.id) }}" class="btn-act btn-blue" style="font-size:10px;padding:5px 8px;text-decoration:none;" title="Télécharger PDF">📄</a>
+                                    <a href="#" data-disabled="true" class="btn-act btn-blue" style="font-size:10px;padding:5px 8px;text-decoration:none;" title="Télécharger PDF">📄</a>
                                     {% if badge.is_blocked %}
-                                    <a href="{{ url_for('badge.bloquer', id=badge.id) }}" class="btn-act btn-green" style="font-size:10px;padding:5px 8px;text-decoration:none;" title="Débloquer le badge">🔓</a>
+                                    <a href="#" data-disabled="true" class="btn-act btn-green" style="font-size:10px;padding:5px 8px;text-decoration:none;" title="Débloquer le badge">🔓</a>
                                     {% else %}
                                     <a href="#" class="btn-act btn-red" style="font-size:10px;padding:5px 8px;text-decoration:none;" title="Bloquer le badge" onclick="toggleBadgeBlock({{ badge.id }}); return false;">🔒</a>
                                     {% endif %}
-                                    <a href="{{ url_for('badge.supprimer', id=badge.id) }}" class="btn-act btn-red" style="font-size:10px;padding:5px 8px;text-decoration:none;" onclick="return confirm('Supprimer ce badge ?')" title="Supprimer le badge">🗑️</a>
+                                    <a href="#" data-disabled="true" class="btn-act btn-red" style="font-size:10px;padding:5px 8px;text-decoration:none;" onclick="return confirm('Supprimer ce badge ?')" title="Supprimer le badge">🗑️</a>
                                 </div>
                             </td>
                         </tr>
@@ -987,7 +987,7 @@ function submitEditEnterprise() {
     saveBtn.textContent = "⌛ ENREGISTREMENT...";
     saveBtn.disabled = true;
     
-    fetch("{{ url_for('badge.api_update_ent') }}", {
+    fetch("{{ '#' }}", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -1069,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const lot = this.value;
             const printBtn = document.getElementById('printLotBtn');
             if (printBtn) {
-                printBtn.href = lot ? "{{ url_for('badge.imprimer_a4') }}?lot=" + lot : "{{ url_for('badge.imprimer_a4') }}";
+                printBtn.href = lot ? "{{ url_for('badges.print_batch') }}?lot=" + lot : "{{ url_for('badges.print_batch') }}";
             }
         });
     }
@@ -1159,7 +1159,7 @@ document.querySelector('input[name="photo"]').addEventListener('change', functio
     }
 });
 
-// === Noro AI Badge Auto-fill ===
+// === SINYLON AI Badge Auto-fill ===
 const aiScanZone = document.getElementById('ai-scan-zone');
 const aiFileInput = document.getElementById('ai-file-input');
 
@@ -1197,14 +1197,14 @@ if (aiScanZone && aiFileInput) {
 async function handleAiBadgeAnalysis(file) {
     let key = localStorage.getItem('gemini_api_key') || '';
     if (!key) {
-        key = prompt("Veuillez saisir votre clé API Gemini pour utiliser le remplissage intelligent Noro AI :");
+        key = prompt("Veuillez saisir votre clé API Gemini pour utiliser le remplissage intelligent SINYLON AI :");
         if (!key) return;
         localStorage.setItem('gemini_api_key', key);
     }
 
     const scanTextEl = aiScanZone.querySelector('div:nth-child(2)');
     const originalText = scanTextEl.textContent;
-    scanTextEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours par Noro AI...';
+    scanTextEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours par SINYLON AI...';
     aiScanZone.style.opacity = '0.7';
 
     const reader = new FileReader();

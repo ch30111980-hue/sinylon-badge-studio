@@ -4,7 +4,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <div class="d-flex gap-2">
-        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark shadow-sm">
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-dark shadow-sm">
             <i class="fas fa-arrow-left me-2"></i> Tableau de Bord
         </a>
         <div class="dropdown">
@@ -12,40 +12,40 @@
                 <i class="fas fa-plus-circle me-2"></i> Nouvelle Demande de Permis
             </button>
             <ul class="dropdown-menu shadow border-0">
-                <li><a class="dropdown-item" href="{{ url_for('permis.nouveau') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-file-signature me-2 text-primary"></i> <strong>DEMANDE DE PERMIS (SINYLON FIAT)</strong> — En ligne
                 </a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><h6 class="dropdown-header small text-uppercase fw-bold">Permis Papier SINYLON FIAT</h6></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='securite_generale') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-file-contract me-2 text-dark"></i> <strong>RECTO (P1)</strong> — Sécurité Générale
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='revalidation') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-sync me-2 text-secondary"></i> <strong>VERSO (P2)</strong> — Revalidation
                 </a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='hauteur') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-hard-hat me-2 text-primary"></i> <strong>BLEUE (A)</strong> — Travail en Hauteur
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='chaud') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-fire me-2 text-danger"></i> <strong>ROUGE (B)</strong> — Travail à Chaud
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='levage') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-dolly me-2 text-warning"></i> <strong>JAUNE (C)</strong> — Permis de Levage
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='espace_confine') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-door-closed me-2 text-success"></i> <strong>CYAN (E)</strong> — Espace Confiné
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='fouille') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-shovel me-2" style="color: #2e7d32;"></i> <strong>PERMIS D'EXCAVATION (F)</strong>
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='electrique') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-bolt me-2" style="color: #ff9500;"></i> <strong>ORANGE (G)</strong> — Consignation Électrique
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='vehicule') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-car me-2 text-info"></i> <strong>VIOLETTE (D)</strong> — Permis d'Entrée Véhicule
                 </a></li>
-                <li><a class="dropdown-item" href="{{ url_for('permis.formulaire_papier', type_form='materiel') }}">
+                <li><a class="dropdown-item" href="#" data-disabled="true">
                     <i class="fas fa-toolbox me-2 text-secondary"></i> <strong>MATÉRIELS</strong> — Autorisation d'utilisation
                 </a></li>
             </ul>

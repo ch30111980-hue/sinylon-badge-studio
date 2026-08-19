@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Journal d'Audit Trail - SINYLON Badge Studio Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">🛡️ Journal d'Audit Immuable</h2>
+            <p class="text-muted mb-0">Traçabilité complète des actions, changements de statuts et accréditations sur le chantier.</p>
+        </div>
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour Dashboard
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Date / Heure</th>
+                            <th>Opérateur</th>
+                            <th>Action</th>
+                            <th>Entité</th>
+                            <th>Réf. Cible</th>
+                            <th>Détails & Changements</th>
+                            <th>IP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td class="ps-4 text-nowrap text-muted font-monospace small">
+                                {{ log.timestamp }}
+                            </td>
+                            <td>
+                                <span class="badge bg-dark">{{ log.user_role }}</span>
+                                <span class="fw-bold ms-1">{{ log.user_name }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">{{ log.action }}</span>
+                            </td>
+                            <td>
+                                <span class="text-uppercase text-muted small fw-bold">{{ log.entity_type }}</span>
+                            </td>
+                            <td>
+                                <span class="font-monospace fw-bold">{{ log.entity_id }}</span>
+                            </td>
+                            <td>
+                                <div class="text-truncate" style="max-width: 380px;" title="{{ log.details or '' }}">
+                                    {{ log.details or '-' }}
+                                </div>
+                                {% if log.old_values or log.new_values %}
+                                <div class="small text-muted font-monospace mt-1">
+                                    {% if log.old_values %}<span class="text-danger">Ancien: {{ log.old_values }}</span>{% endif %}
+                                    {% if log.new_values %}<span class="text-success ms-2">Nouveau: {{ log.new_values }}</span>{% endif %}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted font-monospace small">{{ log.ip_address or '127.0.0.1' }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-history fa-2x mb-2 text-secondary"></i>
+                                <p class="mb-0">Aucun événement d'audit enregistré.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

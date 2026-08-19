@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4 no-print">
-        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark">
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-dark">
             <i class="fas fa-arrow-left me-2"></i> Retour
         </a>
         <button onclick="window.print()" class="btn btn-primary">
@@ -40,7 +40,7 @@
                         <i class="fas fa-file-pdf me-2 text-danger"></i> ✍️ Signature, Enregistrement & Validation PDF
                     </h5>
                     
-                    <form action="{{ url_for('permis.approuver_signer', id=permis.id) }}" method="POST" id="sig-form-admin" onsubmit="return validateAdminSignature(event)">
+                    <form action="#" onsubmit="return false;" method="POST" id="sig-form-admin" onsubmit="return validateAdminSignature(event)">
                         <input type="hidden" name="is_papier" value="true">
                         <input type="hidden" name="signature_data" id="admin_signature_data">
 
@@ -109,10 +109,10 @@
                 </div>
                 <div class="card-body bg-light">
                     <div class="d-flex gap-2 flex-wrap justify-content-center">
-                        <a href="{{ url_for('permis.refaire', id=permis.id, is_papier='true') }}" class="btn btn-warning btn-3d px-4">
+                        <a href="#" data-disabled="true" class="btn btn-warning btn-3d px-4">
                             <i class="fas fa-redo me-2"></i> À Refaire
                         </a>
-                        <a href="{{ url_for('permis.revoquer', id=permis.id, is_papier='true') }}" class="btn btn-danger btn-3d px-4" onclick="return confirm('Êtes-vous sûr de vouloir révoquer/annuler ce permis ?');">
+                        <a href="#" data-disabled="true" class="btn btn-danger btn-3d px-4" onclick="return confirm('Êtes-vous sûr de vouloir révoquer/annuler ce permis ?');">
                             <i class="fas fa-ban me-2"></i> Annuler / Révoquer
                         </a>
                     </div>
@@ -219,7 +219,7 @@
         
         <div class="card-footer text-center py-3" style="background: rgba(255, 255, 255, 0.02); border-top: 1px solid rgba(255, 255, 255, 0.08);">
             <p class="small text-muted mb-0" style="display: inline-flex; align-items: center; justify-content: center; gap: 5px; color: #94a3b8 !important;">
-                <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 14px; width: auto; vertical-align: middle;">
+                <img src="{{ url_for('static', filename='img/img/logo.png') }}" alt="Sinylon" style="height: 14px; width: auto; vertical-align: middle;">
                 <span>SINYLON FIAT — Système de Sécurité Numérique © 2026</span>
             </p>
         </div>

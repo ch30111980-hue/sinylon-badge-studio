@@ -106,7 +106,7 @@
                             </td>
                             <td class="small">{{ inc.actions_correctives or 'Aucune spécifiée' }}</td>
                             <td>
-                                <form method="POST" action="{{ url_for('analytics_bp.incident_update_statut', incident_id=inc.id) }}" class="d-flex gap-1">
+                                <form method="POST" action="#" onsubmit="return false;" class="d-flex gap-1">
                                     <select name="statut" class="form-select form-select-sm fw-semibold" style="font-size: 0.75rem; border-radius: 8px;">
                                         <option value="Ouvert" {% if inc.statut == 'Ouvert' %}selected{% endif %}>🔴 Ouvert</option>
                                         <option value="En cours" {% if inc.statut == 'En cours' %}selected{% endif %}>🟡 En cours</option>
@@ -138,7 +138,7 @@
                 <h5 class="modal-title fw-bold"><i class="fas fa-exclamation-circle me-2"></i> Signaler une Non-Conformité ou Incident HSE</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{{ url_for('analytics_bp.incident_nouveau') }}">
+            <form method="POST" action="#" onsubmit="return false;">
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Titre du Signalement *</label>

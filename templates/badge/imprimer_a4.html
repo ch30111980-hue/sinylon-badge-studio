@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Impression Badges - NORO BADGE 5.0 PRO</title>
+    <title>Impression Badges - SINYLON BADGE STUDIO PRO</title>
     <!-- On charge le bundle complet font-awesome, QR Code et html2pdf -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -203,7 +203,7 @@
                             {% endif %}
                         </div>
                         <!-- Generates QR code using qrcode.js with optimized data size -->
-                        {% set qr_parts = ["=== NORO SECURITY ==="] %}
+                        {% set qr_parts = ["=== SINYLON SECURITY ==="] %}
                         {% if badge.numero_badge %}{% set _ = qr_parts.append("Badge: " ~ badge.numero_badge) %}{% endif %}
                         {% if badge.nom or badge.prenom %}{% set _ = qr_parts.append("Nom: " ~ (badge.nom or '')|upper ~ " " ~ (badge.prenom or '')) %}{% endif %}
                         {% if badge.societe_affichee %}{% set _ = qr_parts.append("Soc: " ~ badge.societe_affichee) %}{% endif %}
@@ -244,7 +244,7 @@
                         {% if habs %}
                             {% set _ = qr_parts.append("Habs: " ~ habs|join(', ')) %}
                         {% endif %}
-                        <div class="b-qr" id="qr-{{ badge.id }}" data-text="{{ url_for('badge.verifier_public', id=badge.id, _external=True) }}"></div>
+                        <div class="b-qr" id="qr-{{ badge.id }}" data-text="{{ url_for('badges.verify_badge_public', qr_token=badge.qr_token, _external=True) }}"></div>
                     </div>
 
                     <div class="b-info" style="text-align: left;">

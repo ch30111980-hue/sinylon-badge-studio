@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SINYLON FIAT - {% block title %}{% endblock %}</title>
+    <title>SINYLON Badge Studio Pro - {% block title %}{% endblock %}</title>
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -311,10 +311,10 @@
     <nav class="navbar navbar-expand navbar-light shadow-sm fixed-top" style="backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid rgba(226, 232, 240, 0.8); z-index: 1050; box-shadow: 0 4px 20px rgba(0,0,0,0.06); transition: all 0.3s ease;">
 
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('dashboard') }}">
-                <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 28px; width: auto; margin-right: 10px;">
-                <span style="letter-spacing: 1px; color: #0f172a;">NORO <span style="background: linear-gradient(to right, #ea580c, #84cc16); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">UNIFIED</span></span>
-                <span class="badge bg-primary ms-2 px-2 py-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">SINYLON FIAT STELLANTIS</span>
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('dashboard.index') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Sinylon" style="height: 28px; width: auto; margin-right: 10px;" onerror="this.style.display='none'">
+                <span style="letter-spacing: 0.5px; color: #0f172a;">SINYLON <span style="background: linear-gradient(to right, #ea580c, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BADGE STUDIO</span></span>
+                <span class="badge bg-dark ms-2 px-2 py-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">PRO V2.1</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -323,27 +323,14 @@
                 {% if current_user.is_authenticated %}
                 <ul class="navbar-nav me-auto">
                     {% if current_user.role not in ['agent', 'gardien', 'securite'] %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">{{ _('Dashboard') }}</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold text-primary" href="{{ url_for('permis.assistant') }}"><i class="fas fa-robot me-1"></i> NORO</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('badge.liste') }}">{{ _('Badges') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('permis.liste') }}">{{ _('Permis') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('badge.documents') }}">📂 {{ _('Documents') }}</a></li>
-                    {% if is_desktop %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('carte_chantier') }}">🗺️ Plan Interactif</a></li>
-                    {% endif %}
-                    {% endif %}
-                    {% if current_user.role in ['SINYLON FIAT', 'admin', 'agent', 'gardien', 'securite'] %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('badge.caisse') }}">📟 {{ _('Caisse NFC') }}</a></li>
-                    {% endif %}
-                    {% if current_user.is_admin or (current_user.username and current_user.username.lower() == 'nouri') %}
-                    <li class="nav-item"><a class="nav-link fw-bold text-info" href="{{ url_for('annuaire') }}">📖 Annuaire & Urgences</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold text-primary" href="{{ url_for('analytics') }}">📊 Analytics</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold text-warning" href="{{ url_for('habilitations') }}">🏗️ Habilitations</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold text-danger" href="{{ url_for('incidents') }}">📸 Incidents HSE</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard.index') }}">{{ _('Dashboard') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('daily_permits.daily_permits_hub') }}"><i class="fas fa-calendar-check text-primary me-1"></i> Permis du Jour</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('permits.list_permits') }}">{{ _('Permis') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('workers.annuaire') }}">📖 Annuaire</a></li>
                     {% endif %}
                     {% if current_user.is_admin %}
-                    <li class="nav-item"><a class="nav-link fw-bold text-warning" href="{{ url_for('badge.admin_dashboard') }}">👑 Admin Entreprise</a></li>
-                    <li class="nav-item"><a class="nav-link fw-bold" style="color: #10b981 !important;" href="{{ url_for('dashboard') }}">🏢 SINYLON FIAT - ENTREPRISES</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-info" href="{{ url_for('audit.view_audit_logs') }}">📋 Audit</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-warning" href="{{ url_for('backups.list_backups') }}">💾 Sauvegardes</a></li>
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav align-items-center">
@@ -376,7 +363,7 @@
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 16px;">
                             <li><a class="dropdown-item fw-medium py-2" href="#" data-bs-toggle="modal" data-bs-target="#userProfileModal"><i class="fas fa-user-cog text-primary me-2"></i>Mon Profil (Photo, Téléphone, Signature)</a></li>
                             {% if current_user.is_admin %}
-                            <li><a class="dropdown-item fw-medium py-2" href="{{ url_for('main.users_online') }}"><i class="fas fa-signal text-success me-2"></i>Comptes en Ligne (PC 💻 / Mobile 📱)</a></li>
+                            {# lien users_online supprimé — endpoint non disponible en V2.1 #}
                             {% endif %}
                             {% if not current_user.is_admin %}
                             <li><a class="dropdown-item fw-medium py-2" href="#" data-bs-toggle="modal" data-bs-target="#emailNotificationsModal"><i class="fas fa-bell text-warning me-2"></i>Email Notifications</a></li>
@@ -860,10 +847,10 @@
                 }
                 
                 let title = "Alerte Système";
-                let url = "{{ url_for('dashboard') }}";
+                let url = "{{ url_for('dashboard.index') }}";
                 
                 if (data.type === 'permis') {
-                    url = "{{ url_for('dashboard') }}";
+                    url = "{{ url_for('permits.list_permits') }}";
                     if (data.action === 'creation') title = "Nouveau Permis Soumis";
                     else if (data.action === 'approbation') title = "Permis Validé 🟢";
                     else if (data.action === 'refaire') title = "Permis à Corriger 🟠";
@@ -871,12 +858,12 @@
                     else if (data.action === 'bloque') title = "Permis Bloqué 🚫";
                     else if (data.action === 'debloque') title = "Permis Réactivé ✅";
                 } else if (data.type === 'badge') {
-                    url = "{{ url_for('badge.liste') }}";
+                    url = "{{ url_for('workers.annuaire') }}";
                     if (data.action === 'creation') title = "Nouveau Badge Demandé";
                     else if (data.action === 'bloque') title = "Badge Bloqué 🚫";
                     else if (data.action === 'debloque') title = "Badge Réactivé ✅";
                 } else if (data.type === 'entreprise') {
-                    url = "{{ url_for('dashboard') }}";
+                    url = "{{ url_for('dashboard.index') }}";
                     if (data.action === 'bloque') title = "Entreprise Bloquée ⛔";
                     else if (data.action === 'debloque') title = "Entreprise Débloquée ✅";
                 }
@@ -995,7 +982,7 @@
                     <h5 class="modal-title fw-bold"><i class="fas fa-user-cog me-2 text-primary"></i> Mon Profil & Paramètres (Photo, Téléphone, Signature)</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ url_for('auth.upload_profil_photo') }}" enctype="multipart/form-data">
+                <form method="POST" action="#" enctype="multipart/form-data" onsubmit="return false;">
                     <div class="modal-body p-4 text-start">
                         
                         <!-- Header Profil Avatar -->
@@ -1169,10 +1156,10 @@
 
     {% block scripts %}{% endblock %}
 
-    <!-- NORO AI Autofill Script -->
+    <!-- SINYLON AI Autofill Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const pendingData = localStorage.getItem('noro_pending_data');
+            const pendingData = localStorage.getItem('sinylon_pending_data');
             if (pendingData) {
                 try {
                     const data = JSON.parse(pendingData);
@@ -1202,79 +1189,24 @@
                     }
                     
                     if (filledCount > 0) {
-                        console.log(`NORO AI a pré-rempli ${filledCount} champs.`);
+                        console.log(`SINYLON AI a pré-rempli ${filledCount} champs.`);
                         // Optionnel: afficher un petit toast de confirmation
                     }
                     
                     // Nettoyer pour ne pas re-remplir à l'infini
-                    localStorage.removeItem('noro_pending_data');
+                    localStorage.removeItem('sinylon_pending_data');
                 } catch (e) {
-                    console.error("Erreur lors de l'auto-remplissage NORO AI:", e);
+                    console.error("Erreur lors de l'auto-remplissage SINYLON AI:", e);
                 }
             }
         });
     </script>
-    <!-- Modal 1-Clic Création Combinée Entreprise + Compte Utilisateur -->
-    {% if current_user.is_authenticated and current_user.is_admin %}
-    <div class="modal fade" id="createEnterpriseUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg text-dark" style="border-radius: 20px;">
-                <div class="modal-header bg-success text-white p-4" style="border-radius: 20px 20px 0 0;">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-building-circle-check me-2"></i> Création 1-Clic Entreprise & Accès</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" action="{{ url_for('main.creer_entreprise_combines') }}">
-                    <div class="modal-body p-4 text-start">
-                        <p class="text-muted small mb-3"><i class="fas fa-magic text-success me-1"></i> Crée instantanément l'Entreprise et son compte de connexion sans aucune double saisie.</p>
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Nom de l'Entreprise Sous-Traitante *</label>
-                            <input type="text" name="nom_entreprise" class="form-control fw-bold" placeholder="ex: COSIDER, SIMAN, FIAT" required>
-                        </div>
-
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label class="form-label fw-bold small">Nom Responsable</label>
-                                <input type="text" name="nom_responsable" class="form-control form-control-sm" placeholder="ex: Benali">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label fw-bold small">Prénom Responsable</label>
-                                <input type="text" name="prenom_responsable" class="form-control form-control-sm" placeholder="ex: Ahmed">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold"><i class="fas fa-envelope text-primary me-1"></i> Email de Connexion (Identifiant) *</label>
-                            <input type="email" name="email" class="form-control" placeholder="ex: cosider@noro.dz" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold"><i class="fab fa-whatsapp text-success me-1"></i> Numéros WhatsApp Multiples (DG, Chef, HSE 1, HSE 2)</label>
-                            <input type="text" name="telephones_whatsapp" class="form-control font-monospace" placeholder="ex: 0550112233 (DG), 0770445566 (HSE 1), 0661889900 (HSE 2)">
-                            <div class="form-text text-muted small"><i class="fas fa-info-circle me-1"></i> Séparer par des virgules. Les alertes seront expédiées à tous ces numéros en parallèle.</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Mot de Passe d'Accès</label>
-                            <input type="text" name="password" class="form-control font-monospace" placeholder="Laisser vide pour générer auto (ex: Cosider2026!)">
-                        </div>
-                    </div>
-                    <div class="modal-footer bg-light p-3" style="border-radius: 0 0 20px 20px;">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-success fw-bold px-4 shadow-sm"><i class="fas fa-check-circle me-1"></i> Créer & Générer Accès WhatsApp</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
     <!-- PWA Offline ServiceWorker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/static/sw.js')
-                    .then(reg => console.log('NORO PWA ServiceWorker registered:', reg.scope))
+                    .then(reg => console.log('SINYLON PWA ServiceWorker registered:', reg.scope))
                     .catch(err => console.log('ServiceWorker error:', err));
             });
         }

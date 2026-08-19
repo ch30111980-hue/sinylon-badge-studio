@@ -1,5 +1,5 @@
 // ╔══════════════════════════════════════════╗
-// ║    🌪️  MES NORO  — Chahrour Nouri       ║
+// ║    🌪️  SINYLON CSPS  — Chahrour Nouri       ║
 // ║       Tous droits réservés © 2026        ║
 // ╚══════════════════════════════════════════╝
 
@@ -434,7 +434,7 @@ function renderPermitList() {
         listEl.appendChild(item);
     });
 
-    // Mise à jour du compteur MES NORO
+    // Mise à jour du compteur SINYLON CSPS
     const countEl = document.getElementById('total-permits-count');
     if (countEl) countEl.innerText = Object.keys(allPermits).length;
 }

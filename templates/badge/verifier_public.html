@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vérification Badge — NORO Security</title>
+    <title>Vérification Badge — SINYLON Security</title>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -384,7 +384,7 @@
         <!-- Header -->
         <div class="brand-header">
             <div class="brand-logo">
-                <i class="fa-solid fa-shield-halved"></i> NORO<span>UNIFIED</span>
+                <i class="fa-solid fa-shield-halved"></i> SINYLON<span>UNIFIED</span>
             </div>
             <div class="verified-badge">
                 <i class="fa-solid fa-square-check me-1"></i> Certifié
@@ -466,7 +466,7 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-                <form method="POST" action="{{ url_for('badge.inspection_express', id=badge.id) }}">
+                <form method="POST" action="#" onsubmit="return false;">
                     <input type="hidden" name="type_inspection" value="conforme">
                     <button type="submit" style="width: 100%; background: #10b981; color: #fff; border: none; padding: 12px 6px; border-radius: 12px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
                         <i class="fa-solid fa-circle-check" style="font-size: 18px;"></i>
@@ -490,7 +490,7 @@
         <div id="modalAvertissement" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
             <div style="background: #1e293b; border: 1px solid #f59e0b; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; color: #fff;">
                 <h4 style="color: #f59e0b; font-weight: 800; margin-bottom: 10px;"><i class="fa-solid fa-triangle-exclamation me-1"></i> Avertissement HSE</h4>
-                <form method="POST" action="{{ url_for('badge.inspection_express', id=badge.id) }}">
+                <form method="POST" action="#" onsubmit="return false;">
                     <input type="hidden" name="type_inspection" value="avertissement">
                     <label style="font-size: 12px; font-weight: 600; color: #cbd5e1; display: block; margin-bottom: 6px;">Sélectionner le motif :</label>
                     <select name="motif" style="width: 100%; padding: 10px; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 10px; margin-bottom: 12px;">
@@ -511,7 +511,7 @@
         <div id="modalInfractionGrave" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
             <div style="background: #1e293b; border: 1px solid #ef4444; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; color: #fff;">
                 <h4 style="color: #ef4444; font-weight: 800; margin-bottom: 10px;"><i class="fa-solid fa-ban me-1"></i> Infraction Grave HSE</h4>
-                <form method="POST" action="{{ url_for('badge.inspection_express', id=badge.id) }}">
+                <form method="POST" action="#" onsubmit="return false;">
                     <input type="hidden" name="type_inspection" value="infraction_grave">
                     <label style="font-size: 12px; font-weight: 600; color: #cbd5e1; display: block; margin-bottom: 6px;">Motif de l'infraction :</label>
                     <select name="motif" style="width: 100%; padding: 10px; background: #0f172a; color: #fff; border: 1px solid #475569; border-radius: 10px; margin-bottom: 12px;">
@@ -806,14 +806,14 @@
                 <!-- Validation Actions -->
                 {% if (badge.statut == 'attente_provisoire' and current_user.role == 'admin') or (badge.statut == 'en_attente' and (current_user.role == 'admin' or current_user.role == 'SINYLON FIAT')) %}
                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <a href="{{ url_for('badge.valider_csps', id=badge.id) }}" style="display: block; width: 100%; padding: 12px; background: var(--accent-green); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);">
+                    <a href="#" data-disabled="true" style="display: block; width: 100%; padding: 12px; background: var(--accent-green); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);">
                         <i class="fa-solid fa-circle-check me-1"></i> Valider / Activer le Badge
                     </a>
                     <div style="display: flex; gap: 8px;">
-                        <a href="{{ url_for('badge.refaire_csps', id=badge.id) }}" style="flex: 1; padding: 10px; background: var(--accent-orange); color: #0b0f19; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                        <a href="#" data-disabled="true" style="flex: 1; padding: 10px; background: var(--accent-orange); color: #0b0f19; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
                             <i class="fa-solid fa-rotate me-1"></i> À Refaire
                         </a>
-                        <a href="{{ url_for('badge.refuser_csps', id=badge.id) }}" style="flex: 1; padding: 10px; background: var(--accent-red); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
+                        <a href="#" data-disabled="true" style="flex: 1; padding: 10px; background: var(--accent-red); color: #fff; text-align: center; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 13px;">
                             <i class="fa-solid fa-circle-xmark"></i> Refuser
                         </a>
                     </div>
@@ -825,7 +825,7 @@
                     <div style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 8px;">
                         <i class="fa-solid fa-lock me-1"></i> Contrôle du Blocage (HSE)
                     </div>
-                    <form action="{{ url_for('badge.bloquer', id=badge.id) }}" method="POST" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 14px;">
+                    <form action="#" onsubmit="return false;" method="POST" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 14px;">
                         <div style="display: flex; gap: 16px; margin-bottom: 10px;">
                             <label style="color: var(--accent-green); font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                                 <input type="radio" name="statut_blocage" value="actif" {% if not badge.is_blocked %}checked{% endif %} style="accent-color: var(--accent-green);" onchange="document.getElementById('b_v_motif_field').style.display='none';"> 

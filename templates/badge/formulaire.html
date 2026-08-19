@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Nouveau Badge — NORO BADGE 5.0{% endblock %}
+{% block title %}Nouveau Badge — SINYLON BADGE STUDIO PRO{% endblock %}
 
 {% block content %}
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
 
-    /* === NORO BADGE 5.0 DESIGN SYSTEM === */
+    /* === SINYLON BADGE STUDIO PRO DESIGN SYSTEM === */
     .nb5-wrapper {
         background: #0f1117;
         border-radius: 14px;
@@ -336,10 +336,10 @@
 
 <!-- Nav -->
 <div class="d-flex align-items-center gap-2 mb-3">
-    <a href="{{ url_for('dashboard') }}" class="nb5-back-btn">
+    <a href="{{ url_for('dashboard.index') }}" class="nb5-back-btn">
         <i class="fas fa-arrow-left me-1"></i> Tableau de Bord
     </a>
-    <a href="{{ url_for('badge.liste') }}" class="nb5-back-btn">
+    <a href="#" data-disabled="true" class="nb5-back-btn">
         <i class="fas fa-id-card me-1"></i> Liste des Badges
     </a>
 </div>
@@ -350,8 +350,8 @@
     <div class="nb5-header">
         <div class="logo">FIAT</div>
         <div class="title" style="display: inline-flex; align-items: center; gap: 8px;">
-            <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 24px; width: auto; vertical-align: middle;">
-            <span>NORO BADGE 5.0 — NOUVELLE DEMANDE</span>
+            <img src="{{ url_for('static', filename='img/img/logo.png') }}" alt="Sinylon" style="height: 24px; width: auto; vertical-align: middle;">
+            <span>SINYLON BADGE STUDIO — NOUVEAU BADGE</span>
         </div>
         <div style="font-size:11px; color:#5a6080; font-family:'Oswald',sans-serif; letter-spacing:2px;">
             {{ current_user.full_name() }}
@@ -371,10 +371,10 @@
             <div class="nb5-form-body">
                 <form method="POST" enctype="multipart/form-data" id="badgeForm">
 
-                    <!-- Scanner intelligent Noro AI -->
+                    <!-- Scanner intelligent SINYLON AI -->
                     <div class="nb5-sec" style="background: rgba(59, 130, 246, 0.05); border: 2px dashed #3b82f6; border-radius: 10px; padding: 15px; margin-bottom: 20px; cursor: pointer; text-align: center;" id="ai-scan-zone">
                         <div style="font-family: 'Oswald', sans-serif; font-size: 13px; color: #3b82f6; font-weight: bold; margin-bottom: 5px;">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> REMPLIR VIA NORO AI
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> REMPLIR VIA SINYLON AI
                         </div>
                         <div style="font-size: 11px; color: #8a94a6; line-height: 1.4;">
                             Déposez la CNI, le Passeport ou la carte CNAS du travailleur ici pour pré-remplir le formulaire.
@@ -401,7 +401,7 @@
                         </div>
                         <div class="nb5-field">
                             <label>Numéro de Badge *</label>
-                            <input type="text" name="numero_badge" placeholder="NORO-XXXX" required>
+                            <input type="text" name="numero_badge" placeholder="SIN-XXXX" required>
                         </div>
                         <div class="nb5-field">
                             <label>NFC UID (Carte physique)</label>
@@ -728,7 +728,7 @@
     // Set today's date as default emission
     document.querySelector('[name="date_emission"]').valueAsDate = new Date();
 
-    // === Noro AI Badge Auto-fill ===
+    // === SINYLON AI Badge Auto-fill ===
     const aiScanZone = document.getElementById('ai-scan-zone');
     const aiFileInput = document.getElementById('ai-file-input');
 
@@ -766,14 +766,14 @@
     async function handleAiBadgeAnalysis(file) {
         let key = localStorage.getItem('gemini_api_key') || '';
         if (!key) {
-            key = prompt("Veuillez saisir votre clé API Gemini pour utiliser le remplissage intelligent Noro AI :");
+            key = prompt("Veuillez saisir votre clé API Gemini pour utiliser le remplissage intelligent SINYLON AI :");
             if (!key) return;
             localStorage.setItem('gemini_api_key', key);
         }
 
         const scanTextEl = aiScanZone.querySelector('div:nth-child(2)');
         const originalText = scanTextEl.textContent;
-        scanTextEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours par Noro AI...';
+        scanTextEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours par SINYLON AI...';
         aiScanZone.style.opacity = '0.7';
 
         const reader = new FileReader();

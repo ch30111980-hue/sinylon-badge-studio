@@ -182,7 +182,7 @@
                             <p class="text-white-50 x-small mb-3" style="font-size: 0.78rem; line-height: 1.4;">{{ f.description }}</p>
                         </div>
                         <div>
-                            <a href="{{ url_for('badge.download_fiche_epi', fiche_id=key) }}" class="btn btn-sm btn-outline-light w-100 fw-bold d-flex align-items-center justify-content-center gap-2" style="border-radius: 8px;">
+                            <a href="#" data-disabled="true" class="btn btn-sm btn-outline-light w-100 fw-bold d-flex align-items-center justify-content-center gap-2" style="border-radius: 8px;">
                                 <i class="fas fa-download text-success"></i> Télécharger Fiche EPI
                             </a>
                         </div>
@@ -277,14 +277,14 @@
                                                 <td class="text-end">
                                                     <div class="d-inline-flex gap-1">
                                                         {% if not doc.is_approved %}
-                                                        <a href="{{ url_for('badge.approve_document', doc_id=doc.id) }}" class="btn btn-outline-success btn-action" title="Approuver">
+                                                        <a href="#" data-disabled="true" class="btn btn-outline-success btn-action" title="Approuver">
                                                             <i class="fas fa-check"></i>
                                                         </a>
                                                         {% endif %}
-                                                        <a href="{{ url_for('badge.download_document', doc_type='entreprise', doc_id=doc.id) }}" class="btn btn-outline-primary btn-action" title="Télécharger">
+                                                        <a href="#" data-disabled="true" class="btn btn-outline-primary btn-action" title="Télécharger">
                                                             <i class="fas fa-download"></i>
                                                         </a>
-                                                        <form action="{{ url_for('badge.delete_document', doc_type='entreprise', doc_id=doc.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous supprimer ce document ?');">
+                                                        <form action="#" onsubmit="return false;" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous supprimer ce document ?');">
                                                             <button type="submit" class="btn btn-outline-danger btn-action" title="Supprimer">
                                                                 <i class="fas fa-trash-alt"></i>
                                                             </button>
@@ -352,10 +352,10 @@
                                                                 <td class="text-muted small" style="font-size: 11px;">{{ doc.uploaded_at.strftime('%d/%m/%Y %H:%M') }}</td>
                                                                 <td class="text-end">
                                                                     <div class="d-inline-flex gap-1">
-                                                                        <a href="{{ url_for('badge.download_document', doc_type='badge', doc_id=doc.id) }}" class="btn btn-outline-primary btn-action py-0 px-2" style="font-size: 10px;" title="Télécharger">
+                                                                        <a href="#" data-disabled="true" class="btn btn-outline-primary btn-action py-0 px-2" style="font-size: 10px;" title="Télécharger">
                                                                             <i class="fas fa-download"></i>
                                                                         </a>
-                                                                        <form action="{{ url_for('badge.delete_document', doc_type='badge', doc_id=doc.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous supprimer ce document ?');">
+                                                                        <form action="#" onsubmit="return false;" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous supprimer ce document ?');">
                                                                             <button type="submit" class="btn btn-outline-danger btn-action py-0 px-2" style="font-size: 10px;" title="Supprimer">
                                                                                 <i class="fas fa-trash-alt"></i>
                                                                             </button>
@@ -410,7 +410,7 @@
                 <div class="card-body">
                     <p class="text-muted small">Téléversez ici les documents généraux requis par FIAT / SINYLON FIAT (ex: contrats, assurances, plans de sécurité).</p>
                     
-                    <form action="{{ url_for('badge.upload_entreprise') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                    <form action="#" onsubmit="return false;" method="POST" enctype="multipart/form-data" class="mb-4">
                         <div class="mb-3">
                             <label class="form-label fw-semibold small">Type de document</label>
                             <select class="form-select" name="nom" required>
@@ -457,10 +457,10 @@
                                     <td class="text-muted small">{{ doc.uploaded_at.strftime('%d/%m/%Y %H:%M') }}</td>
                                     <td class="text-end">
                                         <div class="d-inline-flex gap-1">
-                                            <a href="{{ url_for('badge.download_document', doc_type='entreprise', doc_id=doc.id) }}" class="btn btn-outline-primary btn-action" title="Télécharger">
+                                            <a href="#" data-disabled="true" class="btn btn-outline-primary btn-action" title="Télécharger">
                                                 <i class="fas fa-download"></i>
                                             </a>
-                                            <form action="{{ url_for('badge.delete_document', doc_type='entreprise', doc_id=doc.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous supprimer ce document ?');">
+                                            <form action="#" onsubmit="return false;" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous supprimer ce document ?');">
                                                 <button type="submit" class="btn btn-outline-danger btn-action" title="Supprimer">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
@@ -538,10 +538,10 @@
                                                     <td class="text-muted small" style="font-size: 11px;">{{ doc.uploaded_at.strftime('%d/%m/%Y %H:%M') }}</td>
                                                     <td class="text-end">
                                                         <div class="d-inline-flex gap-1">
-                                                            <a href="{{ url_for('badge.download_document', doc_type='badge', doc_id=doc.id) }}" class="btn btn-outline-primary btn-action py-0 px-2" style="font-size: 10px;" title="Télécharger">
+                                                            <a href="#" data-disabled="true" class="btn btn-outline-primary btn-action py-0 px-2" style="font-size: 10px;" title="Télécharger">
                                                                 <i class="fas fa-download"></i>
                                                             </a>
-                                                            <form action="{{ url_for('badge.delete_document', doc_type='badge', doc_id=doc.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous supprimer ce document ?');">
+                                                            <form action="#" onsubmit="return false;" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous supprimer ce document ?');">
                                                                 <button type="submit" class="btn btn-outline-danger btn-action py-0 px-2" style="font-size: 10px;" title="Supprimer">
                                                                     <i class="fas fa-trash-alt"></i>
                                                                 </button>
@@ -583,7 +583,7 @@
         <div class="modal fade" id="uploadEntModal-{{ ent.id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="border-radius: 16px;">
-                    <form action="{{ url_for('badge.upload_entreprise') }}" method="POST" enctype="multipart/form-data">
+                    <form action="#" onsubmit="return false;" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="entreprise_id" value="{{ ent.id }}">
                         <div class="modal-header">
                             <h5 class="modal-title fw-bold"><i class="fas fa-file-upload text-warning me-2"></i> Déposer un document général ({{ ent.nom }})</h5>
@@ -621,7 +621,7 @@
         <div class="modal fade" id="uploadBadgeModal-{{ b.id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="border-radius: 16px;">
-                    <form action="{{ url_for('badge.upload_badge') }}" method="POST" enctype="multipart/form-data">
+                    <form action="#" onsubmit="return false;" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="badge_id" value="{{ b.id }}">
                         <div class="modal-header">
                             <h5 class="modal-title fw-bold"><i class="fas fa-file-upload text-primary me-2"></i> Ajouter au dossier de {{ b.prenom }} {{ b.nom }}</h5>
@@ -662,7 +662,7 @@
     <div class="modal fade" id="uploadBadgeModalSub-{{ b.id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="border-radius: 16px;">
-                <form action="{{ url_for('badge.upload_badge') }}" method="POST" enctype="multipart/form-data">
+                <form action="#" onsubmit="return false;" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="badge_id" value="{{ b.id }}">
                     <div class="modal-header">
                         <h5 class="modal-title fw-bold"><i class="fas fa-file-upload text-primary me-2"></i> Ajouter au dossier de {{ b.prenom }} {{ b.nom }}</h5>

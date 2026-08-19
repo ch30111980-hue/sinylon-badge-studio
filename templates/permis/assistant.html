@@ -9,7 +9,7 @@
 </head>
 <body>
     <!-- Bouton de retour -->
-    <a href="{{ url_for('dashboard') }}" style="position: fixed; top: 15px; right: 20px; z-index: 99999; text-decoration: none;" class="btn-3d btn-primary-3d">
+    <a href="{{ url_for('dashboard.index') }}" style="position: fixed; top: 15px; right: 20px; z-index: 99999; text-decoration: none;" class="btn-3d btn-primary-3d">
         <i class="fa-solid fa-arrow-left"></i> Retour au Dashboard
     </a>
     
@@ -54,7 +54,7 @@
     </style>
     <div class="ai-center-container">
         <div class="ai-header">
-            <h1><i class="fa-solid fa-robot"></i> NORO AI</h1>
+            <h1><i class="fa-solid fa-robot"></i> SINYLON AI</h1>
             <p>Assistant Intelligent pour Permis et Autorisations</p>
         </div>
 
@@ -79,12 +79,12 @@
             </div>
         </div>
 
-        <!-- Chat de l'NORO -->
+        <!-- Chat de l'SINYLON -->
         <div class="chat-box">
-            <h4><i class="fa-solid fa-comments"></i> Discussion NORO</h4>
+            <h4><i class="fa-solid fa-comments"></i> Discussion SINYLON</h4>
             <div id="chat-messages" class="chat-messages">
                 <div class="message system" style="background:#e3f2fd; padding:10px; border-radius:8px; color:#0d47a1; font-size:14px; margin-bottom:10px;">
-                    <i class="fa-solid fa-info-circle"></i> Je suis votre assistant NORO. Donnez-moi vos consignes (ex: "Remplis un permis de travail à chaud pour SEGULA demain à 9h...") ou déposez un document. Je préparerai le formulaire et vous y redirigerai automatiquement !
+                    <i class="fa-solid fa-info-circle"></i> Je suis votre assistant SINYLON. Donnez-moi vos consignes (ex: "Remplis un permis de travail à chaud pour SEGULA demain à 9h...") ou déposez un document. Je préparerai le formulaire et vous y redirigerai automatiquement !
                 </div>
             </div>
             <div class="chat-input-area">

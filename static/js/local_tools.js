@@ -1108,7 +1108,7 @@ async function sendChatMessage() {
                 
             } else if (updates.action_type === 'single_permit' || updates.permit_type) {
                 // Sauvegarder les données
-                localStorage.setItem('noro_pending_data', JSON.stringify(updates));
+                localStorage.setItem('sinylon_pending_data', JSON.stringify(updates));
                 appendChatMessage(updates.ai_response || "Redirection vers le formulaire...", 'assistant');
                 setTimeout(() => {
                     window.location.href = `/permis/formulaire_papier/${updates.permit_type || 'securite_generale'}`;
@@ -1356,7 +1356,7 @@ async function handleMultipleFilesAnalysis(files) {
         const todayStr = new Date().toISOString().split('T')[0];
         p['date-main'] = todayStr;
         
-        localStorage.setItem('noro_pending_data', JSON.stringify(p));
+        localStorage.setItem('sinylon_pending_data', JSON.stringify(p));
         appendChatMessage(`Permis de travail détecté (${p.permit_type}). Redirection avec les données copiées et date mise à jour au ${todayStr}...`, 'assistant');
         setTimeout(() => {
             window.location.href = `/permis/formulaire_papier/${p.permit_type || 'securite_generale'}`;

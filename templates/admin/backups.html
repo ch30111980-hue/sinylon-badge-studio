@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Sauvegardes & Restauration - SINYLON Badge Studio Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">💾 Sauvegardes & Restauration Intégrale</h2>
+            <p class="text-muted mb-0">Gestion des snapshots atomiques (Base de données SQLite + Photos + Documents PDF).</p>
+        </div>
+        <div class="d-flex gap-2">
+            <form action="{{ url_for('backups.create_backup_now') }}" method="POST" class="d-inline">
+                <input type="hidden" name="backup_type" value="MANUAL">
+                <button type="submit" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-save me-1"></i> Créer Sauvegarde Maintenant
+                </button>
+            </form>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Date de Création</th>
+                            <th>Fichier Archive</th>
+                            <th>Type</th>
+                            <th>Taille</th>
+                            <th>Intervenants</th>
+                            <th>Badges</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in backups %}
+                        <tr>
+                            <td class="ps-4 text-nowrap text-muted font-monospace small">
+                                {{ b.created_at }}
+                            </td>
+                            <td>
+                                <i class="fas fa-file-archive text-warning me-2"></i>
+                                <span class="fw-bold font-monospace">{{ b.filename }}</span>
+                            </td>
+                            <td>
+                                <span class="badge {% if b.backup_type == 'DAILY' %}bg-info{% elif b.backup_type == 'WEEKLY' %}bg-success{% else %}bg-primary{% endif %}">
+                                    {{ b.backup_type }}
+                                </span>
+                            </td>
+                            <td class="font-monospace small">
+                                {{ (b.size_bytes / (1024 * 1024)) | round(2) }} Mo
+                            </td>
+                            <td>{{ b.workers_count }}</td>
+                            <td>{{ b.badges_count }}</td>
+                            <td class="text-end pe-4">
+                                <a href="{{ url_for('backups.download_backup', filename=b.filename) }}" class="btn btn-sm btn-outline-primary me-1" title="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <form action="{{ url_for('backups.restore_backup_action') }}" method="POST" class="d-inline" onsubmit="return confirm('Attention : Cette action va restaurer les données à partir de cette archive. Confirmer ?');">
+                                    <input type="hidden" name="filename" value="{{ b.filename }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Restaurer">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-database fa-2x mb-2 text-secondary"></i>
+                                <p class="mb-0">Aucune sauvegarde enregistrée pour le moment.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

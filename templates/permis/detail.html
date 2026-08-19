@@ -32,7 +32,7 @@
                             <i class="fas fa-file-pdf me-2 text-danger"></i> ✍️ Signature, Enregistrement & Validation PDF
                         </h5>
                         
-                        <form action="{{ url_for('permis.approuver_signer', id=permis.id) }}" method="POST" id="sig-form-admin" onsubmit="return validateAdminSignature(event)">
+                        <form action="#" onsubmit="return false;" method="POST" id="sig-form-admin" onsubmit="return validateAdminSignature(event)">
                             <input type="hidden" name="is_papier" value="false">
                             <input type="hidden" name="signature_data" id="admin_signature_data">
 
@@ -101,10 +101,10 @@
                     </div>
                     <div class="card-body bg-light">
                         <div class="d-flex gap-2 flex-wrap justify-content-center">
-                            <a href="{{ url_for('permis.refaire', id=permis.id) }}" class="btn btn-warning btn-3d px-4">
+                            <a href="#" data-disabled="true" class="btn btn-warning btn-3d px-4">
                                 <i class="fas fa-redo me-2"></i> À Refaire
                             </a>
-                            <a href="{{ url_for('permis.revoquer', id=permis.id) }}" class="btn btn-danger btn-3d px-4" onclick="return confirm('Êtes-vous sûr de vouloir révoquer/annuler ce permis ?');">
+                            <a href="#" data-disabled="true" class="btn btn-danger btn-3d px-4" onclick="return confirm('Êtes-vous sûr de vouloir révoquer/annuler ce permis ?');">
                                 <i class="fas fa-ban me-2"></i> Annuler / Révoquer
                             </a>
                         </div>
@@ -112,7 +112,7 @@
                         <hr class="mt-4 mb-4">
                         
                         <h6 class="text-danger fw-bold"><i class="fas fa-lock me-1"></i> Blocage Sécurité (Désactivation Temporaire)</h6>
-                        <form action="{{ url_for('permis.bloquer', id=permis.id) }}" method="POST" class="p-3 mt-3 border border-danger rounded" style="background-color: #fff5f5;">
+                        <form action="#" onsubmit="return false;" method="POST" class="p-3 mt-3 border border-danger rounded" style="background-color: #fff5f5;">
                             <div style="display:flex; gap:20px; margin-bottom:15px;">
                                 <label style="color:#10b981; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px;">
                                     <input type="radio" name="statut_blocage" id="p_actif" value="actif" {% if not permis.is_blocked %}checked{% endif %} style="accent-color:#10b981; width:16px; height:16px;" onchange="document.getElementById('p_motif_field').style.display='none';"> 
@@ -281,7 +281,7 @@
 
 
         <div class="text-center mt-4 mb-5 no-print">
-            <a href="{{ url_for('permis.liste') }}" class="btn btn-secondary shadow-sm px-4"><i class="fas fa-arrow-left me-2"></i> {{ _('Retour à la liste') }}</a>
+            <a href="#" data-disabled="true" class="btn btn-secondary shadow-sm px-4"><i class="fas fa-arrow-left me-2"></i> {{ _('Retour à la liste') }}</a>
         </div>
     </div>
 </div>

@@ -21,7 +21,7 @@
                 <p class="mb-0 text-white-50">Vue globale de tous les permis et badges</p>
             </div>
             <div class="text-end">
-                <a href="{{ url_for('permis.export_csv') }}" class="btn btn-outline-light btn-sm"><i class="fas fa-file-excel me-1"></i> Export Global</a>
+                <a href="#" data-disabled="true" class="btn btn-outline-light btn-sm"><i class="fas fa-file-excel me-1"></i> Export Global</a>
             </div>
         </div>
     </div>
@@ -29,7 +29,7 @@
 
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-        <div class="card shadow-sm border-0 bg-white" style="cursor: pointer;" onclick="window.location.href='{{ url_for('dashboard') }}';" title="Voir le tableau de bord SINYLON FIAT">
+        <div class="card shadow-sm border-0 bg-white" style="cursor: pointer;" onclick="window.location.href='{{ url_for('dashboard.index') }}';" title="Voir le tableau de bord SINYLON FIAT">
             <div class="card-body">
                 <h6 class="text-muted text-uppercase mb-2 text-primary">Badges en Attente</h6>
                 <h2 id="admin-badges-en-attente" class="mb-0 text-primary">{{ badges_en_attente }}</h2>
@@ -150,11 +150,11 @@
                             <span class="badge bg-secondary">{{ ent_nom }}</span>
                             {% if ent_nom != 'N/A' %}
                                 {% if ent_nom in blocked_entreprises %}
-                                <a href="{{ url_for('permis.bloquer_entreprise', nom=ent_nom) }}" class="badge bg-success text-white text-decoration-none ms-1 px-2 py-1" style="font-size: 0.75rem;" title="Débloquer l'entreprise en ligne">
+                                <a href="#" data-disabled="true" class="badge bg-success text-white text-decoration-none ms-1 px-2 py-1" style="font-size: 0.75rem;" title="Débloquer l'entreprise en ligne">
                                     <i class="fas fa-unlock me-1"></i> Débloquer
                                 </a>
                                 {% else %}
-                                <a href="{{ url_for('permis.bloquer_entreprise', nom=ent_nom) }}" class="badge bg-danger text-white text-decoration-none ms-1 px-2 py-1" style="font-size: 0.75rem;" title="Bloquer l'entreprise suite à infraction">
+                                <a href="#" data-disabled="true" class="badge bg-danger text-white text-decoration-none ms-1 px-2 py-1" style="font-size: 0.75rem;" title="Bloquer l'entreprise suite à infraction">
                                     <i class="fas fa-lock me-1"></i> Bloquer l'Entreprise
                                 </a>
                                 {% endif %}
@@ -193,21 +193,21 @@
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ url_for('permis.detail', id=p.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-outline-primary" title="Voir"><i class="fas fa-eye"></i> Voir</a>
+                                <a href="#" data-disabled="true" class="btn btn-outline-primary" title="Voir"><i class="fas fa-eye"></i> Voir</a>
                                 
                                 {% if (p.statut in ['en_attente', 'attente_FIAT'] and (current_user.role == 'admin' or (current_user.entreprise and current_user.entreprise.upper() == 'FIAT'))) or (p.statut == 'attente_SINYLON FIAT' and (current_user.role == 'admin' or current_user.role == 'SINYLON FIAT')) %}
-                                <a href="{{ url_for('permis.approuver', id=p.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-outline-success" title="Valider le permis"><i class="fas fa-check"></i> Valider</a>
+                                <a href="#" data-disabled="true" class="btn btn-outline-success" title="Valider le permis"><i class="fas fa-check"></i> Valider</a>
                                 {% endif %}
-                                <a href="{{ url_for('permis.refaire', id=p.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-outline-warning" title="Marquer à Corriger / Refaire"><i class="fas fa-redo-alt"></i> À Refaire</a>
+                                <a href="#" data-disabled="true" class="btn btn-outline-warning" title="Marquer à Corriger / Refaire"><i class="fas fa-redo-alt"></i> À Refaire</a>
                                 
                                 {% if p.is_blocked %}
-                                <a href="{{ url_for('permis.bloquer', id=p.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-outline-success" title="Débloquer le permis"><i class="fas fa-unlock"></i> Débloquer</a>
+                                <a href="#" data-disabled="true" class="btn btn-outline-success" title="Débloquer le permis"><i class="fas fa-unlock"></i> Débloquer</a>
                                 {% else %}
                                 <a href="#" class="btn btn-outline-danger" title="Bloquer le permis" onclick="togglePermitBlock({{ p.id }}, {{ 'true' if is_papier else 'false' }}); return false;"><i class="fas fa-lock"></i> Bloquer</a>
                                 {% endif %}
                                 
-                                <a href="{{ url_for('permis.revoquer', id=p.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-outline-danger" title="Révoquer / Bloquer pour infraction"><i class="fas fa-shield-alt"></i> Révoquer</a>
-                                <form action="{{ url_for('permis.supprimer', id=p.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous vraiment supprimer ce permis ?');" style="margin: 0; padding: 0;">
+                                <a href="#" data-disabled="true" class="btn btn-outline-danger" title="Révoquer / Bloquer pour infraction"><i class="fas fa-shield-alt"></i> Révoquer</a>
+                                <form action="#" onsubmit="return false;" method="POST" class="d-inline" onsubmit="return confirm('Voulez-vous vraiment supprimer ce permis ?');" style="margin: 0; padding: 0;">
                                     <button type="submit" class="btn btn-outline-danger" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" title="Supprimer définitivement"><i class="fas fa-trash"></i> Supprimer</button>
                                 </form>
                             </div>

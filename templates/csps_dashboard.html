@@ -35,16 +35,16 @@
             </div>
         </div>
         <div class="d-flex gap-2 flex-wrap">
-            <a href="{{ url_for('main.rapport_hebdo_SINYLON FIAT_pdf') }}" target="_blank" class="btn btn-sm btn-light fw-bold px-3 text-dark shadow-sm" style="border-radius:20px;">
+            <a href="#" data-disabled="true" target="_blank" class="btn btn-sm btn-light fw-bold px-3 text-dark shadow-sm" style="border-radius:20px;">
                 <i class="fas fa-file-pdf text-danger me-1"></i> Rapport Hebdo FIAT (PDF)
             </a>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-light px-3" style="border-radius:20px;">
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-sm btn-outline-light px-3" style="border-radius:20px;">
                 <i class="fas fa-arrow-left me-1"></i> Retour
             </a>
-            <a href="{{ url_for('main.test_whatsapp') }}" class="btn btn-sm btn-success fw-bold px-3" style="border-radius:20px;">
+            <a href="#" data-disabled="true" class="btn btn-sm btn-success fw-bold px-3" style="border-radius:20px;">
                 <i class="fab fa-whatsapp me-1"></i> Testeur WhatsApp
             </a>
-            <a href="{{ url_for('badge.admin_dashboard') }}" class="btn btn-sm px-3 text-dark fw-bold" style="background:#fbbf24; border-radius:20px; border:none;">
+            <a href="#" data-disabled="true" class="btn btn-sm px-3 text-dark fw-bold" style="background:#fbbf24; border-radius:20px; border:none;">
                 <i class="fas fa-id-badge me-1"></i> Admin Badges
             </a>
         </div>
@@ -65,17 +65,17 @@
                 </div>
                 <div class="d-flex align-items-center gap-1 flex-wrap">
                     {% if stat.b_attente or stat.p_attente %}
-                    <a href="{{ url_for('main.valider_lot_SINYLON FIAT_entreprise', id=stat.entreprise.id) }}" class="btn btn-sm btn-success fw-bold py-1 px-2.5 shadow-sm" style="border-radius: 8px; font-size: 0.78rem;" title="Valider tous les permis et badges conformes">
+                    <a href="#" data-disabled="true" class="btn btn-sm btn-success fw-bold py-1 px-2.5 shadow-sm" style="border-radius: 8px; font-size: 0.78rem;" title="Valider tous les permis et badges conformes">
                         <i class="fas fa-check-double me-1"></i> Valider Lot ({{ stat.b_attente|length + stat.p_attente|length }})
                     </a>
                     {% endif %}
-                    <a href="{{ url_for('main.envoyer_relance_expiration_whatsapp', entreprise_id=stat.entreprise.id) }}" class="btn btn-sm btn-outline-warning text-dark fw-bold py-1 px-2" style="border-radius: 8px; font-size: 0.78rem;" title="Relancer documents expirant sous 7j par WhatsApp">
+                    <a href="#" data-disabled="true" class="btn btn-sm btn-outline-warning text-dark fw-bold py-1 px-2" style="border-radius: 8px; font-size: 0.78rem;" title="Relancer documents expirant sous 7j par WhatsApp">
                         <i class="fas fa-clock-rotate-left me-1"></i> Relancer Expirations
                     </a>
                     <a href="{{ stat.wa_link }}" target="_blank" class="btn btn-sm btn-outline-success fw-bold py-1 px-2" style="border-radius: 8px; font-size: 0.78rem;" title="Contacter par WhatsApp">
                         <i class="fab fa-whatsapp me-1"></i> WhatsApp
                     </a>
-                    <a href="{{ url_for('permis.bloquer_entreprise', nom=stat.entreprise.nom) }}" class="btn btn-sm {% if stat.entreprise.is_blocked %}btn-success{% else %}btn-outline-danger{% endif %} fw-bold py-1 px-2" style="border-radius: 8px; font-size: 0.78rem;">
+                    <a href="#" data-disabled="true" class="btn btn-sm {% if stat.entreprise.is_blocked %}btn-success{% else %}btn-outline-danger{% endif %} fw-bold py-1 px-2" style="border-radius: 8px; font-size: 0.78rem;">
                         <i class="fas fa-ban me-1"></i> {% if stat.entreprise.is_blocked %}Débloquer{% else %}Bloquer{% endif %}
                     </a>
                 </div>
@@ -109,7 +109,7 @@
                                 <div class="fw-bold"><span class="badge bg-danger">BADGE</span> {{ bb.numero_badge }} - {{ bb.nom }} {{ bb.prenom }}</div>
                                 <span class="text-muted small"><i class="fas fa-info-circle me-1"></i>{{ bb.motif_blocage or 'Infraction de sécurité' }}</span>
                             </div>
-                            <a href="{{ url_for('badge.admin_dashboard') }}" class="btn btn-sm btn-outline-danger" title="Aller dans la gestion de badges">Gérer</a>
+                            <a href="#" data-disabled="true" class="btn btn-sm btn-outline-danger" title="Aller dans la gestion de badges">Gérer</a>
                         </li>
                         {% endfor %}
                         
@@ -120,7 +120,7 @@
                                 <span class="text-muted small"><i class="fas fa-info-circle me-1"></i>{{ pb.motif_blocage or 'Infraction de sécurité' }}</span>
                             </div>
                             {% set is_pb_pap = 'true' if pb.type_formulaire is defined else 'false' %}
-                            <a href="{{ url_for('permis.detail', id=pb.id, is_papier=is_pb_pap) }}" class="btn btn-sm btn-outline-danger" title="Voir le permis">Gérer</a>
+                            <a href="#" data-disabled="true" class="btn btn-sm btn-outline-danger" title="Voir le permis">Gérer</a>
                         </li>
                         {% endfor %}
                     </ul>
@@ -141,9 +141,9 @@
                                     {{ b.nom }} {{ b.prenom }} ({{ b.fonction }})
                                 </div>
                                 <div class="btn-group">
-                                    <a href="{{ url_for('badge.valider_csps', id=b.id) }}" class="btn btn-sm btn-success py-0 px-2" title="Valider et Notifier"><i class="fas fa-check"></i></a>
-                                    <a href="{{ url_for('badge.refaire_csps', id=b.id) }}" class="btn btn-sm btn-warning py-0 px-2" title="À refaire (Incomplet)"><i class="fas fa-redo"></i></a>
-                                    <a href="{{ url_for('badge.refuser_csps', id=b.id) }}" class="btn btn-sm btn-danger py-0 px-2" title="Refuser définitivement"><i class="fas fa-times"></i></a>
+                                    <a href="#" data-disabled="true" class="btn btn-sm btn-success py-0 px-2" title="Valider et Notifier"><i class="fas fa-check"></i></a>
+                                    <a href="#" data-disabled="true" class="btn btn-sm btn-warning py-0 px-2" title="À refaire (Incomplet)"><i class="fas fa-redo"></i></a>
+                                    <a href="#" data-disabled="true" class="btn btn-sm btn-danger py-0 px-2" title="Refuser définitivement"><i class="fas fa-times"></i></a>
                                 </div>
                             </div>
                         </li>
@@ -155,9 +155,9 @@
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <div class="fw-bold"><span class="badge bg-warning text-dark">PERMIS</span> Zone : {{ p.zone_travail or p.type_formulaire }}</div>
                                 <div class="btn-group">
-                                    <a href="{{ url_for('permis.approuver', id=p.id) }}?is_papier={{is_p}}" class="btn btn-sm btn-success py-0 px-2" title="Valider le Permis"><i class="fas fa-check"></i></a>
-                                    <a href="{{ url_for('permis.refaire', id=p.id) }}?is_papier={{is_p}}" class="btn btn-sm btn-warning py-0 px-2" title="À Refaire"><i class="fas fa-redo"></i></a>
-                                    <a href="{{ url_for('permis.revoquer', id=p.id) }}?is_papier={{is_p}}" class="btn btn-sm btn-danger py-0 px-2" title="Refuser"><i class="fas fa-times"></i></a>
+                                    <a href="#" data-disabled="true" class="btn btn-sm btn-success py-0 px-2" title="Valider le Permis"><i class="fas fa-check"></i></a>
+                                    <a href="#" data-disabled="true" class="btn btn-sm btn-warning py-0 px-2" title="À Refaire"><i class="fas fa-redo"></i></a>
+                                    <a href="#" data-disabled="true" class="btn btn-sm btn-danger py-0 px-2" title="Refuser"><i class="fas fa-times"></i></a>
                                 </div>
                             </div>
                         </li>

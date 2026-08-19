@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un Permis de Travail - SINYLON Pro{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">📝 Nouveau Permis de Travail</h2>
+            <p class="text-muted mb-0">Demande d'autorisation de travaux avec contrôle d'habilitation des intervenants.</p>
+        </div>
+        <a href="{{ url_for('permits.list_permits') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Annuler
+        </a>
+    </div>
+
+    {% if weather.rules.hauteur.statut == 'INTERDIT' %}
+    <div class="alert alert-warning mb-4">
+        <i class="fas fa-exclamation-circle me-1"></i> <strong>Note Météo :</strong> Les travaux en hauteur et nacelles sont actuellement restreints en raison du vent ({{ weather.vent_kmh }} km/h).
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        <div class="card shadow-sm border-0 rounded-3 mb-4">
+            <div class="card-header bg-white fw-bold">1. Informations Générales</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold">Titre des Travaux</label>
+                        <input type="text" name="titre" class="form-control" placeholder="ex: Montage structure métallique bâtiment B" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Type de Permis</label>
+                        <select name="type_permis" class="form-select" required>
+                            <option value="HAUTEUR">Travail en Hauteur</option>
+                            <option value="FEU">Permis de Feu / Soudure</option>
+                            <option value="ELEC">Travaux Électriques</option>
+                            <option value="NACELLE">Opération Nacelle PEMP</option>
+                            <option value="CONFINE">Espace Confiné</option>
+                            <option value="DEPANNAGE">Entrée / Dépannage</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Zone de Chantier</label>
+                        <input type="text" name="zone_chantier" class="form-control" placeholder="ex: Zone Assemblage Ligne 1" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Responsable de l'Opération</label>
+                        <input type="text" name="responsable_nom" class="form-control" value="{{ current_user.full_name() }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Date & Heure Début</label>
+                        <input type="datetime-local" name="date_debut" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Date & Heure Fin</label>
+                        <input type="datetime-local" name="date_fin" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Description des Travaux</label>
+                        <textarea name="description_travaux" class="form-control" rows="3" placeholder="Détails de l'intervention..."></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Mesures de Prévention Spécifiques</label>
+                        <textarea name="mesures_prevention" class="form-control" rows="2" placeholder="Harnais double longe, extincteur à proximité, balisage au sol..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-3 mb-4">
+            <div class="card-header bg-white fw-bold">2. Intervenants Affectés (Accrédités)</div>
+            <div class="card-body">
+                <p class="text-muted small">Sélectionnez les travailleurs habilités participant à cette tâche :</p>
+                <div class="row g-2" style="max-height: 250px; overflow-y: auto;">
+                    {% for w in workers %}
+                    <div class="col-md-6">
+                        <div class="form-check p-2 border rounded bg-light">
+                            <input class="form-check-input ms-1" type="checkbox" name="worker_ids" value="{{ w.id }}" id="w_{{ w.id }}">
+                            <label class="form-check-label ms-2 fw-bold" for="w_{{ w.id }}">
+                                {{ w.matricule }} - {{ w.nom }} {{ w.prenom }} <span class="text-muted small">({{ w.fonction }})</span>
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+            <i class="fas fa-save me-1"></i> Créer le Permis (Brouillon)
+        </button>
+    </form>
+</div>
+{% endblock %}

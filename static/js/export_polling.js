@@ -1,5 +1,5 @@
 /* static/js/export_polling.js
-   Polling client pour les exports async NORO
+   Polling client pour les exports async SINYLON
    Usage : exportAsync('/export/badges', 'Badges Excel')
 */
 
@@ -69,13 +69,13 @@ function showExportModal(label) {
     `;
     modal.innerHTML = `
       <div style="
-        background: var(--noro-surface, #141414);
-        border: 1px solid var(--noro-border, #2a2a2a);
+        background: var(--sinylon-surface, #141414);
+        border: 1px solid var(--sinylon-border, #2a2a2a);
         border-radius: 10px; padding: 28px 32px; text-align: center;
         min-width: 280px;
       ">
         <div style="font-family:'Space Mono',monospace; font-size:12px; color:#e87c2b; letter-spacing:2px; margin-bottom:14px;">
-          ⬡ NORO — EXPORT EN COURS
+          ⬡ SINYLON — EXPORT EN COURS
         </div>
         <div id="export-modal-label" style="font-size:14px; margin-bottom:18px;"></div>
         <div style="background:#1a1a1a; border-radius:4px; height:4px; overflow:hidden;">
@@ -110,10 +110,10 @@ function hideExportModal() {
 }
 
 function showToast(msg, type = 'info') {
-  let t = document.getElementById('noro-toast');
+  let t = document.getElementById('sinylon-toast');
   if (!t) {
     t = document.createElement('div');
-    t.id = 'noro-toast';
+    t.id = 'sinylon-toast';
     t.style.cssText = `
       position: fixed; bottom: 24px; right: 24px;
       padding: 10px 18px; border-radius: 4px;

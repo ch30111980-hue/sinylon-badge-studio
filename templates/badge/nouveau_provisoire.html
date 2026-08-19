@@ -260,7 +260,7 @@
 
 <!-- Nav -->
 <div class="d-flex align-items-center gap-2 mb-3">
-    <a href="{{ url_for('dashboard') }}" class="nb5-back-btn">
+    <a href="{{ url_for('dashboard.index') }}" class="nb5-back-btn">
         <i class="fas fa-arrow-left"></i> Retour
     </a>
 </div>
@@ -270,8 +270,8 @@
     <div class="nb5-header">
         <div class="logo">FIAT</div>
         <div class="title">
-            <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 24px;">
-            <span>NORO BADGE — DEMANDE DE BADGE PROVISOIRE</span>
+            <img src="{{ url_for('static', filename='img/img/logo.png') }}" alt="Sinylon" style="height: 24px;">
+            <span>SINYLON BADGE — DEMANDE DE BADGE PROVISOIRE</span>
         </div>
         <div style="font-size:11px; color:#5a6080; font-family:'Oswald',sans-serif; letter-spacing:2px;">
             {{ current_user.full_name() }}
@@ -288,7 +288,7 @@
             </div>
 
             <div class="nb5-form-body">
-                <form action="{{ url_for('badge.save_provisional_badge') }}" method="POST" enctype="multipart/form-data">
+                <form action="#" onsubmit="return false;" method="POST" enctype="multipart/form-data">
                     <div class="nb5-sec">
                         <div class="nb5-sec-title">👤 Identité & RH</div>
                         

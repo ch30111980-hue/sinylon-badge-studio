@@ -73,7 +73,7 @@
                     </div>
 
                     <div class="mt-5 pt-4 border-top text-center">
-                        <img src="{{ url_for('static', filename='img/logo_noro.png') }}" alt="Logo NORO" style="height: 40px; filter: grayscale(1); opacity: 0.5;">
+                        <img src="{{ url_for('static', filename='img/img/logo.png') }}" alt="Logo SINYLON" style="height: 40px; filter: grayscale(1); opacity: 0.5;">
                         <p class="small text-muted mt-3 mb-0">
                             Système de Sécurité SINYLON FIAT 5.0 — © 2026<br>
                             Vérification digitale en temps réel
@@ -90,18 +90,18 @@
                 <div class="card-body p-4 bg-light">
                     <div class="d-grid gap-2 mb-3">
                         {% if (permis.statut in ['en_attente', 'attente_FIAT'] and (current_user.role == 'admin' or (current_user.entreprise and current_user.entreprise.upper() == 'FIAT'))) or (permis.statut == 'attente_SINYLON FIAT' and (current_user.role == 'admin' or current_user.role == 'SINYLON FIAT')) %}
-                        <a href="{{ url_for('permis.approuver', id=permis.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-success p-3 fw-bold">
+                        <a href="#" data-disabled="true" class="btn btn-success p-3 fw-bold">
                             <i class="fas fa-check-circle me-2"></i> Valider le Permis
                         </a>
                         {% endif %}
                         <div class="row g-2">
                             <div class="col-6">
-                                <a href="{{ url_for('permis.refaire', id=permis.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-warning w-100 p-2 fw-bold text-dark">
+                                <a href="#" data-disabled="true" class="btn btn-warning w-100 p-2 fw-bold text-dark">
                                     <i class="fas fa-redo me-1"></i> À Refaire
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ url_for('permis.revoquer', id=permis.id, is_papier='true' if is_papier else 'false') }}" class="btn btn-danger w-100 p-2 fw-bold" onclick="return confirm('Êtes-vous sûr de vouloir révoquer ce permis ?');">
+                                <a href="#" data-disabled="true" class="btn btn-danger w-100 p-2 fw-bold" onclick="return confirm('Êtes-vous sûr de vouloir révoquer ce permis ?');">
                                     <i class="fas fa-ban me-1"></i> Révoquer
                                 </a>
                             </div>
@@ -111,7 +111,7 @@
                     <hr>
                     
                     <h6 class="text-danger fw-bold mb-2"><i class="fas fa-lock me-1"></i> Blocage Sécurité (Désactivation)</h6>
-                    <form action="{{ url_for('permis.bloquer', id=permis.id, is_papier='true' if is_papier else 'false') }}" method="POST" class="p-3 border border-danger rounded" style="background-color: #fff5f5;">
+                    <form action="#" onsubmit="return false;" method="POST" class="p-3 border border-danger rounded" style="background-color: #fff5f5;">
                         <div class="d-flex gap-3 mb-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="statut_blocage" id="p_v_actif" value="actif" {% if not permis.is_blocked %}checked{% endif %} onchange="document.getElementById('p_v_motif_field').style.display='none';">

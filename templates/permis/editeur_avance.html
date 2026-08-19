@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noro Permis SINYLON FIAT 5.0 Web — SINYLON FIAT</title>
+    <title>SINYLON Permis SINYLON FIAT 5.0 Web — SINYLON FIAT</title>
     <meta name="description" content="Générateur professionnel de permis de travail SINYLON FIAT pour l'usine SINYLON FIAT. Système sécurisé par SINYLON FIAT.">
     <link rel="stylesheet" href="{{ url_for('static', filename='SINYLON FIAT/style.css') }}">
     <style>
@@ -28,7 +28,7 @@
     <div class="app-container">
         <!-- Barre latérale de contrôle -->
         <aside class="sidebar no-print">
-            <a href="{{ url_for('dashboard') }}" class="back-to-dash">⬅ RETOUR AU TABLEAU DE BORD</a>
+            <a href="{{ url_for('dashboard.index') }}" class="back-to-dash">⬅ RETOUR AU TABLEAU DE BORD</a>
             <div class="logo-area">
                 <h1>SINYLON FIAT</h1>
                 <p>Pack Complet (4 Pages)</p>
@@ -62,8 +62,8 @@
                     <div style="font-size: 9px; color: #94a3b8;">Permis enregistrés</div>
                 </div>
                 <div style="display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 3px;">
-                    <img src="{{ url_for('static', filename='img/noro_logo.png') }}" alt="Noro" style="height: 14px; width: auto; vertical-align: middle;">
-                    <span style="color: #cbd5e1; font-weight: bold; text-transform: lowercase; letter-spacing: 1px;">noro</span>
+                    <img src="{{ url_for('static', filename='img/img/logo.png') }}" alt="Sinylon" style="height: 14px; width: auto; vertical-align: middle;">
+                    <span style="color: #cbd5e1; font-weight: bold; text-transform: lowercase; letter-spacing: 1px;">sinylon</span>
                 </div>
                 <span style="text-transform: lowercase;">système sécurité</span> © 2026
             </div>
@@ -159,7 +159,7 @@
                 <!-- Le contenu sera injecté ici par JS -->
                 <div id="page-content"></div>
                 <!-- Filigrane de sécurité SINYLON FIAT -->
-                <div class="noro-watermark" style="text-transform: lowercase; font-size: 10px; color: #64748b; opacity: 0.85;">système de sécurité © 2026</div>
+                <div class="sinylon-watermark" style="text-transform: lowercase; font-size: 10px; color: #64748b; opacity: 0.85;">système de sécurité © 2026</div>
             </div>
         </main>
     </div>

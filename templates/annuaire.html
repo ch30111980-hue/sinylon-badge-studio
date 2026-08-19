@@ -103,7 +103,7 @@
                                 <button type="button" class="btn btn-sm btn-outline-light p-1" data-bs-toggle="modal" data-bs-target="#editUrgenceModal_{{ u.id }}" title="Modifier ce numéro" style="line-height:1; font-size:0.75rem;">
                                     <i class="fas fa-edit text-warning"></i>
                                 </button>
-                                <form method="POST" action="{{ url_for('annuaire.supprimer_urgence', id=u.id) }}" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce numéro ?');">
+                                <form method="POST" action="#" onsubmit="return false;" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer ce numéro ?');">
                                     <button type="submit" class="btn btn-sm btn-outline-danger p-1" title="Supprimer" style="line-height:1; font-size:0.75rem;">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
@@ -130,7 +130,7 @@
                             <h5 class="modal-title fw-bold"><i class="fas fa-edit me-2 text-warning"></i> Modifier le Numéro : {{ u.title }}</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form method="POST" action="{{ url_for('annuaire.modifier_urgence', id=u.id) }}">
+                        <form method="POST" action="#" onsubmit="return false;">
                             <div class="modal-body p-4 text-start">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Nom du Poste / Titre *</label>
@@ -275,7 +275,7 @@
                 <h5 class="modal-title fw-bold"><i class="fas fa-user-plus me-2"></i> Ajouter un Contact ou Numéro d'Urgence</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{{ url_for('annuaire.nouveau_contact') }}">
+            <form method="POST" action="#" onsubmit="return false;">
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Type de Contact</label>

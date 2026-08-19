@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{ site.name }} — Permis de Travail du Jour</title>
+    <link rel="stylesheet" href="/static/css/fonts.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0F172A;
+            --primary-accent: #2563EB;
+            --success: #059669;
+            --warning: #D97706;
+            --danger: #DC2626;
+            --bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --border: #E2E8F0;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-dark);
+            padding: 16px;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        /* Top Header */
+        .site-header {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-header::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+        }
+
+        .badge-site {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .site-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 4px;
+        }
+
+        .site-location {
+            font-size: 0.85rem;
+            color: #94A3B8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 12px;
+            font-size: 0.8rem;
+        }
+
+        .date-badge {
+            background: rgba(37, 99, 235, 0.3);
+            color: #93C5FD;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        /* Weather / HSE Status */
+        .weather-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .weather-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .weather-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #EFF6FF;
+            color: var(--primary-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .weather-metrics {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .weather-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .hse-badge-ok {
+            background: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Stats Bar */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .stat-lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Permit Cards */
+        .permit-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .permit-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .permit-code {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+            background: #EFF6FF;
+            padding: 2px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .permit-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .permit-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .status-pill {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-valide { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+        .status-en_cours { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+        .status-draft { background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
+        .status-attente_csps { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+        .status-rejete { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+
+        .permit-desc {
+            font-size: 0.8rem;
+            color: #475569;
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+
+        .ppe-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .ppe-tag {
+            font-size: 0.68rem;
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px 0;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Site Permanent Header -->
+        <div class="site-header">
+            <div class="badge-site">
+                <i class="fas fa-qrcode me-1"></i> POINT DE CONTRÔLE CHANTIER
+            </div>
+            <h1 class="site-title">{{ site.name }}</h1>
+            <div class="site-location">
+                <i class="fas fa-map-marker-alt"></i> {{ site.location }}
+            </div>
+            <div class="header-meta">
+                <span>Code Chantier : <strong>{{ site.code }}</strong></span>
+                <span class="date-badge"><i class="far fa-calendar-alt me-1"></i> {{ today_formatted }}</span>
+            </div>
+        </div>
+
+        <!-- Météo Chantier & Conditions HSE -->
+        <div class="weather-card">
+            <div class="weather-info">
+                <div class="weather-icon">
+                    <i class="fas fa-wind"></i>
+                </div>
+                <div>
+                    <div class="weather-metrics">Vent : {{ weather.wind_speed_kmh|round(1) }} km/h | Temp : {{ weather.temp_celsius|round(1) }}°C</div>
+                    <div class="weather-sub">
+                        <i class="far fa-clock me-1"></i> Relevé : {{ weather.last_updated_time }} • 
+                        <span class="badge {% if weather.is_offline %}bg-secondary text-white{% else %}bg-success text-white{% endif %} py-0 px-1" style="font-size: 0.65rem;">
+                            {{ weather.source_label }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                {% if weather.is_blocking %}
+                <span class="status-pill status-rejete"><i class="fas fa-ban me-1"></i> HSE BLOQUÉ</span>
+                {% else %}
+                <span class="hse-badge-ok"><i class="fas fa-check-circle"></i> HSE OK</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Statistiques des Permis du Jour -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-val" style="color: var(--success);">{{ valid_count }}</div>
+                <div class="stat-lbl">Permis Actifs</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val" style="color: var(--warning);">{{ draft_count }}</div>
+                <div class="stat-lbl">En Préparation</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">{{ total_count }}</div>
+                <div class="stat-lbl">Total Journalier</div>
+            </div>
+        </div>
+
+        <!-- Liste des Permis du Jour -->
+        <div class="section-title">
+            <span><i class="fas fa-clipboard-check me-2 text-primary"></i> Permis Autorisés pour Aujourd'hui</span>
+            <a href="javascript:location.reload()" class="refresh-btn">
+                <i class="fas fa-sync-alt"></i> Actualiser
+            </a>
+        </div>
+
+        {% if permits %}
+            {% for p in permits %}
+            <div class="permit-card">
+                <div class="permit-top">
+                    <div>
+                        <span class="permit-code">{{ p.reference }}</span>
+                        <h2 class="permit-name">{{ p.titre }}</h2>
+                        <div class="permit-time">
+                            <i class="far fa-clock"></i> Horaires : {{ p.date_debut[11:16] }} ➔ {{ p.date_fin[11:16] }}
+                        </div>
+                    </div>
+                    <div>
+                        {% if p.status == 'VALIDE' %}
+                            <span class="status-pill status-valide"><i class="fas fa-check-circle me-1"></i> VALIDÉ</span>
+                        {% elif p.status == 'EN_COURS' %}
+                            <span class="status-pill status-en_cours"><i class="fas fa-play-circle me-1"></i> EN COURS</span>
+                        {% elif p.status == 'DRAFT' %}
+                            <span class="status-pill status-draft"><i class="fas fa-pencil-alt me-1"></i> BROUILLON</span>
+                        {% elif p.status == 'TERMINE' %}
+                            <span class="status-pill status-draft"><i class="fas fa-flag-checkered me-1"></i> TERMINÉ</span>
+                        {% else %}
+                            <span class="status-pill status-draft">{{ p.status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if p.description_travaux %}
+                <div class="permit-desc">
+                    {{ p.description_travaux }}
+                </div>
+                {% endif %}
+
+                <div class="ppe-tags">
+                    {% if p.status in ['VALIDE', 'EN_COURS'] %}
+                        <span class="ppe-tag" style="color: var(--success); font-weight: 700; background: #ECFDF5; border-color: #A7F3D0;"><i class="fas fa-stamp me-1"></i> Validé par Maître d'Ouvrage</span>
+                    {% else %}
+                        <span class="ppe-tag" style="color: var(--text-muted);"><i class="fas fa-clock me-1"></i> En attente validation</span>
+                    {% endif %}
+                    <span class="ppe-tag"><i class="fas fa-hard-hat me-1"></i> EPI Requis</span>
+                    <span class="ppe-tag"><i class="fas fa-user-shield me-1"></i> Zone : {{ p.zone_chantier }}</span>
+                    <span class="ppe-tag"><i class="fas fa-building me-1"></i> {{ p.entreprise or 'Sinylon' }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="background: white; border: 1px dashed var(--border); border-radius: 16px; padding: 32px; text-align: center; color: var(--text-muted);">
+                <i class="fas fa-calendar-day" style="font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                <p style="font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">Aucun permis préparé pour aujourd'hui</p>
+                <p style="font-size: 0.8rem;">Le coordinateur CSPS doit déclencher l'ouverture de poste depuis SINYLON Badge Studio Pro.</p>
+            </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>SINYLON Badge Studio Pro V2.1</strong></p>
+            <p>Système Autonome de Contrôle & Sécurité Chantier — Données certifiées en base locale</p>
+        </div>
+    </div>
+</body>
+</html>
