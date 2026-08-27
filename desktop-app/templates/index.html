@@ -509,19 +509,30 @@
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
           {% for w in workers %}
-          <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass-strong); border-radius: 18px; padding: 20px; text-align: center; position: relative; box-shadow: var(--shadow-card);">
+          <div style="background: {{ 'rgba(15, 23, 42, 0.85)' if w.status == 'Actif' else 'rgba(30, 58, 138, 0.25)' }}; border: 1.5px solid {{ 'rgba(52, 211, 153, 0.35)' if w.status == 'Actif' else 'rgba(96, 165, 250, 0.35)' }}; border-radius: 18px; padding: 20px; text-align: center; position: relative; box-shadow: var(--shadow-card);">
             <!-- PHOTO DU TRAVAILLEUR -->
             <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 14px; background: rgba(30, 41, 59, 0.6); padding: 10px; border-radius: 12px;">
               {% if w.photo_path %}
-                <img src="{{ w.photo_path }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-cyan);" alt="Photo {{ w.nom }}">
+                <img src="{{ w.photo_path }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid {{ 'var(--primary-cyan)' if w.status == 'Actif' else '#3b82f6' }};" alt="Photo {{ w.nom }}">
               {% else %}
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; border: 2px solid var(--primary-cyan);">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: {{ 'linear-gradient(135deg, #0ea5e9, #2563eb)' if w.status == 'Actif' else 'rgba(37,99,235,0.4)' }}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; border: 2px solid {{ 'var(--primary-cyan)' if w.status == 'Actif' else '#3b82f6' }};">
                   {{ w.prenom[0] if w.prenom else '' }}{{ w.nom[0] if w.nom else 'S' }}
                 </div>
               {% endif %}
               <div style="text-align: left;">
-                <div style="font-weight: 800; font-size: 14px; color: #ffffff;">{{ w.prenom }} {{ w.nom|upper }}</div>
-                <div style="font-size: 12px; color: var(--primary-cyan); font-weight: 700;">{{ w.matricule }}</div>
+                {% if w.status == 'Actif' %}
+                  <div style="font-weight: 800; font-size: 14px; color: #ffffff; text-shadow: 0 0 8px rgba(255,255,255,0.4);">{{ w.prenom }} {{ w.nom|upper }}</div>
+                  <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                    <span style="font-size: 12px; color: var(--primary-cyan); font-weight: 700;">{{ w.matricule }}</span>
+                    <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 800; font-size: 9px; padding: 1px 5px; border-radius: 6px; border: 1px solid rgba(52, 211, 153, 0.35);">🟢 ACTIF</span>
+                  </div>
+                {% else %}
+                  <div style="font-weight: 700; font-size: 14px; color: #60a5fa;">{{ w.prenom }} {{ w.nom|upper }}</div>
+                  <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                    <span style="font-size: 12px; color: #93c5fd; font-weight: 700;">{{ w.matricule }}</span>
+                    <span style="background: rgba(37, 99, 235, 0.2); color: #93c5fd; font-weight: 800; font-size: 9px; padding: 1px 5px; border-radius: 6px; border: 1px solid rgba(96, 165, 250, 0.35);">🔵 HORS LISTE</span>
+                  </div>
+                {% endif %}
                 <div style="font-size: 11px; color: var(--text-muted);">{{ w.fonction }}</div>
               </div>
             </div>
