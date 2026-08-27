@@ -178,12 +178,24 @@
       70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
     }
+    .worker-row-active {
+      background: rgba(15, 23, 42, 0.6) !important;
+      border-left: 3px solid #34d399;
+      transition: all 0.2s ease;
+    }
+    .worker-row-active:hover {
+      background: rgba(30, 41, 59, 0.85) !important;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.08);
+    }
     .worker-row-inactive {
-      opacity: 0.6;
-      background: rgba(15, 23, 42, 0.35) !important;
+      background: rgba(30, 58, 138, 0.25) !important;
+      border-left: 3px solid #3b82f6;
+      opacity: 0.85;
+      transition: all 0.2s ease;
     }
     .worker-row-inactive:hover {
-      opacity: 0.95;
+      background: rgba(30, 58, 138, 0.4) !important;
+      opacity: 1;
     }
     .form-card-grid {
       display: grid;
@@ -411,43 +423,52 @@
               </thead>
               <tbody>
                 {% for w in workers %}
-                <tr data-status="{{ w.status }}" class="{{ '' if w.status == 'Actif' else 'worker-row-inactive' }}">
+                <tr data-status="{{ w.status }}" class="{{ 'worker-row-active' if w.status == 'Actif' else 'worker-row-inactive' }}">
                   <td><input type="checkbox" name="worker_ids" value="{{ w.id }}" class="worker-checkbox"></td>
                   <td>
                     {% if w.status == 'Actif' %}
-                      <span style="background: rgba(16, 185, 129, 0.18); color: #34d399; font-weight: 800; padding: 3px 8px; border-radius: 6px; font-size: 13px; border: 1px solid rgba(52, 211, 153, 0.3);">N° {{ w.seq_id }}</span>
+                      <span style="background: #ffffff; color: #0f172a; font-weight: 900; padding: 3px 8px; border-radius: 6px; font-size: 12px; box-shadow: 0 0 8px rgba(255,255,255,0.35);">N° {{ w.seq_id }}</span>
                     {% else %}
-                      <span style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; font-weight: 700; padding: 3px 8px; border-radius: 6px; font-size: 13px;">—</span>
+                      <span style="background: rgba(59, 130, 246, 0.15); color: #93c5fd; font-weight: 700; padding: 3px 8px; border-radius: 6px; font-size: 12px; border: 1px solid rgba(96, 165, 250, 0.25);">HORS LISTE</span>
                     {% endif %}
                   </td>
                   <td>
                     {% if w.photo_path %}
                       <img src="{{ w.photo_path }}" class="worker-avatar" alt="Photo {{ w.nom }}">
                     {% else %}
-                      <div class="worker-avatar">{{ w.prenom[0] if w.prenom else '' }}{{ w.nom[0] if w.nom else 'S' }}</div>
+                      <div class="worker-avatar" style="{{ 'background: #3b82f6;' if w.status != 'Actif' else '' }}">{{ w.prenom[0] if w.prenom else '' }}{{ w.nom[0] if w.nom else 'S' }}</div>
                     {% endif %}
                   </td>
                   <td><strong style="color: var(--primary-cyan);">{{ w.matricule }}</strong></td>
                   <td>
-                    <strong style="color: #ffffff;">{{ w.prenom }} {{ w.nom|upper }}</strong>
                     {% if w.status == 'Actif' %}
-                      <span style="display: inline-block; width: 6px; height: 6px; background: #34d399; border-radius: 50%; margin-left: 4px;" title="Actif sur le chantier"></span>
+                      <!-- SUR LA LISTE OFFICIELLE -> ÉCRITURE DU NOM EN BLANC ÉCLATANT -->
+                      <strong style="color: #ffffff; font-size: 14px; font-weight: 800; letter-spacing: 0.3px; text-shadow: 0 0 10px rgba(255,255,255,0.45);">{{ w.prenom }} {{ w.nom|upper }}</strong>
+                      <span style="display: inline-block; width: 7px; height: 7px; background: #34d399; border-radius: 50%; margin-left: 6px; box-shadow: 0 0 6px #34d399;" title="Autorisé / Sur la liste officielle"></span>
+                    {% else %}
+                      <!-- HORS LISTE -> ÉCRITURE DU NOM EN BLEU / GRIS BLEUTÉ -->
+                      <strong style="color: #60a5fa; font-size: 14px; font-weight: 700; letter-spacing: 0.2px;">{{ w.prenom }} {{ w.nom|upper }}</strong>
+                      <span style="display: inline-block; width: 7px; height: 7px; background: #3b82f6; border-radius: 50%; margin-left: 6px;" title="Hors liste / Non actif sur le chantier"></span>
                     {% endif %}
                   </td>
-                  <td><span class="role-badge">{{ w.fonction }}</span></td>
+                  <td>
+                    <span class="role-badge" style="{{ 'background: rgba(37,99,235,0.15); border-color: rgba(96,165,250,0.3); color: #93c5fd;' if w.status != 'Actif' else '' }}">{{ w.fonction }}</span>
+                  </td>
                   <td><strong style="color: #38bdf8;">Sinylon</strong></td>
                   <td>
                     <div style="display: flex; align-items: center; gap: 8px;">
                       {% if w.status == 'Actif' %}
-                        <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.18); color: #34d399; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(52, 211, 153, 0.35);">
-                          <span class="pulse-dot-green"></span> Actif
+                        <!-- BADGE BLANC / VERT SUR LISTE -->
+                        <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.22); color: #34d399; font-weight: 800; font-size: 11px; padding: 4px 9px; border-radius: 12px; border: 1px solid rgba(52, 211, 153, 0.45);">
+                          <span class="pulse-dot-green"></span> 🟢 SUR LISTE (ACTIF)
                         </span>
                       {% else %}
-                        <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(100, 116, 139, 0.2); color: #94a3b8; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.25);">
-                          ⚪ Inactif
+                        <!-- BADGE BLEU HORS LISTE -->
+                        <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(37, 99, 235, 0.22); color: #93c5fd; font-weight: 800; font-size: 11px; padding: 4px 9px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.4);">
+                          🔵 HORS LISTE (INACTIF)
                         </span>
                       {% endif %}
-                      <div class="toggle-switch-wrapper" onclick="toggleBlock({{ w.id }})" title="Cliquer pour basculer le statut Actif / Inactif">
+                      <div class="toggle-switch-wrapper" onclick="toggleBlock({{ w.id }})" title="Cliquer pour basculer le statut Actif (Blanc) / Inactif (Bleu)">
                         <input type="checkbox" {{ 'checked' if w.status == 'Actif' else '' }} class="toggle-switch-input" readonly>
                         <div class="toggle-switch-slider">
                           <div class="toggle-switch-knob"></div>
