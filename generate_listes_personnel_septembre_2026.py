@@ -193,19 +193,18 @@ def generate_securite_doc(chinese, algerians):
     story.append(t_c2)
     story.append(Spacer(1, 3*mm))
 
-    # SECTION 2 COLLÉE : PERSONNEL LOCAL ALGÉRIEN (3 Hommes & 2 Femmes)
-    story.append(Paragraph("<b>2. PERSONNEL LOCAL ALGÉRIEN AUTORISÉ — 5 PERSONNES (3 HOMMES & 2 FEMMES) :</b>", ParagraphStyle('SecAlg', fontName='Helvetica-Bold', fontSize=9.5, leading=12, textColor=HexColor('#15803d'))))
+    # SECTION 2 COLLÉE : PERSONNEL LOCAL ALGÉRIEN (5 PERSONNES)
+    story.append(Paragraph("<b>2. PERSONNEL LOCAL ALGÉRIEN AUTORISÉ — 5 PERSONNES :</b>", ParagraphStyle('SecAlg', fontName='Helvetica-Bold', fontSize=9.5, leading=12, textColor=HexColor('#15803d'))))
     story.append(Spacer(1, 1.5*mm))
 
     alg_data = [
-        ["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "GENRE", "ENTREPRISE", "STATUT CHANTIER"]
+        ["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]
     ]
     for idx, a in enumerate(algerians):
-        icon = "👨 Homme" if a['genre'] == 'Homme' else "👩 Femme"
         alg_data.append([
-            f"{idx+1:02d}", a['mat'], f"{a['nom']} {a['prenom']}", a['fonction'], icon, "SINYLON", "🟢 ACTIF & VALIDÉ"
+            f"{idx+1:02d}", a['mat'], f"{a['nom']} {a['prenom']}", a['fonction'], "SINYLON", "🟢 ACTIF & VALIDÉ"
         ])
-    t_alg = Table(alg_data, colWidths=[28, 75, 150, 130, 55, 50, 55])
+    t_alg = Table(alg_data, colWidths=[28, 75, 175, 145, 60, 60])
     t_alg.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.8, colors.HexColor('#15803d')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#15803d')),
@@ -443,7 +442,7 @@ table.alg-table td {{
         <!-- SECTION LOCAUX ALGÉRIENS COLLÉE -->
         <div class="algerian-section">
             <div class="algerian-header">
-                <span>🇩🇿 2. PERSONNEL LOCAL ALGÉRIEN AUTORISÉ — 5 PERSONNES (3 HOMMES &amp; 2 FEMMES) :</span>
+                <span>🇩🇿 2. PERSONNEL LOCAL ALGÉRIEN AUTORISÉ — 5 PERSONNES :</span>
                 <span>CONTRATS &amp; VISITES MÉDICALES CONFORMES</span>
             </div>
             <table class="alg-table">
@@ -453,13 +452,12 @@ table.alg-table td {{
                         <th style="width:85px;">MATRICULE</th>
                         <th>NOM &amp; PRÉNOM</th>
                         <th>FONCTION OFFICIELLE</th>
-                        <th style="width:80px;text-align:center;">CATÉGORIE</th>
                         <th style="width:75px;text-align:center;">ENTREPRISE</th>
                         <th style="width:75px;text-align:center;">STATUT</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {"".join([f"<tr><td style='text-align:center;font-weight:bold;'>{i+1:02d}</td><td style='font-family:monospace;color:#1e3a8a;font-weight:bold;'>{a['mat']}</td><td><strong>{a['nom']}</strong> {a['prenom']}</td><td style='color:#0f172a;'>{a['fonction']}</td><td style='text-align:center;'>{'👨 Homme' if a['genre']=='Homme' else '👩 Femme'}</td><td style='text-align:center;'>SINYLON</td><td style='text-align:center;color:#15803d;font-weight:bold;'>🟢 AUTORISÉ</td></tr>" for i, a in enumerate(algerians)])}
+                    {"".join([f"<tr><td style='text-align:center;font-weight:bold;'>{i+1:02d}</td><td style='font-family:monospace;color:#1e3a8a;font-weight:bold;'>{a['mat']}</td><td><strong>{a['nom']}</strong> {a['prenom']}</td><td style='color:#0f172a;'>{a['fonction']}</td><td style='text-align:center;'>SINYLON</td><td style='text-align:center;color:#15803d;font-weight:bold;'>🟢 AUTORISÉ</td></tr>" for i, a in enumerate(algerians)])}
                 </tbody>
             </table>
         </div>
@@ -563,14 +561,13 @@ def generate_chantier_doc(chinese, algerians):
     story.append(Spacer(1, 2*mm))
 
     # SECTION LOCAUX ALGÉRIENS
-    story.append(Paragraph("<b>🇩🇿 PERSONNEL LOCAL ALGÉRIEN AUTORISÉ (3 HOMMES &amp; 2 FEMMES) :</b>", ParagraphStyle('SA', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#15803d'))))
+    story.append(Paragraph("<b>🇩🇿 PERSONNEL LOCAL ALGÉRIEN AUTORISÉ (5 PERSONNES) :</b>", ParagraphStyle('SA', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#15803d'))))
     story.append(Spacer(1, 1*mm))
 
-    alg_rows = [["MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "CATÉGORIE", "STATUT"]]
+    alg_rows = [["MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT"]]
     for a in algerians:
-        cat = "👨 Homme" if a['genre'] == 'Homme' else "👩 Femme"
-        alg_rows.append([a['mat'], f"{a['nom']} {a['prenom']}", a['fonction'], cat, "🟢 VALIDÉ"])
-    t_alg_cha = Table(alg_rows, colWidths=[75, 175, 150, 70, 70])
+        alg_rows.append([a['mat'], f"{a['nom']} {a['prenom']}", a['fonction'], "SINYLON", "🟢 VALIDÉ"])
+    t_alg_cha = Table(alg_rows, colWidths=[75, 200, 160, 55, 50])
     t_alg_cha.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.8, colors.HexColor('#15803d')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#15803d')),
@@ -777,7 +774,7 @@ table.worker-table tr:nth-child(even) {{ background: #f8fafc; }}
         <!-- SECTION LOCAUX ALGÉRIENS -->
         <div class="alg-box">
             <div style="font-size:10px;font-weight:900;color:#15803d;margin-bottom:3px;display:flex;justify-content:space-between;">
-                <span>🇩🇿 PERSONNEL LOCAL ALGÉRIEN AUTORISÉ (3 HOMMES &amp; 2 FEMMES) :</span>
+                <span>🇩🇿 PERSONNEL LOCAL ALGÉRIEN AUTORISÉ ({len(algerians)} PERSONNES) :</span>
                 <span>TOUS CONFORMES HSE &amp; SÉCURITÉ</span>
             </div>
             <table class="alg-table">
@@ -786,12 +783,12 @@ table.worker-table tr:nth-child(even) {{ background: #f8fafc; }}
                         <th style="width:75px;">MATRICULE</th>
                         <th>NOM &amp; PRÉNOM</th>
                         <th>FONCTION OFFICIELLE</th>
-                        <th style="width:85px;">CATÉGORIE</th>
+                        <th style="width:85px;">ENTREPRISE</th>
                         <th style="width:75px;">STATUT</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {"".join([f"<tr><td style='font-family:monospace;color:#1e3a8a;'>{a['mat']}</td><td><strong>{a['nom']}</strong> {a['prenom']}</td><td>{a['fonction']}</td><td>{'👨 Homme' if a['genre']=='Homme' else '👩 Femme'}</td><td style='color:#15803d;'>🟢 AUTORISÉ</td></tr>" for a in algerians])}
+                    {"".join([f"<tr><td style='font-family:monospace;color:#1e3a8a;'>{a['mat']}</td><td><strong>{a['nom']}</strong> {a['prenom']}</td><td>{a['fonction']}</td><td>SINYLON</td><td style='color:#15803d;'>🟢 AUTORISÉ</td></tr>" for a in algerians])}
                 </tbody>
             </table>
         </div>
