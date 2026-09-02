@@ -113,9 +113,9 @@ def generate_securite_doc(chinese, algerians):
     p_sub = Paragraph("<b>DOCUMENT TRANSMIS AU CHEF DE LA SÉCURITÉ STELLANTIS</b> — PROJET K9 CKD0 TAFRAOUI", ParagraphStyle('ST2', fontName='Helvetica-Bold', fontSize=9, leading=11, alignment=1, textColor=HexColor('#1e3a8a')))
     p_valid = Paragraph("<b>📅 PÉRIODE ACTIVE : DU 01/09/2026 AU 30/09/2026</b> (Renouvelable chaque mois du 1er au 30)", ParagraphStyle('ST3', fontName='Helvetica-Bold', fontSize=8.5, leading=10, alignment=1, textColor=HexColor('#15803d')))
 
-    # Header tableau avec Logo
+    # Header tableau avec Logo (Sans trait sous le logo)
     header_data = [
-        [RLImage(LOGO_PATH, width=38, height=46) if os.path.exists(LOGO_PATH) else "SINYLON",
+        [RLImage(LOGO_PATH, width=42, height=37) if os.path.exists(LOGO_PATH) else "SINYLON",
          Paragraph("<b>SINYLON ENTREPRISE INDUSTRIELLE</b><br/><font size=7.5 color='#475569'>Projet Assemblage K9 CKD0 · Usine Stellantis Tafraoui</font><br/><b>Fiche Officielle des Effectifs Autorisés — Septembre 2026</b>", ParagraphStyle('HDesc', fontName='Helvetica', fontSize=9, leading=12)),
          RLImage(qr_temp, width=42, height=42)]
     ]
@@ -124,7 +124,6 @@ def generate_securite_doc(chinese, algerians):
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (0,0), 'CENTER'),
         ('ALIGN', (2,0), (2,0), 'CENTER'),
-        ('LINEBELOW', (0,0), (-1,-1), 1.5, colors.HexColor('#0f172a')),
         ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(t_head)
@@ -262,7 +261,7 @@ body {{ font-family: 'Outfit', sans-serif; background: #e2e8f0; color: #0f172a; 
 }}
 .header-row {{
     display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 2.5px solid #0f172a; padding-bottom: 8px; margin-bottom: 8px;
+    padding-bottom: 8px; margin-bottom: 8px;
 }}
 .logo-left {{
     display: flex; align-items: center; gap: 10px;
@@ -477,9 +476,9 @@ def generate_chantier_doc(chinese, algerians):
     )
     story = []
 
-    # En-tête avec Logo Sinylon
+    # En-tête avec Logo Sinylon (Sans trait sous le logo)
     head_data = [
-        [RLImage(LOGO_PATH, width=50, height=60) if os.path.exists(LOGO_PATH) else "SINYLON",
+        [RLImage(LOGO_PATH, width=48, height=42) if os.path.exists(LOGO_PATH) else "SINYLON",
          Paragraph("<b>AFFICHAGE CHANTIER — PERSONNEL AUTORISÉ</b><br/><font size=11 color='#1e3a8a'><b>SINYLON · PROJET STELLANTIS K9 CKD0</b></font><br/><font size=8.5 color='#15803d'><b>🟢 MOIS DE SEPTEMBRE 2026 (DU 01/09/2026 AU 30/09/2026 — RENOUVELABLE)</b></font>", ParagraphStyle('PH', fontName='Helvetica', alignment=1, leading=14)),
          RLImage(qr_temp, width=55, height=55)]
     ]
@@ -488,7 +487,6 @@ def generate_chantier_doc(chinese, algerians):
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (0,0), 'CENTER'),
         ('ALIGN', (2,0), (2,0), 'CENTER'),
-        ('LINEBELOW', (0,0), (-1,-1), 1.5, colors.HexColor('#0f172a')),
         ('BOTTOMPADDING', (0,0), (-1,-1), 3),
     ]))
     story.append(t_h)
@@ -623,7 +621,7 @@ body {{ font-family: 'Outfit', sans-serif; background: #e2e8f0; color: #0f172a; 
 }}
 .p-header {{
     display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 2.5px solid #0f172a; padding-bottom: 6px;
+    padding-bottom: 6px;
 }}
 .p-title {{
     text-align: center; margin: 4px 0;
