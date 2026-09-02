@@ -131,12 +131,12 @@ def generate_securite_doc(chinese, algerians):
     story.append(Paragraph(f"<b>1. ÉQUIPE CHANTIER SINYLON ({len(chinese)} INTERVENANTS) — 1ÈRE PARTIE (N° 01 À 27) :</b>", ParagraphStyle('Sec1', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#0f172a'))))
     story.append(Spacer(1, 1.5*mm))
 
-    t1_data = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]]
+    t1_data = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION", "ENTREPRISE", "STATUT CHANTIER"]]
     for idx, w in enumerate(chinese[:27]):
         t1_data.append([
             f"{idx+1:02d}", w['mat'], f"{w['nom']} {w['prenom']}", w['fonction'], "SINYLON", "🟢 AUTORISÉ"
         ])
-    t_c1 = Table(t1_data, colWidths=[28, 75, 175, 145, 60, 60])
+    t_c1 = Table(t1_data, colWidths=[24, 66, 174, 140, 65, 65])
     t_c1.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1e3a8a')),
@@ -159,7 +159,7 @@ def generate_securite_doc(chinese, algerians):
          Paragraph("<b>SINYLON — SUITE DE LA LISTE OFFICIELLE DU PERSONNEL (SEPTEMBRE 2026)</b><br/><font size=8 color='#64748b'>Document de Transmission Sécurité · Usine Stellantis Tafraoui</font>", ParagraphStyle('HDesc2', fontName='Helvetica', fontSize=9, leading=12)),
          RLImage(qr_temp, width=38, height=38)]
     ]
-    t_head2 = Table(header_data_p2, colWidths=[55, 435, 55])
+    t_head2 = Table(header_data_p2, colWidths=[55, 424, 55])
     t_head2.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (0,0), 'CENTER'),
@@ -172,12 +172,12 @@ def generate_securite_doc(chinese, algerians):
     story.append(Paragraph(f"<b>ÉQUIPE CHANTIER SINYLON — 2ÈME PARTIE (N° 28 À {len(chinese)}) :</b>", ParagraphStyle('Sec2', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#0f172a'))))
     story.append(Spacer(1, 1.5*mm))
 
-    t2_data = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]]
+    t2_data = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION", "ENTREPRISE", "STATUT CHANTIER"]]
     for idx, w in enumerate(chinese[27:]):
         t2_data.append([
             f"{idx+28:02d}", w['mat'], f"{w['nom']} {w['prenom']}", w['fonction'], "SINYLON", "🟢 AUTORISÉ"
         ])
-    t_c2 = Table(t2_data, colWidths=[28, 75, 175, 145, 60, 60])
+    t_c2 = Table(t2_data, colWidths=[24, 66, 174, 140, 65, 65])
     t_c2.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1e3a8a')),
@@ -198,19 +198,19 @@ def generate_securite_doc(chinese, algerians):
     story.append(Spacer(1, 1.5*mm))
 
     alg_data = [
-        ["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]
+        ["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION", "ENTREPRISE", "STATUT CHANTIER"]
     ]
     for idx, a in enumerate(algerians):
         alg_data.append([
             f"{idx+1:02d}", a['mat'], f"{a['nom']} {a['prenom']}", a['fonction'], "SINYLON", "🟢 ACTIF & VALIDÉ"
         ])
-    t_alg = Table(alg_data, colWidths=[28, 75, 175, 145, 60, 60])
+    t_alg = Table(alg_data, colWidths=[24, 66, 174, 140, 65, 65])
     t_alg.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.8, colors.HexColor('#15803d')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#15803d')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 7.5),
+        ('FONTSIZE', (0,0), (-1,-1), 7.2),
         ('BACKGROUND', (0,1), (-1,-1), colors.HexColor('#f0fdf4')),
         ('ALIGN', (0,0), (1,-1), 'CENTER'),
         ('ALIGN', (4,0), (-1,-1), 'CENTER'),
@@ -223,12 +223,12 @@ def generate_securite_doc(chinese, algerians):
 
     # VISAS ET ACCUSÉ DE RÉCEPTION SÉCURITÉ
     visa_data = [
-        ["ÉMIS PAR (HSE SINYLON)", "APPROUVÉ PAR (CHEF PROJET)", "ACCUSÉ DE RÉCEPTION — CHEF DE LA SÉCURITÉ STELLANTIS"],
+        ["ÉMIS PAR (HSE SINYLON)", "APPROUVÉ PAR (CHEF PROJET)", "ACCUSÉ DE RÉCEPTION — CHEF SÉCURITÉ STELLANTIS"],
         ["Nom : Nouri Chahrour\nFonction : HSE Sinylon\nDate : 01/09/2026 · 08h10\n\nSignature :",
-         "Nom : Xie Xian\nFonction : Chef de Projet Sinylon\nDate : 01/09/2026\n\nSignature :",
-         "Reçu le : ...... / 09 / 2026 à ...... h ......\nNom de l'Officier de Sécurité : ........................................\nSignature & Cachet Sécurité :"]
+         "Nom : Xie Xian\nFonction : Chef Projet Sinylon\nDate : 01/09/2026\n\nSignature :",
+         "Reçu le : ...... / 09 / 2026 à ...... h ......\nNom Officier Sécurité : ...................................\nSignature & Cachet Sécurité :"]
     ]
-    t_visa = Table(visa_data, colWidths=[175, 175, 194])
+    t_visa = Table(visa_data, colWidths=[160, 160, 214])
     t_visa.setStyle(TableStyle([
         ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#0f172a')),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
@@ -388,7 +388,7 @@ table.alg-table td {{
                     <th style="width:30px;text-align:center;">N°</th>
                     <th style="width:85px;">MATRICULE</th>
                     <th>NOM &amp; PRÉNOM</th>
-                    <th>FONCTION OFFICIELLE</th>
+                    <th>FONCTION</th>
                     <th style="width:75px;text-align:center;">ENTREPRISE</th>
                     <th style="width:75px;text-align:center;">STATUT</th>
                 </tr>
@@ -429,7 +429,7 @@ table.alg-table td {{
                     <th style="width:30px;text-align:center;">N°</th>
                     <th style="width:85px;">MATRICULE</th>
                     <th>NOM &amp; PRÉNOM</th>
-                    <th>FONCTION OFFICIELLE</th>
+                    <th>FONCTION</th>
                     <th style="width:75px;text-align:center;">ENTREPRISE</th>
                     <th style="width:75px;text-align:center;">STATUT</th>
                 </tr>
@@ -451,7 +451,7 @@ table.alg-table td {{
                         <th style="width:30px;text-align:center;">N°</th>
                         <th style="width:85px;">MATRICULE</th>
                         <th>NOM &amp; PRÉNOM</th>
-                        <th>FONCTION OFFICIELLE</th>
+                        <th>FONCTION</th>
                         <th style="width:75px;text-align:center;">ENTREPRISE</th>
                         <th style="width:75px;text-align:center;">STATUT</th>
                     </tr>
@@ -549,7 +549,7 @@ def generate_chantier_doc(chinese, algerians):
         [RLImage(qr_temp, width=65, height=65),
          Paragraph(f"<b>📱 SCANNEZ CE QR CODE POUR CONTRÔLER LES {len(chinese)+len(algerians)} INTERVENANTS EN DIRECT</b><br/><font size=8 color='#334155'>Vérification instantanée sur smartphone : validité, photos et habilitations de sécurité certifiées.</font><br/><font size=7.5 color='#1e3a8a'><i>{chantier_url}</i></font><br/><font size=8 color='#dc2626'><b>Port des badges et des EPI obligatoires · Urgence HSE Sinylon : 0563765157</b></font>", ParagraphStyle('QRT', fontName='Helvetica', fontSize=8.5, leading=11.5))]
     ]
-    t_qr = Table(qr_info_data, colWidths=[75, 465])
+    t_qr = Table(qr_info_data, colWidths=[75, 459])
     t_qr.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f8fafc')),
@@ -564,12 +564,12 @@ def generate_chantier_doc(chinese, algerians):
     story.append(Paragraph(f"<b>1. ÉQUIPE CHANTIER SINYLON ({len(chinese)} INTERVENANTS) — 1ÈRE PARTIE (N° 01 À 27) :</b>", ParagraphStyle('SC1', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#0f172a'))))
     story.append(Spacer(1, 1.5*mm))
 
-    t_data_c1 = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]]
+    t_data_c1 = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION", "ENTREPRISE", "STATUT CHANTIER"]]
     for idx, w in enumerate(chinese[:27]):
         t_data_c1.append([
             f"{idx+1:02d}", w['mat'], f"{w['nom']} {w['prenom']}", w['fonction'], "SINYLON", "🟢 AUTORISÉ"
         ])
-    tc1 = Table(t_data_c1, colWidths=[28, 75, 175, 145, 60, 60])
+    tc1 = Table(t_data_c1, colWidths=[24, 66, 174, 140, 65, 65])
     tc1.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0f172a')),
@@ -592,7 +592,7 @@ def generate_chantier_doc(chinese, algerians):
          Paragraph("<b>AFFICHAGE CHANTIER — SUITE DE LA LISTE DU PERSONNEL AUTORISÉ</b><br/><font size=8 color='#64748b'>Sinylon · Projet Stellantis K9 CKD0 Tafraoui (Septembre 2026)</font>", ParagraphStyle('HDesc2', fontName='Helvetica', fontSize=9, leading=12)),
          RLImage(qr_temp, width=38, height=38)]
     ]
-    t_head_p2 = Table(head_p2, colWidths=[55, 435, 55])
+    t_head_p2 = Table(head_p2, colWidths=[55, 424, 55])
     t_head_p2.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('ALIGN', (0,0), (0,0), 'CENTER'),
@@ -606,12 +606,12 @@ def generate_chantier_doc(chinese, algerians):
     story.append(Paragraph(f"<b>ÉQUIPE CHANTIER SINYLON — 2ÈME PARTIE (N° 28 À {len(chinese)}) :</b>", ParagraphStyle('SC2', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#0f172a'))))
     story.append(Spacer(1, 1.5*mm))
 
-    t_data_c2 = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]]
+    t_data_c2 = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION", "ENTREPRISE", "STATUT CHANTIER"]]
     for idx, w in enumerate(chinese[27:]):
         t_data_c2.append([
             f"{idx+28:02d}", w['mat'], f"{w['nom']} {w['prenom']}", w['fonction'], "SINYLON", "🟢 AUTORISÉ"
         ])
-    tc2 = Table(t_data_c2, colWidths=[28, 75, 175, 145, 60, 60])
+    tc2 = Table(t_data_c2, colWidths=[24, 66, 174, 140, 65, 65])
     tc2.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0f172a')),
@@ -631,18 +631,18 @@ def generate_chantier_doc(chinese, algerians):
     story.append(Paragraph("<b>2. PERSONNEL LOCAL ALGÉRIEN AUTORISÉ — 5 PERSONNES :</b>", ParagraphStyle('SA', fontName='Helvetica-Bold', fontSize=9.5, leading=12, textColor=HexColor('#15803d'))))
     story.append(Spacer(1, 1.5*mm))
 
-    alg_rows = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]]
+    alg_rows = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION", "ENTREPRISE", "STATUT CHANTIER"]]
     for idx, a in enumerate(algerians):
         alg_rows.append([
             f"{idx+1:02d}", a['mat'], f"{a['nom']} {a['prenom']}", a['fonction'], "SINYLON", "🟢 ACTIF & VALIDÉ"
         ])
-    t_alg_cha = Table(alg_rows, colWidths=[28, 75, 175, 145, 60, 60])
+    t_alg_cha = Table(alg_rows, colWidths=[24, 66, 174, 140, 65, 65])
     t_alg_cha.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.8, colors.HexColor('#15803d')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#15803d')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 7.5),
+        ('FONTSIZE', (0,0), (-1,-1), 7.2),
         ('BACKGROUND', (0,1), (-1,-1), colors.HexColor('#f0fdf4')),
         ('ALIGN', (0,0), (1,-1), 'CENTER'),
         ('ALIGN', (4,0), (-1,-1), 'CENTER'),
@@ -654,14 +654,14 @@ def generate_chantier_doc(chinese, algerians):
     story.append(Spacer(1, 4*mm))
 
     foot_data = [
-        ["SUPERVISEUR HSE SINYLON : Nouri Chahrour (0563765157)", "CHEF DE PROJET : Xie Xian", "ACCÈS CHANTIER STRICTEMENT CONTRÔLÉ"]
+        ["SUPERVISEUR HSE : Nouri Chahrour (0563765157)", "CHEF PROJET : Xie Xian", "ACCÈS : BADGES & EPI OBLIGATOIRES"]
     ]
-    t_foot = Table(foot_data, colWidths=[205, 170, 165])
+    t_foot = Table(foot_data, colWidths=[224, 140, 170])
     t_foot.setStyle(TableStyle([
         ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#0f172a')),
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f1f5f9')),
         ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 7.5),
+        ('FONTSIZE', (0,0), (-1,-1), 7.2),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
         ('TOPPADDING', (0,0), (-1,-1), 3),
         ('BOTTOMPADDING', (0,0), (-1,-1), 3),
@@ -795,7 +795,7 @@ table.alg-table td {{
                     <th style="width:30px;text-align:center;">N°</th>
                     <th style="width:85px;">MATRICULE</th>
                     <th>NOM &amp; PRÉNOM</th>
-                    <th>FONCTION OFFICIELLE</th>
+                    <th>FONCTION</th>
                     <th style="width:75px;text-align:center;">ENTREPRISE</th>
                     <th style="width:75px;text-align:center;">STATUT</th>
                 </tr>
@@ -838,7 +838,7 @@ table.alg-table td {{
                     <th style="width:30px;text-align:center;">N°</th>
                     <th style="width:85px;">MATRICULE</th>
                     <th>NOM &amp; PRÉNOM</th>
-                    <th>FONCTION OFFICIELLE</th>
+                    <th>FONCTION</th>
                     <th style="width:75px;text-align:center;">ENTREPRISE</th>
                     <th style="width:75px;text-align:center;">STATUT</th>
                 </tr>
