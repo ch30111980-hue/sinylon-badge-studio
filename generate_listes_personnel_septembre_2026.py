@@ -517,20 +517,20 @@ def generate_chantier_doc(chinese, algerians):
         with open(LOGO_PATH, 'rb') as lf:
             logo_b64 = base64.b64encode(lf.read()).decode('utf-8')
 
-    # --- REPORTLAB AFFICHE CHANTIER (1 PAGE A4) ---
+    # --- REPORTLAB AFFICHE CHANTIER (2 PAGES A4 — UNE SEULE LISTE CONTINUE) ---
     doc = SimpleDocTemplate(
         pdf_path,
         pagesize=A4,
-        leftMargin=8*mm,
-        rightMargin=8*mm,
-        topMargin=6*mm,
-        bottomMargin=6*mm
+        leftMargin=10*mm,
+        rightMargin=10*mm,
+        topMargin=8*mm,
+        bottomMargin=8*mm
     )
     story = []
 
-    # En-tête sans trait
+    # --- PAGE 1 CHANTIER ---
     head_data = [
-        [RLImage(LOGO_PATH, width=46, height=40) if os.path.exists(LOGO_PATH) else "SINYLON",
+        [RLImage(LOGO_PATH, width=48, height=42) if os.path.exists(LOGO_PATH) else "SINYLON",
          Paragraph("<b>AFFICHAGE CHANTIER — PERSONNEL AUTORISÉ</b><br/><font size=11 color='#1e3a8a'><b>SINYLON · PROJET STELLANTIS K9 CKD0</b></font><br/><font size=8.5 color='#15803d'><b>🟢 MOIS DE SEPTEMBRE 2026 (DU 01/09/2026 AU 30/09/2026 — RENOUVELABLE)</b></font>", ParagraphStyle('PH', fontName='Helvetica', alignment=1, leading=14)),
          RLImage(qr_temp, width=50, height=50)]
     ]
@@ -542,14 +542,14 @@ def generate_chantier_doc(chinese, algerians):
         ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(t_h)
-    story.append(Spacer(1, 1.5*mm))
+    story.append(Spacer(1, 2*mm))
 
-    # Grand QR Code
+    # Grand QR Code d'en-tête
     qr_info_data = [
-        [RLImage(qr_temp, width=80, height=80),
-         Paragraph(f"<b>📱 SCANNEZ CE QR CODE POUR CONTRÔLER LES {len(chinese)+len(algerians)} INTERVENANTS</b><br/><font size=8 color='#334155'>Vérification instantanée sur smartphone : validité, photos et habilitations de sécurité certifiées.</font><br/><font size=7.5 color='#1e3a8a'><i>{chantier_url}</i></font><br/><font size=8 color='#dc2626'><b>Badges &amp; EPI obligatoires · Urgence HSE Sinylon : 0563765157</b></font>", ParagraphStyle('QRT', fontName='Helvetica', fontSize=9, leading=12))]
+        [RLImage(qr_temp, width=65, height=65),
+         Paragraph(f"<b>📱 SCANNEZ CE QR CODE POUR CONTRÔLER LES {len(chinese)+len(algerians)} INTERVENANTS EN DIRECT</b><br/><font size=8 color='#334155'>Vérification instantanée sur smartphone : validité, photos et habilitations de sécurité certifiées.</font><br/><font size=7.5 color='#1e3a8a'><i>{chantier_url}</i></font><br/><font size=8 color='#dc2626'><b>Port des badges et des EPI obligatoires · Urgence HSE Sinylon : 0563765157</b></font>", ParagraphStyle('QRT', fontName='Helvetica', fontSize=8.5, leading=11.5))]
     ]
-    t_qr = Table(qr_info_data, colWidths=[90, 450])
+    t_qr = Table(qr_info_data, colWidths=[75, 465])
     t_qr.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f8fafc')),
@@ -558,16 +558,85 @@ def generate_chantier_doc(chinese, algerians):
         ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(t_qr)
+    story.append(Spacer(1, 2.5*mm))
+
+    # 54 TRAVAILLEURS CHINOIS — 1ÈRE PARTIE (N° 01 À 27) EN LISTE UNIQUE
+    story.append(Paragraph(f"<b>1. ÉQUIPE CHANTIER SINYLON ({len(chinese)} INTERVENANTS) — 1ÈRE PARTIE (N° 01 À 27) :</b>", ParagraphStyle('SC1', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#0f172a'))))
+    story.append(Spacer(1, 1.5*mm))
+
+    t_data_c1 = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]]
+    for idx, w in enumerate(chinese[:27]):
+        t_data_c1.append([
+            f"{idx+1:02d}", w['mat'], f"{w['nom']} {w['prenom']}", w['fonction'], "SINYLON", "🟢 AUTORISÉ"
+        ])
+    tc1 = Table(t_data_c1, colWidths=[28, 75, 175, 145, 60, 60])
+    tc1.setStyle(TableStyle([
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0f172a')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,-1), 7.2),
+        ('ALIGN', (0,0), (1,-1), 'CENTER'),
+        ('ALIGN', (4,0), (-1,-1), 'CENTER'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 1.8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 1.8),
+    ]))
+    story.append(tc1)
+
+    story.append(PageBreak())
+
+    # --- PAGE 2 CHANTIER ---
+    head_p2 = [
+        [RLImage(LOGO_PATH, width=38, height=33) if os.path.exists(LOGO_PATH) else "SINYLON",
+         Paragraph("<b>AFFICHAGE CHANTIER — SUITE DE LA LISTE DU PERSONNEL AUTORISÉ</b><br/><font size=8 color='#64748b'>Sinylon · Projet Stellantis K9 CKD0 Tafraoui (Septembre 2026)</font>", ParagraphStyle('HDesc2', fontName='Helvetica', fontSize=9, leading=12)),
+         RLImage(qr_temp, width=38, height=38)]
+    ]
+    t_head_p2 = Table(head_p2, colWidths=[55, 435, 55])
+    t_head_p2.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('ALIGN', (0,0), (0,0), 'CENTER'),
+        ('ALIGN', (2,0), (2,0), 'CENTER'),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+    ]))
+    story.append(t_head_p2)
     story.append(Spacer(1, 2*mm))
 
-    # SECTION LOCAUX ALGÉRIENS
-    story.append(Paragraph("<b>🇩🇿 PERSONNEL LOCAL ALGÉRIEN AUTORISÉ (5 PERSONNES) :</b>", ParagraphStyle('SA', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#15803d'))))
-    story.append(Spacer(1, 1*mm))
+    # 54 TRAVAILLEURS CHINOIS — 2ÈME PARTIE (N° 28 À 54)
+    story.append(Paragraph(f"<b>ÉQUIPE CHANTIER SINYLON — 2ÈME PARTIE (N° 28 À {len(chinese)}) :</b>", ParagraphStyle('SC2', fontName='Helvetica-Bold', fontSize=9, leading=11, textColor=HexColor('#0f172a'))))
+    story.append(Spacer(1, 1.5*mm))
 
-    alg_rows = [["MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT"]]
-    for a in algerians:
-        alg_rows.append([a['mat'], f"{a['nom']} {a['prenom']}", a['fonction'], "SINYLON", "🟢 VALIDÉ"])
-    t_alg_cha = Table(alg_rows, colWidths=[75, 200, 160, 55, 50])
+    t_data_c2 = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]]
+    for idx, w in enumerate(chinese[27:]):
+        t_data_c2.append([
+            f"{idx+28:02d}", w['mat'], f"{w['nom']} {w['prenom']}", w['fonction'], "SINYLON", "🟢 AUTORISÉ"
+        ])
+    tc2 = Table(t_data_c2, colWidths=[28, 75, 175, 145, 60, 60])
+    tc2.setStyle(TableStyle([
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0f172a')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,-1), 7.2),
+        ('ALIGN', (0,0), (1,-1), 'CENTER'),
+        ('ALIGN', (4,0), (-1,-1), 'CENTER'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 1.8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 1.8),
+    ]))
+    story.append(tc2)
+    story.append(Spacer(1, 3*mm))
+
+    # SECTION 2 COLLÉE : PERSONNEL LOCAL ALGÉRIEN
+    story.append(Paragraph("<b>2. PERSONNEL LOCAL ALGÉRIEN AUTORISÉ — 5 PERSONNES :</b>", ParagraphStyle('SA', fontName='Helvetica-Bold', fontSize=9.5, leading=12, textColor=HexColor('#15803d'))))
+    story.append(Spacer(1, 1.5*mm))
+
+    alg_rows = [["N°", "MATRICULE", "NOM & PRÉNOM", "FONCTION OFFICIELLE", "ENTREPRISE", "STATUT CHANTIER"]]
+    for idx, a in enumerate(algerians):
+        alg_rows.append([
+            f"{idx+1:02d}", a['mat'], f"{a['nom']} {a['prenom']}", a['fonction'], "SINYLON", "🟢 ACTIF & VALIDÉ"
+        ])
+    t_alg_cha = Table(alg_rows, colWidths=[28, 75, 175, 145, 60, 60])
     t_alg_cha.setStyle(TableStyle([
         ('GRID', (0,0), (-1,-1), 0.8, colors.HexColor('#15803d')),
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#15803d')),
@@ -575,76 +644,31 @@ def generate_chantier_doc(chinese, algerians):
         ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
         ('FONTSIZE', (0,0), (-1,-1), 7.5),
         ('BACKGROUND', (0,1), (-1,-1), colors.HexColor('#f0fdf4')),
-        ('ALIGN', (0,0), (0,-1), 'CENTER'),
-        ('ALIGN', (3,0), (-1,-1), 'CENTER'),
+        ('ALIGN', (0,0), (1,-1), 'CENTER'),
+        ('ALIGN', (4,0), (-1,-1), 'CENTER'),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('TOPPADDING', (0,0), (-1,-1), 1.5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 1.5),
+        ('TOPPADDING', (0,0), (-1,-1), 2.2),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 2.2),
     ]))
     story.append(t_alg_cha)
-    story.append(Spacer(1, 2*mm))
-
-    # 54 TRAVAILLEURS CHINOIS (2 COLONNES ÉQUILIBRÉES DE 27)
-    story.append(Paragraph(f"<b>ÉQUIPE CHANTIER SINYLON ({len(chinese)} INTERVENANTS) :</b>", ParagraphStyle('SC', fontName='Helvetica-Bold', fontSize=8.5, leading=10, textColor=HexColor('#0f172a'))))
-    story.append(Spacer(1, 1*mm))
-
-    half = len(chinese) // 2
-    t_data_c1 = [["MATRICULE", "NOM & PRÉNOM", "FONCTION"]]
-    for w in chinese[:half]:
-        t_data_c1.append([w['mat'], f"{w['nom']} {w['prenom']}"[:19], w['fonction'][:22]])
-    tc1 = Table(t_data_c1, colWidths=[65, 115, 90])
-    tc1.setStyle(TableStyle([
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0f172a')),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 5.8),
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('TOPPADDING', (0,0), (-1,-1), 0.7),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 0.7),
-    ]))
-
-    t_data_c2 = [["MATRICULE", "NOM & PRÉNOM", "FONCTION"]]
-    for w in chinese[half:]:
-        t_data_c2.append([w['mat'], f"{w['nom']} {w['prenom']}"[:19], w['fonction'][:22]])
-    tc2 = Table(t_data_c2, colWidths=[65, 115, 90])
-    tc2.setStyle(TableStyle([
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#0f172a')),
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0f172a')),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 5.8),
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('TOPPADDING', (0,0), (-1,-1), 0.7),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 0.7),
-    ]))
-
-    t_double = Table([[tc1, tc2]], colWidths=[270, 270])
-    t_double.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('LEFTPADDING', (0,0), (-1,-1), 0),
-        ('RIGHTPADDING', (0,0), (-1,-1), 0),
-    ]))
-    story.append(t_double)
-    story.append(Spacer(1, 2*mm))
+    story.append(Spacer(1, 4*mm))
 
     foot_data = [
-        ["SUPERVISEUR HSE : Nouri Chahrour (0563765157)", "CHEF DE PROJET : Xie Xian", "ACCÈS CHANTIER STRICTEMENT CONTRÔLÉ"]
+        ["SUPERVISEUR HSE SINYLON : Nouri Chahrour (0563765157)", "CHEF DE PROJET : Xie Xian", "ACCÈS CHANTIER STRICTEMENT CONTRÔLÉ"]
     ]
-    t_foot = Table(foot_data, colWidths=[200, 170, 170])
+    t_foot = Table(foot_data, colWidths=[205, 170, 165])
     t_foot.setStyle(TableStyle([
         ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#0f172a')),
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#f1f5f9')),
         ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 7),
+        ('FONTSIZE', (0,0), (-1,-1), 7.5),
         ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('TOPPADDING', (0,0), (-1,-1), 2),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+        ('TOPPADDING', (0,0), (-1,-1), 3),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
     ]))
     story.append(t_foot)
-
     doc.build(story)
-    print(f"Succès : PDF Chantier généré -> {pdf_path}")
+    print(f"Succès : PDF Chantier généré (Une seule liste unifiée) -> {pdf_path}")
 
     # --- HTML CHANTIER ---
     html_content = f"""<!DOCTYPE html>
@@ -703,40 +727,29 @@ table.alg-table th {{
 }}
 table.alg-table td {{
     border: 1px solid #86efac; padding: 2.5px 6px; font-weight: 700; background: #fff;
+    border: 1px solid #86efac; padding: 3.5px 6px; font-weight: 700; background: #fff;
 }}
-.grid-2 {{
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 3px 0;
-}}
-table.worker-table {{
-    width: 100%; border-collapse: collapse; font-size: 7.5px;
-}}
-table.worker-table th {{
-    background: #0f172a; color: #fff; padding: 2px 4px; text-align: left; font-size: 7px;
-}}
-table.worker-table td {{
-    border: 1px solid #cbd5e1; padding: 1.5px 4px;
-}}
-table.worker-table tr:nth-child(even) {{ background: #f8fafc; }}
 
 .p-footer {{
-    border-top: 1.5px solid #0f172a; padding-top: 4px; display: flex;
-    justify-content: space-between; font-size: 8px; font-weight: 700;
+    border-top: 1.5px solid #0f172a; padding-top: 6px; display: flex;
+    justify-content: space-between; font-size: 8px; font-weight: 700; color: #334155;
 }}
 @media print {{
     body {{ background: #fff; }}
     .no-print {{ display: none !important; }}
-    .poster-a4 {{ margin: 0; border: 2.5mm solid #000; box-shadow: none; height: 297mm; }}
+    .page-a4 {{ margin: 0; border: none; box-shadow: none; min-height: 297mm; height: 297mm; padding: 8mm 10mm; }}
 }}
 </style>
 </head>
 <body>
 <div class="no-print">
-    <button onclick="window.print()">🖨️ IMPRIMER L'AFFICHE CHANTIER A4</button>
+    <button onclick="window.print()">🖨️ IMPRIMER L'AFFICHE CHANTIER (UNE SEULE LISTE — 2 PAGES A4)</button>
 </div>
 
-<div class="poster-a4">
+<!-- PAGE 1 / 2 -->
+<div class="page-a4">
     <div>
-        <div class="p-header">
+        <div class="header-row">
             <div style="display:flex;align-items:center;gap:10px;">
                 <img src="data:image/png;base64,{logo_b64}" style="height:44px;width:auto;" alt="Logo Sinylon">
                 <div>
@@ -750,64 +763,110 @@ table.worker-table tr:nth-child(even) {{ background: #f8fafc; }}
             </div>
         </div>
 
-        <div class="p-title">
+        <div class="title-block">
             <h1>AFFICHAGE CHANTIER — PERSONNEL AUTORISÉ</h1>
             <h2>CONTRÔLE D'ACCÈS &amp; VÉRIFICATION SÉCURITÉ DES ÉQUIPES</h2>
             <div class="status-pill">
-                🟢 VALIDITÉ DU 01/09/2026 AU 30/09/2026 (RENOUVELABLE CHAQUE MOIS DU 1ER AU 30)
+                🟢 VALIDITÉ DU 01/09/2026 AU 30/09/2026 (RENOUVELABLE CHAQUE MOIS DU 1ER AU 30) — TOTAL : {len(chinese)+len(algerians)} PERSONNES
             </div>
         </div>
 
         <div class="qr-row">
-            <img src="data:image/png;base64,{qr_b64}" style="width:75px;height:75px;" alt="QR Code Chantier">
-            <div style="font-size:10px;line-height:1.3;">
-                <strong style="font-size:12px;color:#0f172a;display:block;margin-bottom:2px;">
-                    📱 SCANNEZ CE QR CODE POUR CONTRÔLER LES {len(chinese)+len(algerians)} INTERVENANTS
+            <img src="data:image/png;base64,{qr_b64}" style="width:65px;height:65px;" alt="QR Code Chantier">
+            <div style="font-size:9.5px;line-height:1.35;">
+                <strong style="font-size:11.5px;color:#0f172a;display:block;margin-bottom:2px;">
+                    📱 SCANNEZ CE QR CODE POUR CONTRÔLER LES {len(chinese)+len(algerians)} INTERVENANTS EN DIRECT
                 </strong>
-                Chaque agent de sécurité ou superviseur HSE peut vérifier en direct sur son smartphone les photos, fiches et habilitations certifiées.
-                <div style="font-family:monospace;color:#1e3a8a;font-size:8.5px;margin-top:3px;">
+                Chaque agent de sécurité ou superviseur HSE peut vérifier en direct sur smartphone les photos, fiches et habilitations certifiées.
+                <div style="font-family:monospace;color:#1e3a8a;font-size:8px;margin-top:2px;">
                     {chantier_url}
                 </div>
             </div>
         </div>
 
+        <!-- 54 CHINOIS SINYLON : 1ÈRE PARTIE -->
+        <div style="font-size:9.5px;font-weight:900;color:#0f172a;margin:6px 0 4px 0;">
+            1. ÉQUIPE CHANTIER SINYLON ({len(chinese)} INTERVENANTS) — 1ÈRE PARTIE (N° 01 À 27) :
+        </div>
+
+        <table class="worker-table">
+            <thead>
+                <tr>
+                    <th style="width:30px;text-align:center;">N°</th>
+                    <th style="width:85px;">MATRICULE</th>
+                    <th>NOM &amp; PRÉNOM</th>
+                    <th>FONCTION OFFICIELLE</th>
+                    <th style="width:75px;text-align:center;">ENTREPRISE</th>
+                    <th style="width:75px;text-align:center;">STATUT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {"".join([f"<tr><td style='text-align:center;font-weight:bold;'>{i+1:02d}</td><td style='font-family:monospace;font-weight:bold;color:#1e3a8a;'>{w['mat']}</td><td><strong>{w['nom']}</strong> {w['prenom']}</td><td>{w['fonction']}</td><td style='text-align:center;'>SINYLON</td><td style='text-align:center;color:#15803d;font-weight:bold;'>🟢 AUTORISÉ</td></tr>" for i, w in enumerate(chinese[:27])])}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="p-footer">
+        <div>Superviseur HSE Sinylon : <strong>Nouri Chahrour (0563765157)</strong></div>
+        <div>Page 1 / 2 — Suite de la liste en Page 2</div>
+        <div>Accès Chantier : <strong>Badges &amp; EPI Obligatoires</strong></div>
+    </div>
+</div>
+
+<!-- PAGE 2 / 2 -->
+<div class="page-a4">
+    <div>
+        <div class="header-row">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <img src="data:image/png;base64,{logo_b64}" style="height:40px;width:auto;" alt="Logo Sinylon">
+                <div>
+                    <div style="font-size:16px;font-weight:900;">SINYLON — SUITE DU REGISTRE CHANTIER</div>
+                    <div style="font-size:8.5px;color:#475569;font-weight:700;">PROJET K9 CKD0 STELLANTIS (SEPTEMBRE 2026)</div>
+                </div>
+            </div>
+            <img src="data:image/png;base64,{qr_b64}" style="width:40px;height:40px;" alt="QR Code">
+        </div>
+
+        <!-- 54 CHINOIS SINYLON : 2ÈME PARTIE -->
+        <div style="font-size:9.5px;font-weight:900;color:#0f172a;margin:6px 0 4px 0;">
+            ÉQUIPE CHANTIER SINYLON — 2ÈME PARTIE (N° 28 À {len(chinese)}) :
+        </div>
+
+        <table class="worker-table">
+            <thead>
+                <tr>
+                    <th style="width:30px;text-align:center;">N°</th>
+                    <th style="width:85px;">MATRICULE</th>
+                    <th>NOM &amp; PRÉNOM</th>
+                    <th>FONCTION OFFICIELLE</th>
+                    <th style="width:75px;text-align:center;">ENTREPRISE</th>
+                    <th style="width:75px;text-align:center;">STATUT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {"".join([f"<tr><td style='text-align:center;font-weight:bold;'>{i+28:02d}</td><td style='font-family:monospace;font-weight:bold;color:#1e3a8a;'>{w['mat']}</td><td><strong>{w['nom']}</strong> {w['prenom']}</td><td>{w['fonction']}</td><td style='text-align:center;'>SINYLON</td><td style='text-align:center;color:#15803d;font-weight:bold;'>🟢 AUTORISÉ</td></tr>" for i, w in enumerate(chinese[27:])])}
+            </tbody>
+        </table>
+
         <!-- SECTION LOCAUX ALGÉRIENS -->
         <div class="alg-box">
-            <div style="font-size:10px;font-weight:900;color:#15803d;margin-bottom:3px;display:flex;justify-content:space-between;">
-                <span>🇩🇿 PERSONNEL LOCAL ALGÉRIEN AUTORISÉ ({len(algerians)} PERSONNES) :</span>
+            <div class="alg-header">
+                <span>🇩🇿 2. PERSONNEL LOCAL ALGÉRIEN AUTORISÉ ({len(algerians)} PERSONNES) :</span>
                 <span>TOUS CONFORMES HSE &amp; SÉCURITÉ</span>
             </div>
             <table class="alg-table">
                 <thead>
                     <tr>
-                        <th style="width:75px;">MATRICULE</th>
+                        <th style="width:30px;text-align:center;">N°</th>
+                        <th style="width:85px;">MATRICULE</th>
                         <th>NOM &amp; PRÉNOM</th>
                         <th>FONCTION OFFICIELLE</th>
-                        <th style="width:85px;">ENTREPRISE</th>
-                        <th style="width:75px;">STATUT</th>
+                        <th style="width:75px;text-align:center;">ENTREPRISE</th>
+                        <th style="width:75px;text-align:center;">STATUT</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {"".join([f"<tr><td style='font-family:monospace;color:#1e3a8a;'>{a['mat']}</td><td><strong>{a['nom']}</strong> {a['prenom']}</td><td>{a['fonction']}</td><td>SINYLON</td><td style='color:#15803d;'>🟢 AUTORISÉ</td></tr>" for a in algerians])}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- 54 CHINOIS SINYLON -->
-        <div style="font-size:8.5px;font-weight:900;color:#0f172a;margin:3px 0 2px 0;">
-            ÉQUIPE CHANTIER SINYLON ({len(chinese)} INTERVENANTS) :
-        </div>
-        <div class="grid-2">
-            <table class="worker-table">
-                <thead><tr><th>MATRICULE</th><th>NOM &amp; PRÉNOM</th><th>FONCTION</th></tr></thead>
-                <tbody>
-                    {"".join([f"<tr><td style='font-family:monospace;font-weight:bold;'>{w['mat']}</td><td><strong>{w['nom']}</strong> {w['prenom']}</td><td>{w['fonction']}</td></tr>" for w in chinese[:27]])}
-                </tbody>
-            </table>
-            <table class="worker-table">
-                <thead><tr><th>MATRICULE</th><th>NOM &amp; PRÉNOM</th><th>FONCTION</th></tr></thead>
-                <tbody>
-                    {"".join([f"<tr><td style='font-family:monospace;font-weight:bold;'>{w['mat']}</td><td><strong>{w['nom']}</strong> {w['prenom']}</td><td>{w['fonction']}</td></tr>" for w in chinese[27:]])}
+                    {"".join([f"<tr><td style='text-align:center;font-weight:bold;'>{i+1:02d}</td><td style='font-family:monospace;color:#1e3a8a;font-weight:bold;'>{a['mat']}</td><td><strong>{a['nom']}</strong> {a['prenom']}</td><td>{a['fonction']}</td><td style='text-align:center;'>SINYLON</td><td style='text-align:center;color:#15803d;font-weight:bold;'>🟢 AUTORISÉ</td></tr>" for i, a in enumerate(algerians)])}
                 </tbody>
             </table>
         </div>
